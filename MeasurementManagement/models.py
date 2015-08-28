@@ -92,6 +92,7 @@ class MeasurementDevice(models.Model):
 class Measurement(models.Model):
     date = models.DateTimeField()
     order = models.ForeignKey(MeasurementOrder)
+    order_items = models.ManyToManyField(CharacteristicValueDescription)
     examiner = models.ForeignKey(User)
     remarks = models.TextField()
     meas_item = models.ForeignKey(MeasurementItem)
