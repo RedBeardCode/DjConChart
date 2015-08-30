@@ -1,11 +1,12 @@
-from django.shortcuts import render
-
 # Create your views here.
 
-from django.views.generic import FormView
+from django.views.generic import CreateView
 
-from .forms import MeasurementForm
+from .models import Measurement
 
-class MeasurementView(FormView):
+
+class MeasurementView(CreateView):
     template_name = "new_measurement.html"
-    form_class = MeasurementForm
+    model = Measurement
+    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
+              'meas_item', 'measurement_devices', 'raw_data_file']
