@@ -11,20 +11,18 @@
     <script type="text/javascript" src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/calendar.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/actions.js" %}"></script>
-    <script type="text/javascript" src="{% static "admin/js/admin/DateTimeShortcuts.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/related-widget-wrapper.js" %}"></script>
+
+    </script>
 {% endblock %}
 {% block content %}
 
-    <form method="post">
+    <form; method = "post" >
         {% csrf_token %}
 
         {{ form|crispy }}
 
-        <button type="submit">Submit</button>
-    </form>
+        < button; class= "btn btn-default"; type = "submit" > Submit < / button >
+        < / form >;
 
-{% endblock %}
-
-{% block page_scripts %}
 {% endblock %}
