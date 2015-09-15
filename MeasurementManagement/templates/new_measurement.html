@@ -9,14 +9,11 @@
     <script type="text/javascript" src="/admin/jsi18n/"></script>
     <script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
-    <script type="text/javascript" src="{% static "admin/js/calendar.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/actions.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/related-widget-wrapper.js" %}"></script>
 
-    </script>
 {% endblock %}
 {% block content %}
-
     <form; method = "post" >
         {% csrf_token %}
 
@@ -25,4 +22,32 @@
         < button; class= "btn btn-default"; type = "submit" > Submit < / button >
         < / form >;
 
+{% endblock %}
+
+{% block inlinescripts %}
+    <script type="text/javascript">
+
+        function get_order_items() {
+            var order_pk = $('#id_order').val();
+            $.ajax({
+                url: '{% url "get_order_info" %}',
+                success: function (data, textStatus, XMLHttpRequest) {
+                    var order_items = data.order_items;
+                    $("#id_order_items").children().remove();
+
+                    for (var item in order_items) {
+                        $("#id_order_items").append("<option value='" + order_items[item].pk + "'>" + order_items[item].label + "</option>");
+                    }
+                },
+                type: 'POST',
+                data: {order: order_pk},
+                datatype: 'JSON',
+            });
+        }
+        $(document).ready(function () {
+            $("#id_order_items").children().remove();
+            $("#id_order_items").append("<option value='-1'> Please select first the order</option>");
+            init_ajax_csrf();
+        });
+    </script>
 {% endblock %}
