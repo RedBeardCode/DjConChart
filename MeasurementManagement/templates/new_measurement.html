@@ -14,13 +14,13 @@
 
 {% endblock %}
 {% block content %}
-    <form; method = "post" >
+    <form method="post">
         {% csrf_token %}
 
         {{ form|crispy }}
 
-        < button; class= "btn btn-default"; type = "submit" > Submit < / button >
-        < / form >;
+        <button class="btn btn-default" type="submit"> Submit</button>
+    </form>
 
 {% endblock %}
 
@@ -32,12 +32,20 @@
             $.ajax({
                 url: '{% url "get_order_info" %}',
                 success: function (data, textStatus, XMLHttpRequest) {
-                    var order_items = data.order_items;
                     $("#id_order_items").children().remove();
-
-                    for (var item in order_items) {
-                        $("#id_order_items").append("<option value='" + order_items[item].pk + "'>" + order_items[item].label + "</option>");
+                    for (var item in data.order_items) {
+                        $("#id_order_items").append("<option value='" + data.order_items[item][0] + "'>" + data.order_items[item][1] + "</option>");
                     }
+
+                    $("#id_measurement_devices").children().remove();
+                    for (var device in data.meas_devices) {
+                        $("#id_measurement_devices").append("<option value='" + data.meas_devices[device][0] + "'>" + data.meas_devices[device][1] + "</option>");
+                    }
+                    $("#id_meas_item").children().remove();
+                    for (var meas_item in data.meas_items) {
+                        $("#id_meas_item").append("<option value='" + data.meas_items[meas_item][0] + "'>" + data.meas_items[meas_item][1] + "</option>");
+                    }
+
                 },
                 type: 'POST',
                 data: {order: order_pk},
@@ -46,7 +54,12 @@
         }
         $(document).ready(function () {
             $("#id_order_items").children().remove();
+            $("#id_meas_item").children().remove();
+            $("#id_measurement_devices").children().remove();
+
             $("#id_order_items").append("<option value='-1'> Please select first the order</option>");
+            $("#id_meas_item").append("<option value='-1'> Please select first the order</option>");
+            $("#id_measurement_devices").append("<option value='-1'> Please select first the order</option>");
             init_ajax_csrf();
         });
     </script>

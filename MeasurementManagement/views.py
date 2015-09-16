@@ -23,12 +23,23 @@ class MeasurementView(CreateView):
 
 
 def get_ajax_order_info(request):
-    items_response = [{'pk': -1, 'label': 'Please select first the order'}]
+    start_tuple = (-1, 'Please select first the order')
+    items_response = {'order_items': [start_tuple], 'meas_devices': [start_tuple], 'meas_items': [start_tuple]}
     if request.is_ajax() and request.method == 'POST' and request.POST['order']:
-        items_response = []
+        order_items_response = []
+        meas_devices_response = []
+        meas_item_response = []
         order_pk = int(request.POST['order'])
         order = MeasurementOrder.objects.get(pk=order_pk)
-        items = order.order_type.charateristic_values.all()
-        for item in items:
-            items_response.append({'pk': item.pk, 'label': item.description})
-    return JsonResponse({'order_items': items_response})
+        order_items = order.order_type.charateristic_values.all()
+        meas_items = order.measurement_items.all()
+        for item in order_items:
+            devices = item.possible_meas_devices.all()
+            for dev in devices:
+                meas_devices_response.append((dev.pk, str(dev)))
+            order_items_response.append((item.pk, item.description))
+        for item in meas_items:
+            meas_item_response.append((item.pk, str(item)))
+        return JsonResponse({'order_items': order_items_response, 'meas_devices': meas_devices_response,
+                             'meas_items': meas_item_response}, )
+    return JsonResponse(items_response)

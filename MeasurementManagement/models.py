@@ -3,7 +3,18 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+class MeasurementDevice(models.Model):
+    name = models.TextField()
+    sn = models.CharField(max_length=11)
 
+    def __unicode__(self):
+        return self.name + ": " + self.sn
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __repr__(self):
+        return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 class CalculationRule(models.Model):
     rule_name = models.TextField(verbose_name='Name of the calculation rule')
@@ -26,6 +37,7 @@ class CharacteristicValueDescription(models.Model):
     value_name = models.TextField(verbose_name='Name of the characterisitc value')
     description = models.TextField(verbose_name='Description of the characteristic value')
     calculation_rule = models.ForeignKey(CalculationRule)
+    possible_meas_devices = models.ManyToManyField(MeasurementDevice)
 
     def __unicode__(self):
         return  self.value_name
@@ -35,6 +47,7 @@ class CharacteristicValueDescription(models.Model):
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.value_name + '>'
+
 
 class MeasurementItem(models.Model):
     sn = models.CharField(max_length=11)
@@ -65,8 +78,10 @@ class MeasurementOrderDefinition(models.Model):
 class MeasurementOrder(models.Model):
     date = models.DateTimeField()
     order_type = models.ForeignKey(MeasurementOrderDefinition)
+    measurement_items = models.ManyToManyField(MeasurementItem)
+
     def __unicode__(self):
-        return  self.order_type.name + 'from ' + str(self.date  )
+        return self.order_type.name + ' from ' + str(self.date)
 
     def __str__(self):
         return str(self.__unicode__())
@@ -75,18 +90,6 @@ class MeasurementOrder(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 
-class MeasurementDevice(models.Model):
-    name = models.TextField()
-    sn = models.CharField(max_length=11)
-
-    def __unicode__(self):
-        return  self.name +  self.sn
-
-    def __str__(self):
-        return str(self.__unicode__())
-
-    def __repr__(self):
-        return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 
 class Measurement(models.Model):

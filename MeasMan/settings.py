@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'reversion',
     'crispy_forms',
     'MeasurementManagement',
+   # 'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
