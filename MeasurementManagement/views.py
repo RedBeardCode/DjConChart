@@ -1,9 +1,11 @@
 # Create your views here.
+from datetime import datetime
+
 from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse
 
-from .models import Measurement, CharacteristicValueDescription, MeasurementOrder
+from .models import Measurement, MeasurementOrder
 
 
 class MeasurementView(CreateView):
@@ -15,10 +17,11 @@ class MeasurementView(CreateView):
     def get_form(self, form_class=None):
         form = super(MeasurementView, self).get_form(form_class)
         field = form.fields['date']
+        field.initial = datetime.now()
         field.widget = AdminSplitDateTime()
         form.fields['date'] = field
         form.fields['order'].widget.attrs.update({'onchange': 'get_order_items();'})
-        form.fields['order_items'].queryset = CharacteristicValueDescription.objects.none()
+        form.fields['examiner'].initial = self.request.user
         return form
 
 
