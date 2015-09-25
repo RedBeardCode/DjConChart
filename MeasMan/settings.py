@@ -40,7 +40,7 @@ INSTALLED_APPS = (
     'reversion',
     'crispy_forms',
     'MeasurementManagement',
-   # 'debug_toolbar',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -118,3 +118,4 @@ LOGOUT_URL = 'mysite_logout'
 LOGIN_REDIRECT_URL = '/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': ''}
