@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 from selenium import webdriver
-
 from selenium.webdriver.support.ui import Select
 
 from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefinition, CharacteristicValueDescription
@@ -26,22 +25,28 @@ def login_as_admin(selenium):
 
 def create_correct_sample_data():
     calc_rule = CalculationRule.objects.create(rule_name="dummy", rule_code='def dummy():\n    return True\n')
-    devices = [MeasurementDevice.objects.create(sn=i, name=str(i)) for i in range(5)]
+    devices = [MeasurementDevice.objects.create(sn=i, name='Device {:d}'.format(i)) for i in range(5)]
     length = CharacteristicValueDescription.objects.create(value_name='length', description='length',
                                                            calculation_rule=calc_rule)
-    length.possible_meas_devices.add(*devices)
+    length.possible_meas_devices.add(devices[0])
     width = CharacteristicValueDescription.objects.create(value_name='width', description='width',
                                                           calculation_rule=calc_rule)
-    width.possible_meas_devices.add(*devices)
+    width.possible_meas_devices.add(*(devices[:3]))
     height = CharacteristicValueDescription.objects.create(value_name='height', description='height',
                                                            calculation_rule=calc_rule)
     height.possible_meas_devices.add(*devices)
-    order_definition = MeasurementOrderDefinition.objects.create(name="OrderDefinition")
-    order_definition.charateristic_values.add(length, width, height)
+
+    order_definition1 = MeasurementOrderDefinition.objects.create(name="OrderDefinition1")
+    order_definition1.charateristic_values.add(length)
+    order_definition2 = MeasurementOrderDefinition.objects.create(name="OrderDefinition2")
+    order_definition2.charateristic_values.add(length, width)
+    order_definition3 = MeasurementOrderDefinition.objects.create(name="OrderDefinition3")
+    order_definition3.charateristic_values.add(length, width, height)
+    order_definitions = [order_definition1, order_definition2, order_definition3]
     for i in range(10):
-        item = MeasurementItem.objects.create(sn=i, name=str(1))
+        item = MeasurementItem.objects.create(sn=i, name='Item {:d}'.format(i))
         order = MeasurementOrder.objects.create(date=FAKE_TIME + datetime.timedelta(days=i),
-                                                order_type=order_definition)
+                                                order_type=order_definitions[i % 3])
         order.measurement_items.add(item)
 
 
@@ -71,7 +76,8 @@ def test_order_choice(admin_client, live_server):
     login_as_admin(selenium)
     order = Select(selenium.find_element_by_id('id_order'))
 
-    target_names = ['---------'] + ['OrderDefinition from 2020-12-{:02d} 17:05:55+00:00'.format(i + 5) for i in
+    target_names = ['---------'] + ['OrderDefinition{:d} from 2020-12-{:02d} 17:05:55+00:00'.format(i % 3 + 1, i + 5)
+                                    for i in
                                     range(10)]
     order_names = [opt.text for opt in order.options]
     assert target_names == order_names
@@ -121,4 +127,28 @@ def test_all_elements(admin_client, live_server):
     assert selenium.find_element_by_id('id_measurement_devices')
     assert selenium.find_element_by_id('id_raw_data_file')
     assert selenium.find_element_by_class_name('btn')
+    selenium.close()
+
+
+@pytest.mark.django_db
+def test_on_change_order(admin_client, live_server):
+    create_correct_sample_data()
+    selenium = webdriver.Firefox()
+    selenium.get(live_server + '/new_measurement/')
+    login_as_admin(selenium)
+    order = Select(selenium.find_element_by_id('id_order'))
+    order_items = Select(selenium.find_element_by_id('id_order_items'))
+    meas_items = Select(selenium.find_element_by_id('id_meas_item'))
+    meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
+    target_order_items = [['length'], ['length', 'width'], ['length', 'width', 'height']]
+    target_meas_items = ['Item {:d}: {:d}'.format(i, i) for i in range(10)]
+    target_meas_devices = [['Device {:d}: {:d}'.format(i, i) for i in range(1)],
+                           ['Device {:d}: {:d}'.format(i, i) for i in range(3)],
+                           ['Device {:d}: {:d}'.format(i, i) for i in range(5)]]
+
+    for i in range(10):
+        order.select_by_index(i + 1)
+        assert [ord.text for ord in order_items.options] == target_order_items[i % 3]
+        assert [item.text for item in meas_items.options] == [target_meas_items[i]]
+        assert [dev.text for dev in meas_devices.options] == target_meas_devices[i % 3]
     selenium.close()

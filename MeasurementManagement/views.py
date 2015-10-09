@@ -40,9 +40,11 @@ def get_ajax_order_info(request):
             devices = item.possible_meas_devices.all()
             for dev in devices:
                 meas_devices_response.append((dev.pk, str(dev)))
+            meas_devices_response = sorted(set(meas_devices_response))
             order_items_response.append((item.pk, item.description))
         for item in meas_items:
             meas_item_response.append((item.pk, str(item)))
+        meas_item_response = sorted(set(meas_item_response))
         return JsonResponse({'order_items': order_items_response, 'meas_devices': meas_devices_response,
                              'meas_items': meas_item_response}, )
     return JsonResponse(items_response)
