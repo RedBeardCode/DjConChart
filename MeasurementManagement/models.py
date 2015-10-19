@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import reversion as revisions
 # Create your models here.
 
 class MeasurementDevice(models.Model):
@@ -16,6 +16,8 @@ class MeasurementDevice(models.Model):
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
+
+@revisions.register
 class CalculationRule(models.Model):
     rule_name = models.TextField(verbose_name='Name of the calculation rule')
     rule_code = models.TextField(verbose_name='Pythoncode für die Auswertung')
