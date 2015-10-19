@@ -31,7 +31,13 @@ class CalculationRule(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.rule_name + '>'
 
     def calculate(self, measurements):
-        return None
+        func_name = '__calc_rule_function_{:d}'.format(self.pk)
+        code_lines = ['def ' + func_name + '(measurements):'] + ['    ' + line for line in self.rule_code.splitlines()]
+        code_lines += ['    return calculate(measurements)']
+        exec('\n'.join(code_lines))
+        self.__calc_func = locals()[func_name]
+        return self.__calc_func(measurements)
+
 
 class CharacteristicValueDescription(models.Model):
     value_name = models.TextField(verbose_name='Name of the characterisitc value')
