@@ -27,25 +27,29 @@
 {% block inlinescripts %}
     <script type="text/javascript">
 
+        function init_select(select_id, itemlist) {
+            var sel_items = $(select_id).val();
+            $(select_id).children().remove();
+            for (var item in itemlist) {
+                var value = itemlist[item][0];
+                if (sel_items != null && sel_items.indexOf(value.toString()) >= 0) {
+                    $(select_id).append("<option value='" + value + "' selected='selected'>" + itemlist[item][1] + "</option>");
+
+                }
+                else {
+                    $(select_id).append("<option value='" + value + "'>" + itemlist[item][1] + "</option>");
+                }
+            }
+            $(select_id).select(sel_items)
+        }
         function get_order_items() {
             var order_pk = $('#id_order').val();
             $.ajax({
                 url: '{% url "get_order_info" %}',
                 success: function (data, textStatus, XMLHttpRequest) {
-                    $("#id_order_items").children().remove();
-                    for (var item in data.order_items) {
-                        $("#id_order_items").append("<option value='" + data.order_items[item][0] + "'>" + data.order_items[item][1] + "</option>");
-                    }
-
-                    $("#id_measurement_devices").children().remove();
-                    for (var device in data.meas_devices) {
-                        $("#id_measurement_devices").append("<option value='" + data.meas_devices[device][0] + "'>" + data.meas_devices[device][1] + "</option>");
-                    }
-                    $("#id_meas_item").children().remove();
-                    for (var meas_item in data.meas_items) {
-                        $("#id_meas_item").append("<option value='" + data.meas_items[meas_item][0] + "'>" + data.meas_items[meas_item][1] + "</option>");
-                    }
-
+                    init_select("#id_order_items", data.order_items);
+                    init_select("#id_measurement_devices", data.meas_devices);
+                    init_select("#id_meas_item", data.meas_items);
                 },
                 type: 'POST',
                 data: {order: order_pk},
@@ -53,14 +57,23 @@
             });
         }
         $(document).ready(function () {
-            $("#id_order_items").children().remove();
-            $("#id_meas_item").children().remove();
-            $("#id_measurement_devices").children().remove();
+            var order_pk = $("#id_order").val();
 
-            $("#id_order_items").append("<option value='-1'> Please select first the order</option>");
-            $("#id_meas_item").append("<option value='-1'> Please select first the order</option>");
-            $("#id_measurement_devices").append("<option value='-1'> Please select first the order</option>");
+
             init_ajax_csrf();
+            if (order_pk) {
+                get_order_items();
+
+            }
+            else {
+                $("#id_order_items").children().remove();
+                $("#id_meas_item").children().remove();
+                $("#id_measurement_devices").children().remove();
+
+                $("#id_order_items").append("<option value='-1'> Please select first the order</option>");
+                $("#id_meas_item").append("<option value='-1'> Please select first the order</option>");
+                $("#id_measurement_devices").append("<option value='-1'> Please select first the order</option>");
+            }
         });
     </script>
 {% endblock %}
