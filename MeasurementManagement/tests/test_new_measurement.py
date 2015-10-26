@@ -2,7 +2,9 @@ import datetime
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from .utilies import login_as_admin, create_correct_sample_data
 from ..models import Measurement
@@ -110,9 +112,39 @@ def test_on_change_order(admin_client, live_server):
 
     for i in range(10):
         order.select_by_index(i + 1)
+        WebDriverWait(selenium, 10).until_not(EC.text_to_be_present_in_element((By.ID, 'id_meas_item'), '---------'))
         assert [ord.text for ord in order_items.options] == target_order_items[i % 3]
         assert [item.text for item in meas_items.options] == [target_meas_items[i]]
         assert [dev.text for dev in meas_devices.options] == target_meas_devices[i % 3]
+    selenium.close()
+
+
+@pytest.mark.django_db
+def test_reload_failed_submit(admin_client, live_server):
+    create_correct_sample_data()
+    selenium = webdriver.Firefox()
+    selenium.get(live_server + '/new_measurement/')
+    login_as_admin(selenium)
+    order = Select(selenium.find_element_by_id('id_order'))
+    order.select_by_index(1)
+    order_items = Select(selenium.find_element_by_id('id_order_items'))
+    order_items.select_by_index(0)
+    meas_items = Select(selenium.find_element_by_id('id_meas_item'))
+    meas_items.select_by_index(0)
+    meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
+    meas_devices.select_by_index(0)
+    button = selenium.find_element_by_tag_name('button')
+    button.click()
+    assert selenium.current_url == live_server.url + '/new_measurement/'
+    WebDriverWait(selenium, 10).until_not(EC.text_to_be_present_in_element((By.ID, 'id_meas_item'), '---------'))
+    reload_order = Select(selenium.find_element_by_id('id_order'))
+    assert reload_order.first_selected_option.text == reload_order.options[1].text
+    reload_order_items = Select(selenium.find_element_by_id('id_order_items'))
+    assert reload_order_items.first_selected_option.text == reload_order_items.options[0].text
+    reload_meas_items = Select(selenium.find_element_by_id('id_meas_item'))
+    assert reload_meas_items.first_selected_option.text == reload_meas_items.options[0].text
+    reload_meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
+    assert reload_meas_devices.first_selected_option.text == reload_meas_devices.options[0].text
     selenium.close()
 
 
