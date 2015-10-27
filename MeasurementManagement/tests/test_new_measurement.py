@@ -170,3 +170,26 @@ def test_submit(admin_client, live_server):
     assert selenium.current_url == live_server.url + '/'
     assert len(Measurement.objects.all()) == 1
     selenium.close()
+
+
+@pytest.mark.django_db
+def test_submit_no_remark(admin_client, live_server):
+    create_correct_sample_data()
+    selenium = webdriver.Firefox()
+    selenium.get(live_server + '/new_measurement/')
+    login_as_admin(selenium)
+    order = Select(selenium.find_element_by_id('id_order'))
+    order.select_by_index(1)
+    order_items = Select(selenium.find_element_by_id('id_order_items'))
+    order_items.select_by_index(0)
+    meas_items = Select(selenium.find_element_by_id('id_meas_item'))
+    meas_items.select_by_index(0)
+    meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
+    meas_devices.select_by_index(0)
+    file_name = selenium.find_element_by_id('id_raw_data_file')
+    file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
+    button = selenium.find_element_by_tag_name('button')
+    button.click()
+    assert selenium.current_url == live_server.url + '/'
+    assert len(Measurement.objects.all()) == 1
+    selenium.close()

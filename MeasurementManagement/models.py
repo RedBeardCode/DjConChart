@@ -97,7 +97,7 @@ class Measurement(models.Model):
     order = models.ForeignKey(MeasurementOrder, verbose_name='Measurement order')
     order_items = models.ManyToManyField(CharacteristicValueDescription, verbose_name='Item of the measurement order')
     examiner = models.ForeignKey(User)
-    remarks = models.TextField(verbose_name='Remarks')
+    remarks = models.TextField(blank=True, verbose_name='Remarks')
     meas_item = models.ForeignKey(MeasurementItem, verbose_name='Measurement item')
     measurement_devices = models.ManyToManyField(MeasurementDevice, verbose_name='Used measurement devices')
     raw_data_file = models.FileField(verbose_name='Raw data file')
