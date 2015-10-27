@@ -12,3 +12,25 @@
 
 {% endblock %}
 
+{% block inlinescripts %}
+
+    <script src="{% static "js/vendor/ace.js" type="text/javascript" %}" charset="utf-8"></script>
+    <script src="{% static "js/vendor//ext-language_tools.js" type="text/javascript" %}" charset="utf-8"></script>
+
+    <script>
+        ace.require("ace/ext/language_tools");
+        var editor = ace.edit("id_rule_code");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/python");
+        editor.setAutoScrollEditorIntoView(true);
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true,
+            maxLines: 30,
+            minLines: 30
+        });
+
+    </script>
+
+{% endblock %}

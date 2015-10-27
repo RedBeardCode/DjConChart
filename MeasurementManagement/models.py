@@ -20,7 +20,7 @@ class MeasurementDevice(models.Model):
 @revisions.register
 class CalculationRule(models.Model):
     rule_name = models.TextField(verbose_name='Name of the calculation rule')
-    rule_code = models.TextField(verbose_name='Pythoncode für die Auswertung')
+    rule_code = models.TextField(verbose_name='Python code for the analysis')
 
     def __unicode__(self):
         return self.rule_name
