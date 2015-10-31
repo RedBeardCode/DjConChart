@@ -2,7 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <form method="post">
+    <form id="calc_form" method="post">
         {% csrf_token %}
 
         {{ form|crispy }}
@@ -18,8 +18,10 @@
     <script src="{% static "js/vendor//ext-language_tools.js" type="text/javascript" %}" charset="utf-8"></script>
 
     <script>
+        var textarea = $("#id_rule_code")[0];
+        $("#id_rule_code").before('<pre id="editor"></pre>');
         ace.require("ace/ext/language_tools");
-        var editor = ace.edit("id_rule_code");
+        var editor = ace.edit("editor");
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/python");
         editor.setAutoScrollEditorIntoView(true);
@@ -30,6 +32,12 @@
             maxLines: 30,
             minLines: 30
         });
+
+        editor.setValue = textarea.value;
+        editor.getSession().on('change', function () {
+            textarea.value = editor.getSession().getValue();
+        });
+        textarea.style.display = "none";
 
     </script>
 

@@ -1,9 +1,11 @@
 # Create your views here.
 from datetime import datetime
 
+import reversion as revisions
 from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse
+from django.db import transaction
 
 from .models import Measurement, MeasurementOrder, CalculationRule
 
@@ -14,10 +16,16 @@ class NewCalculationRule(CreateView):
     fields = ['rule_name', 'rule_code']
     success_url = ''
 
-    # @transaction.atomic
-    # @revisions.create_revision
-    # def form_valid(self, form):
-    #     return super(NewCalculationRule, self).form_valid(form)
+    def get_form(self, form_class=None):
+        form = super(NewCalculationRule, self).get_form(form_class)
+        # form.fields['rule_code'].widget.attrs.update({'style': 'visibility: hidden;',
+        #                                              'rows': 0})
+        return form
+
+    @transaction.atomic
+    @revisions.create_revision
+    def form_valid(self, form):
+        return super(NewCalculationRule, self).form_valid(form)
 
 
 class MeasurementView(CreateView):
