@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import transaction
 import reversion as revisions
 # Create your models here.
 
@@ -40,6 +41,10 @@ class CalculationRule(models.Model):
         self.__calc_func = locals()[func_name]
         return self.__calc_func(measurements)
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        with transaction.atomic(), revisions.create_revision():
+            super(CalculationRule, self).save(force_insert, force_update, using, update_fields)
 
 class CharacteristicValueDescription(models.Model):
     value_name = models.TextField(verbose_name='Name of the characterisitc value')
