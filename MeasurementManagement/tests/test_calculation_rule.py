@@ -47,3 +47,15 @@ def test_create_rule_view_noname(admin_client, live_server):
         assert len(CalculationRule.objects.all()) == 0
     finally:
         selenium.close()
+
+
+@pytest.mark.django_db
+def test_rule_changed(admin_client, live_server):
+    rule = CalculationRule.objects.create(rule_name='HistTest', rule_code='def calculate(measurements):\n    pass\n')
+    assert rule.is_changed()
+    rule.save()
+    assert rule.is_changed()
+    rule.calculate([''])
+    assert not rule.is_changed()
+    rule.save()
+    assert rule.is_changed()
