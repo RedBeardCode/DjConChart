@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.db import transaction
+import reversion as revisions
 # Create your models here.
 
 class MeasurementDevice(models.Model):
@@ -16,9 +17,15 @@ class MeasurementDevice(models.Model):
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
+
+@revisions.register
 class CalculationRule(models.Model):
     rule_name = models.TextField(verbose_name='Name of the calculation rule')
-    rule_code = models.TextField(verbose_name='Pythoncode für die Auswertung')
+    rule_code = models.TextField(verbose_name='Python code for the analysis')
+
+    def __init__(self, *args, **kwargs):
+        super(CalculationRule, self).__init__(*args, **kwargs)
+        self.__is_changed = True
 
     def __unicode__(self):
         return self.rule_name
@@ -31,7 +38,22 @@ class CalculationRule(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.rule_name + '>'
 
     def calculate(self, measurements):
-        return None
+        func_name = '__calc_rule_function_{:d}'.format(self.pk)
+        code_lines = ['def ' + func_name + '(measurements):'] + ['    ' + line for line in self.rule_code.splitlines()]
+        code_lines += ['    return calculate(measurements)']
+        exec('\n'.join(code_lines))
+        self.__calc_func = locals()[func_name]
+        self.__is_changed = False
+        return self.__calc_func(measurements)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.__is_changed = True
+        with transaction.atomic(), revisions.create_revision():
+            super(CalculationRule, self).save(force_insert, force_update, using, update_fields)
+
+    def is_changed(self):
+        return self.__is_changed
 
 class CharacteristicValueDescription(models.Model):
     value_name = models.TextField(verbose_name='Name of the characterisitc value')

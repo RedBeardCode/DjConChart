@@ -5,7 +5,14 @@ from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse
 
-from .models import Measurement, MeasurementOrder
+from .models import Measurement, MeasurementOrder, CalculationRule
+
+
+class NewCalculationRule(CreateView):
+    template_name = "new_calculation_rule.html"
+    model = CalculationRule
+    fields = ['rule_name', 'rule_code']
+    success_url = ''
 
 
 class NewMeasurement(CreateView):
