@@ -6,8 +6,14 @@ from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse
 
 from .models import Measurement, MeasurementOrder, CalculationRule
-from .models import MeasurementItem, MeasurementOrderDefinition
+from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 
+
+class NewMeasurementDevice(CreateView):
+    template_name = "new_base.html"
+    model = MeasurementDevice
+    fields = ['name', 'sn']
+    success_url = '/'
 
 class NewMeasurementOrder(CreateView):
     template_name = "new_measurement_order.html"
