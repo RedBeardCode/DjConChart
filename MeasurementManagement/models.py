@@ -5,7 +5,7 @@ import reversion as revisions
 # Create your models here.
 
 class MeasurementDevice(models.Model):
-    name = models.TextField()
+    name = models.CharField(max_length=127)
     sn = models.CharField(max_length=11)
 
     def __unicode__(self):
@@ -86,8 +86,9 @@ class MeasurementItem(models.Model):
 
 
 class MeasurementOrderDefinition(models.Model):
-    name = models.CharField(max_length=127)
-    characteristic_values = models.ManyToManyField(CharacteristicValueDescription)
+    name = models.CharField(max_length=127, verbose_name='Name of the measurement order')
+    characteristic_values = models.ManyToManyField(CharacteristicValueDescription,
+                                                   verbose_name='Characterisctic values to be measured')
     def __unicode__(self):
         return  self.name
 
@@ -98,9 +99,9 @@ class MeasurementOrderDefinition(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 class MeasurementOrder(models.Model):
-    date = models.DateTimeField()
-    order_type = models.ForeignKey(MeasurementOrderDefinition)
-    measurement_items = models.ManyToManyField(MeasurementItem)
+    date = models.DateTimeField(verbose_name='execution date')
+    order_type = models.ForeignKey(MeasurementOrderDefinition, verbose_name='Based measurement order definition')
+    measurement_items = models.ManyToManyField(MeasurementItem, verbose_name='Measured items')
 
     def __unicode__(self):
         return self.order_type.name + ' from ' + str(self.date)
