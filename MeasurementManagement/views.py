@@ -6,13 +6,20 @@ from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse
 
 from .models import Measurement, MeasurementOrder, CalculationRule
+from .models import MeasurementItem
 
+
+class NewMeasurementItem(CreateView):
+    template_name = "new_base.html"
+    model = MeasurementItem
+    fields = ['sn', 'name']
+    success_url = '/'
 
 class NewCalculationRule(CreateView):
     template_name = "new_calculation_rule.html"
     model = CalculationRule
     fields = ['rule_name', 'rule_code']
-    success_url = ''
+    success_url = '/'
 
 
 class NewMeasurement(CreateView):
@@ -20,6 +27,7 @@ class NewMeasurement(CreateView):
     model = Measurement
     fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
               'meas_item', 'measurement_devices', 'raw_data_file']
+    success_url = "/"
 
     def get_form(self, form_class=None):
         form = super(NewMeasurement, self).get_form(form_class)

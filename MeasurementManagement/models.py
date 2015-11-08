@@ -72,8 +72,8 @@ class CharacteristicValueDescription(models.Model):
 
 
 class MeasurementItem(models.Model):
-    sn = models.CharField(max_length=11)
-    name = models.TextField()
+    sn = models.CharField(max_length=11, verbose_name='Serial number of the measurement item')
+    name = models.CharField(max_length=255, verbose_name='Name of the measurement item', blank=True)
 
     def __unicode__(self):
         return  self.name + ': ' + self.sn
