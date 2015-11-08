@@ -6,8 +6,29 @@ from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse
 
 from .models import Measurement, MeasurementOrder, CalculationRule
-from .models import MeasurementItem
+from .models import MeasurementItem, MeasurementOrderDefinition
 
+
+class NewMeasurementOrder(CreateView):
+    template_name = "new_measurement_order.html"
+    model = MeasurementOrder
+    fields = ['date', 'order_type', 'measurement_items']
+    success_url = '/'
+
+    def get_form(self, form_class=None):
+        form = super(NewMeasurementOrder, self).get_form(form_class)
+        field = form.fields['date']
+        field.initial = datetime.now()
+        field.widget = AdminSplitDateTime()
+        form.fields['date'] = field
+        return form
+
+
+class NewMeasurementOrderDefinition(CreateView):
+    template_name = "new_base.html"
+    model = MeasurementOrderDefinition
+    fields = ['name', 'characteristic_values']
+    success_url = '/'
 
 class NewMeasurementItem(CreateView):
     template_name = "new_base.html"
@@ -49,7 +70,7 @@ def get_ajax_order_info(request):
         meas_item_response = []
         order_pk = int(request.POST['order'])
         order = MeasurementOrder.objects.get(pk=order_pk)
-        order_items = order.order_type.charateristic_values.all()
+        order_items = order.order_type.characteristic_values.all()
         meas_items = order.measurement_items.all()
         for item in order_items:
             devices = item.possible_meas_devices.all()

@@ -86,8 +86,8 @@ class MeasurementItem(models.Model):
 
 
 class MeasurementOrderDefinition(models.Model):
-    name = models.TextField()
-    charateristic_values = models.ManyToManyField(CharacteristicValueDescription)
+    name = models.CharField(max_length=127)
+    characteristic_values = models.ManyToManyField(CharacteristicValueDescription)
     def __unicode__(self):
         return  self.name
 

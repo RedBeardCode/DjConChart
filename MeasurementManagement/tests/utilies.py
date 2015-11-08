@@ -28,11 +28,11 @@ def create_correct_sample_data():
     height.possible_meas_devices.add(*devices)
 
     order_definition1 = MeasurementOrderDefinition.objects.create(name="OrderDefinition1")
-    order_definition1.charateristic_values.add(length)
+    order_definition1.characteristic_values.add(length)
     order_definition2 = MeasurementOrderDefinition.objects.create(name="OrderDefinition2")
-    order_definition2.charateristic_values.add(length, width)
+    order_definition2.characteristic_values.add(length, width)
     order_definition3 = MeasurementOrderDefinition.objects.create(name="OrderDefinition3")
-    order_definition3.charateristic_values.add(length, width, height)
+    order_definition3.characteristic_values.add(length, width, height)
     order_definitions = [order_definition1, order_definition2, order_definition3]
     for i in range(10):
         item = MeasurementItem.objects.create(sn=i, name='Item {:d}'.format(i))

@@ -26,7 +26,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('name', models.TextField()),
-                ('charateristic_values', models.ManyToManyField(to='MeasurementManagement.CharacteristicValueDescription')),
+                ('characteristic_values',
+                 models.ManyToManyField(to='MeasurementManagement.CharacteristicValueDescription')),
             ],
         ),
         migrations.CreateModel(
