@@ -7,7 +7,14 @@ from django.http import JsonResponse
 
 from .models import Measurement, MeasurementOrder, CalculationRule
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
+from .models import CharacteristicValueDescription
 
+
+class NewCharacteristicValueDescription(CreateView):
+    template_name = "new_base.html"
+    model = CharacteristicValueDescription
+    fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
+    success_url = '/'
 
 class NewMeasurementDevice(CreateView):
     template_name = "new_base.html"

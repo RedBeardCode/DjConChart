@@ -56,7 +56,7 @@ class CalculationRule(models.Model):
         return self.__is_changed
 
 class CharacteristicValueDescription(models.Model):
-    value_name = models.TextField(verbose_name='Name of the characterisitc value')
+    value_name = models.CharField(max_length=127, verbose_name='Name of the characterisitc value')
     description = models.TextField(verbose_name='Description of the characteristic value')
     calculation_rule = models.ForeignKey(CalculationRule)
     possible_meas_devices = models.ManyToManyField(MeasurementDevice)
