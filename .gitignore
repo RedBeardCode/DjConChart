@@ -1,3 +1,9 @@
 *.pyc
 */__pycache__/*
 */migrations/*
+.hg/*
+.hgignore
+.idea/*
+*.orig
+db.sqlite3
+
