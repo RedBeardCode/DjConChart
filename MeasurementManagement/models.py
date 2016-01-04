@@ -99,7 +99,6 @@ class MeasurementOrderDefinition(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 class MeasurementOrder(models.Model):
-    date = models.DateTimeField(verbose_name='execution date')
     order_type = models.ForeignKey(MeasurementOrderDefinition, verbose_name='Based measurement order definition')
     measurement_items = models.ManyToManyField(MeasurementItem, verbose_name='Measured items')
 

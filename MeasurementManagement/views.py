@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from .models import Measurement, MeasurementOrder, CalculationRule
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 from .models import CharacteristicValueDescription
+from .multiform import MultiFormsView
+from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
 
 
 class NewCharacteristicValueDescription(CreateView):
@@ -72,6 +74,17 @@ class NewMeasurement(CreateView):
         form.fields['order'].widget.attrs.update({'onchange': 'get_order_items();'})
         form.fields['examiner'].initial = self.request.user
         return form
+
+
+class NewMeasurementItemAndOrder(MultiFormsView):
+    template_name = 'new_item_and_order.html'
+    form_classes = {'item': NewMeasurementItemForm,
+                    'order': NewMeasurementOrderForm}
+    success_url = '/'
+
+    def forms_valid(self, forms, form_name):
+        super(NewMeasurementItemAndOrder, self).forms_valid(forms, form_name)
+
 
 
 def get_ajax_order_info(request):
