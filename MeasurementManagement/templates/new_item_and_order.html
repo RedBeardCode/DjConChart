@@ -13,15 +13,37 @@
     <script type="text/javascript" src="{% static "admin/js/related-widget-wrapper.js" %}"></script>
 
 {% endblock %}
+
+{% block inlinescripts %}
+    <script type="text/javascript">
+        function add_item() {
+            var new_item = "\<li class=\"list-group-item meas-item-group\"\>{{ forms.item|crispy|escapejs }}\</li\>";
+
+            $(".item-list").append(new_item);
+            var l = $(".meas-item-group").removeAttr('backgroundColor');
+            l.filter(':odd').css({'backgroundColor': '#eeeeee'});
+
+        }
+    </script>
+{% endblock %}
+
 {% block content %}
     <form method="post">
         {% csrf_token %}
 
         {{ forms.order|crispy }}
 
-
-        {{ forms.item|crispy }}
-
+        <ul class="list-group item-list">
+            <li class="add_meas_btn_line"><span style="float: right">
+                <button type="button" class="btn btn-default add_meas_item_btn" aria-label="Add measurement item"
+                        onclick="add_item()">
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                    Add measurement item
+                </button>
+            </span>
+            </li>
+            <li class="list-group-item meas-item-group">{{ forms.item|crispy }}</li>
+        </ul>
         <button class="btn btn-default" name='action' value='order' type="submit"> Submit</button>
     </form>
 

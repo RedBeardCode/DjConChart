@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 
 from .models import Measurement, MeasurementOrder, CalculationRule
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
@@ -82,9 +82,20 @@ class NewMeasurementItemAndOrder(MultiFormsView):
                     'order': NewMeasurementOrderForm}
     success_url = '/'
 
-    def forms_valid(self, forms, form_name):
-        super(NewMeasurementItemAndOrder, self).forms_valid(forms, form_name)
+    def order_form_valid(self, form):
+        items = []
+        for sn, name in zip(form.data.getlist('sn'), form.data.getlist('name')):
+            items.append(MeasurementItem.objects.get_or_create(sn=sn, name=name)[0])
+        order_type = MeasurementOrderDefinition.objects.get(pk=form.data['order_type'][0])
+        order = MeasurementOrder.objects.create(order_type=order_type)
+        for item in items:
+            order.measurement_items.add(item)
+        order.save()
+        return HttpResponseRedirect(self.get_success_url())
 
+    def forms_valid(self, forms, form_name):
+        response = super(NewMeasurementItemAndOrder, self).forms_valid(forms, form_name)
+        return response
 
 
 def get_ajax_order_info(request):

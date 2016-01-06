@@ -6,7 +6,7 @@ from .models import MeasurementItem, MeasurementOrder
 class NewMeasurementItemForm(ModelForm):
     class Meta:
         model = MeasurementItem
-        fields = ['name', 'sn']
+        fields = ['sn', 'name']
 
 
 class NewMeasurementOrderForm(ModelForm):

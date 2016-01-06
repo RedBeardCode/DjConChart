@@ -89,6 +89,7 @@ class MeasurementOrderDefinition(models.Model):
     name = models.CharField(max_length=127, verbose_name='Name of the measurement order')
     characteristic_values = models.ManyToManyField(CharacteristicValueDescription,
                                                    verbose_name='Characterisctic values to be measured')
+
     def __unicode__(self):
         return  self.name
 
@@ -99,11 +100,15 @@ class MeasurementOrderDefinition(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 class MeasurementOrder(models.Model):
+    order_nr = models.AutoField(primary_key=True)
     order_type = models.ForeignKey(MeasurementOrderDefinition, verbose_name='Based measurement order definition')
     measurement_items = models.ManyToManyField(MeasurementItem, verbose_name='Measured items')
-
+    # TODO: Write __init__ with an formater-function argument to define the format of the order_nr. Simply set a own value before save file:///home/farmer/B%C3%BCcher/docs/django-docs-1.7-en/ref/models/instances.html?highlight=auto%20increment#explicitly-specifying-auto-primary-key-values
     def __unicode__(self):
-        return self.order_type.name + ' from ' + str(self.date)
+        items_str = ''
+        for item in self.measurement_items.all():
+            items_str += str(item) + ', '
+        return self.order_type.name + ' ' + str(self.order_nr) + ' for ' + items_str
 
     def __str__(self):
         return str(self.__unicode__())
