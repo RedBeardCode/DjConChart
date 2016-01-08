@@ -1,6 +1,7 @@
 import pytest
 from selenium import webdriver
 
+from MeasurementManagement.models import MeasurementOrder
 from .utilies import login_as_admin, create_correct_sample_data
 
 
@@ -119,6 +120,7 @@ def test_admin_measurement_order_definition(admin_client, live_server):
 @pytest.mark.django_db
 def test_admin_measurement_order(admin_client, live_server):
     create_correct_sample_data()
+    first_index = MeasurementOrder.objects.first().pk
     selenium = webdriver.Firefox()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementorder/')
@@ -126,15 +128,15 @@ def test_admin_measurement_order(admin_client, live_server):
         tbody = selenium.find_element_by_id('result_list').find_element_by_tag_name('tbody')
         assert tbody
         assert len(tbody.find_elements_by_tag_name('tr')) == 10
-        assert tbody.find_element_by_link_text('OrderDefinition1 from 2020-12-14 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition3 from 2020-12-13 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition2 from 2020-12-12 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition1 from 2020-12-11 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition3 from 2020-12-10 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition2 from 2020-12-09 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition1 from 2020-12-08 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition3 from 2020-12-07 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition2 from 2020-12-06 17:05:55+00:00')
-        assert tbody.find_element_by_link_text('OrderDefinition1 from 2020-12-05 17:05:55+00:00')
+        assert tbody.find_element_by_link_text('OrderDefinition1 {} for Item 0: 0,'.format(first_index))
+        assert tbody.find_element_by_link_text('OrderDefinition2 {} for Item 1: 1,'.format(first_index + 1))
+        assert tbody.find_element_by_link_text('OrderDefinition3 {} for Item 2: 2,'.format(first_index + 2))
+        assert tbody.find_element_by_link_text('OrderDefinition1 {} for Item 3: 3,'.format(first_index + 3))
+        assert tbody.find_element_by_link_text('OrderDefinition2 {} for Item 4: 4,'.format(first_index + 4))
+        assert tbody.find_element_by_link_text('OrderDefinition3 {} for Item 5: 5,'.format(first_index + 5))
+        assert tbody.find_element_by_link_text('OrderDefinition1 {} for Item 6: 6,'.format(first_index + 6))
+        assert tbody.find_element_by_link_text('OrderDefinition2 {} for Item 7: 7,'.format(first_index + 7))
+        assert tbody.find_element_by_link_text('OrderDefinition3 {} for Item 8: 8,'.format(first_index + 8))
+        assert tbody.find_element_by_link_text('OrderDefinition1 {} for Item 9: 9,'.format(first_index + 9))
     finally:
         selenium.close()

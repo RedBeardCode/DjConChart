@@ -12,11 +12,6 @@ def test_all_elements(admin_client, live_server):
     try:
         selenium.get(live_server + '/new_measurement_order/')
         login_as_admin(selenium)
-        assert selenium.find_element_by_id('id_date_0')
-        assert selenium.find_element_by_id('calendarlink0')
-        assert selenium.find_element_by_link_text('Today')
-        assert selenium.find_element_by_id('id_date_1')
-        assert selenium.find_element_by_id('clocklink0')
         assert selenium.find_element_by_id('id_order_type')
         assert selenium.find_element_by_id('id_measurement_items')
     finally:

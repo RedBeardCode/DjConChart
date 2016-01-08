@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from .utilies import login_as_admin, create_correct_sample_data
-from ..models import Measurement
+from ..models import Measurement, MeasurementOrder
 
 
 # Create your tests here.
@@ -37,13 +37,14 @@ def test_login_requierd(admin_client, live_server):
 def test_order_choice(admin_client, live_server):
     create_correct_sample_data()
     selenium = webdriver.Firefox()
+    first_index = MeasurementOrder.objects.first().pk
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)
         order = Select(selenium.find_element_by_id('id_order'))
 
         target_names = ['---------'] + [
-            'OrderDefinition{:d} from 2020-12-{:02d} 17:05:55+00:00'.format(i % 3 + 1, i + 5)
+            'OrderDefinition{:d} {:d} for Item {:d}: {:d},'.format(i % 3 + 1, i + first_index, i, i)
             for i in
             range(10)]
         order_names = [opt.text for opt in order.options]

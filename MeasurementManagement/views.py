@@ -27,16 +27,9 @@ class NewMeasurementDevice(CreateView):
 class NewMeasurementOrder(CreateView):
     template_name = "new_measurement_order.html"
     model = MeasurementOrder
-    fields = ['date', 'order_type', 'measurement_items']
+    fields = ['order_type', 'measurement_items']
     success_url = '/'
 
-    def get_form(self, form_class=None):
-        form = super(NewMeasurementOrder, self).get_form(form_class)
-        field = form.fields['date']
-        field.initial = datetime.now()
-        field.widget = AdminSplitDateTime()
-        form.fields['date'] = field
-        return form
 
 
 class NewMeasurementOrderDefinition(CreateView):
@@ -82,20 +75,17 @@ class NewMeasurementItemAndOrder(MultiFormsView):
                     'order': NewMeasurementOrderForm}
     success_url = '/'
 
-    def order_form_valid(self, form):
+    def forms_valid(self, forms, form_name=''):
         items = []
+        form = forms['item']
         for sn, name in zip(form.data.getlist('sn'), form.data.getlist('name')):
             items.append(MeasurementItem.objects.get_or_create(sn=sn, name=name)[0])
-        order_type = MeasurementOrderDefinition.objects.get(pk=form.data['order_type'][0])
+        order_type = MeasurementOrderDefinition.objects.get(pk=int(forms['order'].data['order_type']))
         order = MeasurementOrder.objects.create(order_type=order_type)
         for item in items:
             order.measurement_items.add(item)
         order.save()
         return HttpResponseRedirect(self.get_success_url())
-
-    def forms_valid(self, forms, form_name):
-        response = super(NewMeasurementItemAndOrder, self).forms_valid(forms, form_name)
-        return response
 
 
 def get_ajax_order_info(request):

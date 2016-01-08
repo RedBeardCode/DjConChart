@@ -36,6 +36,5 @@ def create_correct_sample_data():
     order_definitions = [order_definition1, order_definition2, order_definition3]
     for i in range(10):
         item = MeasurementItem.objects.create(sn=i, name='Item {:d}'.format(i))
-        order = MeasurementOrder.objects.create(date=FAKE_TIME + datetime.timedelta(days=i),
-                                                order_type=order_definitions[i % 3])
+        order = MeasurementOrder.objects.create(order_type=order_definitions[i % 3])
         order.measurement_items.add(item)
