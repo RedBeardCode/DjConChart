@@ -87,6 +87,11 @@ class NewMeasurementItemAndOrder(MultiFormsView):
         order.save()
         return HttpResponseRedirect(self.get_success_url())
 
+    def forms_invalid(self, forms):
+        forms['sns'] = forms['item'].data.getlist('sn')
+        forms['names'] = forms['item'].data.getlist('name')
+        return self.render_to_response(self.get_context_data(forms=forms))
+
 
 def get_ajax_order_info(request):
     start_tuple = (-1, 'Please select first the order')

@@ -24,6 +24,22 @@
             l.filter(':odd').css({'backgroundColor': '#eeeeee'});
 
         }
+        $(document).ready(function () {
+            {% if forms.sns|length > 1 %}
+                {%  autoescape off %}
+                    var sns = {{ forms.sns }};
+                    var names = {{ forms.names }};
+                {% endautoescape %}
+                for (i = 0; i < {{ forms.sns|length }}-1; i++) {
+                    add_item();
+                }
+                for (i = 0; i <{{ forms.sns|length }}; i++) {
+                    $('.meas-item-group #id_sn')[i].value = sns[i];
+                    $('.meas-item-group #id_name')[i].value = names[i];
+                }
+            {% endif %}
+        })
+
     </script>
 {% endblock %}
 
