@@ -24,6 +24,7 @@
             l.filter(':odd').css({'backgroundColor': '#eeeeee'});
 
         }
+
         $(document).ready(function () {
             {% if forms.sns|length > 1 %}
                 {%  autoescape off %}
@@ -33,9 +34,16 @@
                 for (i = 0; i < {{ forms.sns|length }}-1; i++) {
                     add_item();
                 }
-                for (i = 0; i <{{ forms.sns|length }}; i++) {
+                for (i = {{ forms.sns|length }}-1; i >= 0; i--) {
                     $('.meas-item-group #id_sn')[i].value = sns[i];
                     $('.meas-item-group #id_name')[i].value = names[i];
+                    if (sns[i] != '') {
+                        $('.meas-item-group p').eq(i).remove();
+                        $('.form-group#div_id_sn').eq(i).removeClass('has-error');
+                    }
+                    if (i > 0) {
+                        $('.alert').last().remove();
+                    }
                 }
             {% endif %}
         })
