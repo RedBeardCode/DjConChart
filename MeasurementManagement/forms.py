@@ -13,7 +13,7 @@ class NewMeasurementItemForm(ModelForm):
 
     def clean(self):
         clean_data = super(NewMeasurementItemForm, self).clean()
-        if '' in self.data['sn'] and not self.errors:
+        if '' in self.data.getlist('sn') and not self.errors:
             self.errors['sn'] = ['This field is required']
         sn_list = copy(self.data.getlist('sn'))
         sn_list.sort()

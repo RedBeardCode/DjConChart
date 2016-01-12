@@ -104,3 +104,71 @@ def test_add_meas_order_two_item(admin_client, live_server):
         assert MeasurementItem.objects.get(sn=4713)
     finally:
         selenium.close()
+
+
+@pytest.mark.django_db
+def test_add_meas_order_multi_fail(admin_client, live_server):
+    selenium = webdriver.Firefox()
+    try:
+        create_correct_sample_data()
+        selenium.get(live_server + '/new_item_and_order/')
+        login_as_admin(selenium)
+        order_type = Select(selenium.find_element_by_id('id_order_type'))
+        order_type.select_by_index(1)
+        selenium.find_element_by_class_name('add_meas_item_btn').click()
+        selenium.find_element_by_class_name('add_meas_item_btn').click()
+        selenium.find_element_by_class_name('add_meas_item_btn').click()
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        assert len(selenium.find_elements_by_class_name('has-error')) == 4
+        err_msg = selenium.find_elements_by_id('error_1_id_sn')
+        assert len(err_msg) == 4
+        for msg in err_msg:
+            assert msg.text == "This field is required."
+        selenium.find_elements_by_id('id_sn')[0].send_keys('4711')
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        assert len(selenium.find_elements_by_class_name('has-error')) == 3
+        err_msg = selenium.find_elements_by_id('error_1_id_sn')
+        assert len(err_msg) == 3
+        selenium.find_elements_by_id('id_sn')[1].send_keys('4712')
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        assert len(selenium.find_elements_by_class_name('has-error')) == 2
+        err_msg = selenium.find_elements_by_id('error_1_id_sn')
+        assert len(err_msg) == 2
+        selenium.find_elements_by_id('id_sn')[2].send_keys('4713')
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        assert len(selenium.find_elements_by_class_name('has-error')) == 1
+        err_msg = selenium.find_elements_by_id('error_1_id_sn')
+        assert len(err_msg) == 1
+        selenium.find_elements_by_id('id_sn')[3].send_keys('4714')
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/')
+
+    finally:
+        selenium.close()
+
+
+@pytest.mark.django_db
+def test_add_meas_order_duplicate_sn(admin_client, live_server):
+    selenium = webdriver.Firefox()
+    try:
+        create_correct_sample_data()
+        selenium.get(live_server + '/new_item_and_order/')
+        login_as_admin(selenium)
+        order_type = Select(selenium.find_element_by_id('id_order_type'))
+        order_type.select_by_index(1)
+        selenium.find_element_by_class_name('add_meas_item_btn').click()
+        sns = selenium.find_elements_by_id('id_sn')
+        for sn in sns:
+            sn.send_keys('1')
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        alert = selenium.find_elements_by_class_name('alert')
+        assert len(alert) == 1
+        assert alert[0].text == 'Duplicated measurement item'
+
+    finally:
+        selenium.close()
