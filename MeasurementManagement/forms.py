@@ -1,7 +1,7 @@
 from copy import copy
 
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 
 from .models import MeasurementItem, MeasurementOrder
 
@@ -10,6 +10,7 @@ class NewMeasurementItemForm(ModelForm):
     class Meta:
         model = MeasurementItem
         fields = ['sn', 'name']
+        widgets = {'sn': TextInput(attrs={'onkeyup': 'get_meas_items();'})}
 
     def clean(self):
         clean_data = super(NewMeasurementItemForm, self).clean()

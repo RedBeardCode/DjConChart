@@ -116,3 +116,16 @@ def get_ajax_order_info(request):
         return JsonResponse({'order_items': order_items_response, 'meas_devices': meas_devices_response,
                              'meas_items': meas_item_response}, )
     return JsonResponse(items_response)
+
+
+def get_ajax_meas_item(request):
+    if request.is_ajax() and request.method == 'POST' and request.POST['sn']:
+        sn = request.POST['sn']
+        items = MeasurementItem.objects.filter(sn__istartswith=sn)
+        sn_response = []
+        name_response = []
+        for item in items:
+            sn_response.append(item.sn)
+            name_response.append(item.name)
+        return JsonResponse({'sn': sn_response, 'name': name_response}, )
+    return JsonResponse()

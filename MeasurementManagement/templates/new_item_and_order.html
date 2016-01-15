@@ -25,7 +25,23 @@
 
         }
 
+        function get_meas_items() {
+            var sn = $('#id_sn').val();
+            $.ajax({
+                url: '{% url "get_meas_item" %}',
+                success: function (data, textStatus, XMLHttpRequest) {
+                    alert(data.name);
+                },
+                type: 'POST',
+                data: {sn: sn},
+                datatype: 'JSON',
+            });
+        }
+
+
         $(document).ready(function () {
+            init_ajax_csrf();
+
             {% if forms.sns|length > 1 %}
                 {%  autoescape off %}
                     var sns = {{ forms.sns }};
@@ -47,12 +63,11 @@
                 }
             {% endif %}
         })
-
     </script>
 {% endblock %}
 
 {% block content %}
-    <form method="post">
+    <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
 
         {{ forms.order|crispy }}
