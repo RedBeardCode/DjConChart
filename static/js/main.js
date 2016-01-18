@@ -19,6 +19,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
+
 function init_ajax_csrf() {
     var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({

@@ -10,7 +10,7 @@ class NewMeasurementItemForm(ModelForm):
     class Meta:
         model = MeasurementItem
         fields = ['sn', 'name']
-        widgets = {'sn': TextInput(attrs={'onkeyup': 'get_meas_items();'})}
+        widgets = {'sn': TextInput(attrs={'autocomplete': 'off', 'class': 'sn_autocomplete'})}
 
     def clean(self):
         clean_data = super(NewMeasurementItemForm, self).clean()

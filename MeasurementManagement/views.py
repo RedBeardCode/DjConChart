@@ -119,13 +119,16 @@ def get_ajax_order_info(request):
 
 
 def get_ajax_meas_item(request):
+    response = {'suggestions': []}
     if request.is_ajax() and request.method == 'POST' and request.POST['sn']:
         sn = request.POST['sn']
         items = MeasurementItem.objects.filter(sn__istartswith=sn)
         sn_response = []
         name_response = []
+
         for item in items:
+            response['suggestions'].append({'value': item.sn, 'data': item.name})
             sn_response.append(item.sn)
             name_response.append(item.name)
-        return JsonResponse({'sn': sn_response, 'name': name_response}, )
-    return JsonResponse()
+
+    return JsonResponse(response)

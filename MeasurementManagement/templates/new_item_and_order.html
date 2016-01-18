@@ -11,33 +11,33 @@
     <script type="text/javascript" src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/actions.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/related-widget-wrapper.js" %}"></script>
-
+    <script type="text/javascript" src="{% static "js/vendor/jquery.autocomplete.js" %}"></script>
 {% endblock %}
 
 {% block inlinescripts %}
     <script type="text/javascript">
+        function init_autocomplete() {
+            $('.sn_autocomplete').autocomplete({
+                        paramName: 'sn',
+                        serviceUrl: '{% url "get_meas_item" %}',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        triggerSelectOnValidInput: false,
+                        onSelect: function (suggestion) {
+                            var name_element = $(this).parent().parent().siblings().find('#id_name');
+                            name_element.val(suggestion.data);
+                        }
+                    }
+            );
+        }
         function add_item() {
             var new_item = "\<li class=\"list-group-item meas-item-group\"\>{{ forms.item|crispy|escapejs }}\</li\>";
 
             $(".item-list").append(new_item);
             var l = $(".meas-item-group").removeAttr('backgroundColor');
             l.filter(':odd').css({'backgroundColor': '#eeeeee'});
-
+            init_autocomplete();
         }
-
-        function get_meas_items() {
-            var sn = $('#id_sn').val();
-            $.ajax({
-                url: '{% url "get_meas_item" %}',
-                success: function (data, textStatus, XMLHttpRequest) {
-                    alert(data.name);
-                },
-                type: 'POST',
-                data: {sn: sn},
-                datatype: 'JSON',
-            });
-        }
-
 
         $(document).ready(function () {
             init_ajax_csrf();
@@ -61,8 +61,13 @@
                         $('.alert').last().remove();
                     }
                 }
+
             {% endif %}
-        })
+
+
+            init_autocomplete();
+
+        });
     </script>
 {% endblock %}
 
