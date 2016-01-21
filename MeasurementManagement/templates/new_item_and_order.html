@@ -16,6 +16,26 @@
 
 {% block inlinescripts %}
     <script type="text/javascript">
+        var last_search=null;
+        function setItemName(sn_element, name){
+            var name_element = sn_element.parent().parent().siblings().find('#id_name');
+            name_element.val(name);
+        }
+        function snOnBlur(){
+            var value = $(this).val();
+            if (!last_search) return;
+            var name = "";
+            for( var sug in last_search)
+            {
+                if (value == last_search[sug].value)
+                {
+                    name = last_search[sug].data;
+                }
+
+            }
+            setItemName($(this), name);
+        }
+
         function init_autocomplete() {
             $('.sn_autocomplete').autocomplete({
                         paramName: 'sn',
@@ -24,8 +44,10 @@
                         dataType: 'JSON',
                         triggerSelectOnValidInput: false,
                         onSelect: function (suggestion) {
-                            var name_element = $(this).parent().parent().siblings().find('#id_name');
-                            name_element.val(suggestion.data);
+                            setItemName($(this), suggestion.data);
+                        },
+                        onSearchComplete: function(query, suggestions) {
+                            last_search = suggestions;
                         }
                     }
             );
@@ -66,6 +88,8 @@
 
 
             init_autocomplete();
+            $('#id_sn').blur(snOnBlur);
+
 
         });
     </script>

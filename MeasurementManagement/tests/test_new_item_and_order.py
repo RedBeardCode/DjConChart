@@ -163,12 +163,107 @@ def test_add_meas_order_duplicate_sn(admin_client, live_server):
         selenium.find_element_by_class_name('add_meas_item_btn').click()
         sns = selenium.find_elements_by_id('id_sn')
         for sn in sns:
-            sn.send_keys('1')
+            sn.send_keys('0000001')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/new_item_and_order/')
         alert = selenium.find_elements_by_class_name('alert')
         assert len(alert) == 1
         assert alert[0].text == 'Duplicated measurement item'
 
+    finally:
+        selenium.close()
+
+
+@pytest.mark.django_db
+def test_ac_single_item_type(admin_client, live_server):
+    selenium = webdriver.Firefox()
+    try:
+        create_correct_sample_data()
+        selenium.get(live_server + '/new_item_and_order/')
+        login_as_admin(selenium)
+        sn = selenium.find_element_by_id('id_sn')
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestions')) == 1
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestion')) == 0
+        sn.send_keys('0')
+        selenium.implicitly_wait(1)
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestion')) == 10
+        sn.send_keys('000001')
+        selenium.find_element_by_id('id_name').send_keys("")
+        assert selenium.find_element_by_id('id_name').get_attribute('value') == 'Item 1'
+    finally:
+        selenium.close()
+
+
+@pytest.mark.django_db
+def test_ac_single_item_select(admin_client, live_server):
+    selenium = webdriver.Firefox()
+    try:
+        create_correct_sample_data()
+        selenium.get(live_server + '/new_item_and_order/')
+        login_as_admin(selenium)
+        sn = selenium.find_element_by_id('id_sn')
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestions')) == 1
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestion')) == 0
+        sn.send_keys('0')
+        selenium.implicitly_wait(1)
+        suggestions = selenium.find_elements_by_class_name('autocomplete-suggestion')
+        assert len(suggestions) == 10
+        suggestions[3].click()
+        assert selenium.find_element_by_id('id_name').get_attribute('value') == 'Item 3'
+    finally:
+        selenium.close()
+
+
+@pytest.mark.django_db
+def test_ac_single_item_create(admin_client, live_server):
+    selenium = webdriver.Firefox()
+    try:
+        create_correct_sample_data()
+        selenium.get(live_server + '/new_item_and_order/')
+        login_as_admin(selenium)
+        num_items = MeasurementItem.objects.count()
+        Select(selenium.find_element_by_id('id_order_type')).select_by_index(1)
+        sn = selenium.find_element_by_id('id_sn')
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestions')) == 1
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestion')) == 0
+        sn.send_keys('4711')
+        selenium.implicitly_wait(1)
+        suggestions = selenium.find_elements_by_class_name('autocomplete-suggestion')
+        assert len(suggestions) == 0
+        name = selenium.find_element_by_id('id_name')
+        assert name.get_attribute('value') == ''
+        name.send_keys('Wasser')
+        selenium.find_element_by_name('action').click()
+        assert MeasurementItem.objects.count() == num_items + 1
+    finally:
+        selenium.close()
+
+
+@pytest.mark.django_db
+def test_ac_multi_item_select(admin_client, live_server):
+    selenium = webdriver.Firefox()
+    try:
+        create_correct_sample_data()
+        selenium.get(live_server + '/new_item_and_order/')
+        login_as_admin(selenium)
+        button = selenium.find_element_by_class_name('add_meas_item_btn')
+        button.click()
+        button.click()
+        sns = selenium.find_elements_by_id('id_sn')
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestions')) == 3
+        assert len(selenium.find_elements_by_class_name('autocomplete-suggestion')) == 0
+        sns[0].send_keys('0')
+        selenium.implicitly_wait(1)
+        suggestions = selenium.find_elements_by_class_name('autocomplete-suggestion')
+        assert len(suggestions) == 10
+        suggestions[3].click()
+        names = selenium.find_elements_by_id('id_name')
+        assert names[0].get_attribute('value') == 'Item 3'
+        assert names[1].get_attribute('value') == ''
+        assert names[2].get_attribute('value') == ''
+        sns = selenium.find_elements_by_id('id_sn')
+        assert sns[0].get_attribute('value') == '0000003'
+        assert sns[1].get_attribute('value') == ''
+        assert sns[2].get_attribute('value') == ''
     finally:
         selenium.close()

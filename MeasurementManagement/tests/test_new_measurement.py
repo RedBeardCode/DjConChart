@@ -44,7 +44,7 @@ def test_order_choice(admin_client, live_server):
         order = Select(selenium.find_element_by_id('id_order'))
 
         target_names = ['---------'] + [
-            'OrderDefinition{:d} {:d} for Item {:d}: {:d},'.format(i % 3 + 1, i + first_index, i, i)
+            'OrderDefinition{:d} {:d} for Item {:d}: {:07d},'.format(i % 3 + 1, i + first_index, i, i)
             for i in
             range(10)]
         order_names = [opt.text for opt in order.options]
@@ -115,7 +115,7 @@ def test_on_change_order(admin_client, live_server):
         meas_items = Select(selenium.find_element_by_id('id_meas_item'))
         meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
         target_order_items = [['length'], ['length', 'width'], ['length', 'width', 'height']]
-        target_meas_items = ['Item {:d}: {:d}'.format(i, i) for i in range(10)]
+        target_meas_items = ['Item {:d}: {:07d}'.format(i, i) for i in range(10)]
         target_meas_devices = [['Device {:d}: {:d}'.format(i, i) for i in range(1)],
                                ['Device {:d}: {:d}'.format(i, i) for i in range(3)],
                                ['Device {:d}: {:d}'.format(i, i) for i in range(5)]]

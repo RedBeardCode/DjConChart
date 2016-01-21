@@ -35,6 +35,6 @@ def create_correct_sample_data():
     order_definition3.characteristic_values.add(length, width, height)
     order_definitions = [order_definition1, order_definition2, order_definition3]
     for i in range(10):
-        item = MeasurementItem.objects.create(sn=i, name='Item {:d}'.format(i))
+        item = MeasurementItem.objects.create(sn='{:07d}'.format(i), name='Item {:d}'.format(i))
         order = MeasurementOrder.objects.create(order_type=order_definitions[i % 3])
         order.measurement_items.add(item)
