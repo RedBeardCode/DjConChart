@@ -5,9 +5,10 @@ from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
-from .views import NewMeasurement, NewCalculationRule, get_ajax_order_info, get_ajax_meas_item
+from .views import NewMeasurement, NewCalculationRule, NewMeasurementTag
 from .views import NewMeasurementItem, NewMeasurementOrder, NewMeasurementOrderDefinition
 from .views import NewMeasurementDevice, NewCharacteristicValueDescription, NewMeasurementItemAndOrder
+from .views import get_ajax_order_info, get_ajax_meas_item
 
 admin.autodiscover()
 
@@ -33,6 +34,9 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_characteristic_value_description/$',
                            login_required(NewCharacteristicValueDescription.as_view()),
                            name="new_characteristic_value_description"),
+                       url(r'^new_measurement_tag/$',
+                           login_required(NewMeasurementTag.as_view()),
+                           name="new_measurement_tag"),
                        url(r'^new_item_and_order/$',
                            login_required(NewMeasurementItemAndOrder.as_view()),
                            name="new_item_and_order"),

@@ -98,6 +98,7 @@ def test_all_elements(admin_client, live_server):
         assert selenium.find_element_by_id('id_meas_item')
         assert selenium.find_element_by_id('id_measurement_devices')
         assert selenium.find_element_by_id('id_raw_data_file')
+        assert selenium.find_element_by_id('id_measurement_tag')
         assert selenium.find_element_by_class_name('btn')
     finally:
         selenium.close()

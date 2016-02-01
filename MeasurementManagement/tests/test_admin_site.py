@@ -20,6 +20,7 @@ def test_admin_start(admin_client, live_server):
         assert selenium.find_elements_by_link_text('Measurement order definitions')
         assert selenium.find_elements_by_link_text('Measurement orders')
         assert selenium.find_elements_by_link_text('Measurements')
+        assert selenium.find_elements_by_link_text('Measurement tags')
     finally:
         selenium.close()
 
@@ -138,5 +139,21 @@ def test_admin_measurement_order(admin_client, live_server):
         assert tbody.find_element_by_link_text('OrderDefinition2 {} for Item 7: 0000007,'.format(first_index + 7))
         assert tbody.find_element_by_link_text('OrderDefinition3 {} for Item 8: 0000008,'.format(first_index + 8))
         assert tbody.find_element_by_link_text('OrderDefinition1 {} for Item 9: 0000009,'.format(first_index + 9))
+    finally:
+        selenium.close()
+
+
+@pytest.mark.django_db
+def test_admin_measurement_tag(admin_client, live_server):
+    create_correct_sample_data()
+    selenium = webdriver.Firefox()
+    try:
+        selenium.get(live_server + '/admin/MeasurementManagement/measurementtag/')
+        login_as_admin(selenium)
+        tbody = selenium.find_element_by_id('result_list').find_element_by_tag_name('tbody')
+        assert tbody
+        assert len(tbody.find_elements_by_tag_name('tr')) == 2
+        assert tbody.find_element_by_link_text('width')
+        assert tbody.find_element_by_link_text('height')
     finally:
         selenium.close()

@@ -5,7 +5,7 @@ from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse, HttpResponseRedirect
 
-from .models import Measurement, MeasurementOrder, CalculationRule
+from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 from .models import CharacteristicValueDescription
 from .multiform import MultiFormsView
@@ -51,11 +51,17 @@ class NewCalculationRule(CreateView):
     success_url = '/'
 
 
+class NewMeasurementTag(CreateView):
+    template_name = "new_base.html"
+    model = MeasurementTag
+    fields = ['name']
+    success_url = "/"
+
 class NewMeasurement(CreateView):
     template_name = "new_measurement.html"
     model = Measurement
     fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
-              'meas_item', 'measurement_devices', 'raw_data_file']
+              'meas_item', 'measurement_devices', 'raw_data_file', 'measurement_tag']
     success_url = "/"
 
     def get_form(self, form_class=None):
