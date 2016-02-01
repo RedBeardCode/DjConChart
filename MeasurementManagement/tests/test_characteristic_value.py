@@ -81,4 +81,3 @@ def test_cv_multi_meas_creation(admin_client):
         assert cv.finished
         assert cv.value == 42
 
-# TODO: Fehler bei Messung mit ValueType which is not in MeasOrderDef

@@ -35,7 +35,7 @@ def test_admin_calculation_rule(admin_client, live_server):
         tbody = selenium.find_element_by_id('result_list').find_element_by_tag_name('tbody')
         assert tbody
         lines = tbody.find_elements_by_tag_name('tr')
-        assert len(tbody.find_elements_by_tag_name('tr')) == 1
+        assert len(tbody.find_elements_by_tag_name('tr')) == 2
     finally:
         selenium.close()
 

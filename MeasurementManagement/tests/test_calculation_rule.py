@@ -52,11 +52,16 @@ def test_create_rule_view_noname(admin_client, live_server):
 
 @pytest.mark.django_db
 def test_rule_changed():
-    rule = CalculationRule.objects.create(rule_name='HistTest', rule_code='def calculate(measurements):\n    pass\n')
+    class MockRelationManager(object):
+        def all(self):
+            return []
+
+    rule = CalculationRule.objects.create(rule_name='HistTest', rule_code='def calculate(meas_dict):\n    return 1.0\n')
     assert rule.is_changed()
     rule.save()
     assert rule.is_changed()
-    rule.calculate([''])
+    rel_mock = MockRelationManager()
+    rule.calculate(rel_mock)
     assert not rule.is_changed()
     rule.save()
     assert rule.is_changed()
