@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models.signals import post_save
 import reversion as revisions
 # Create your models here.
 
@@ -38,13 +39,19 @@ class CalculationRule(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.rule_name + '>'
 
     def calculate(self, measurements):
+        meas_dict = {}
+        for meas in measurements.all():
+            if meas.measurement_tag:
+                meas_dict[meas.measurement_tag.name] = meas
+            else:
+                meas_dict[''] = meas
         func_name = '__calc_rule_function_{:d}'.format(self.pk)
-        code_lines = ['def ' + func_name + '(measurements):'] + ['    ' + line for line in self.rule_code.splitlines()]
-        code_lines += ['    return calculate(measurements)']
+        code_lines = ['def ' + func_name + '(meas_dict):'] + ['    ' + line for line in self.rule_code.splitlines()]
+        code_lines += ['    return calculate(meas_dict)']
         exec('\n'.join(code_lines))
         self.__calc_func = locals()[func_name]
         self.__is_changed = False
-        return self.__calc_func(measurements)
+        return self.__calc_func(meas_dict)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -55,12 +62,25 @@ class CalculationRule(models.Model):
     def is_changed(self):
         return self.__is_changed
 
+
+class MeasurementTag(models.Model):
+    name = models.CharField(max_length=255, verbose_name='Tag to distingish measurements for one characteristic value')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __repr__(self):
+        return '<' + self.__class__.__name__ + ': ' + self.name + '>'
+
 class CharacteristicValueDescription(models.Model):
     value_name = models.CharField(max_length=127, verbose_name='Name of the characterisitc value')
     description = models.TextField(verbose_name='Description of the characteristic value')
     calculation_rule = models.ForeignKey(CalculationRule)
     possible_meas_devices = models.ManyToManyField(MeasurementDevice)
-
+    measurement_tags = models.ManyToManyField(MeasurementTag, blank=True)
     def __unicode__(self):
         return  self.value_name
 
@@ -99,6 +119,7 @@ class MeasurementOrderDefinition(models.Model):
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
+
 class MeasurementOrder(models.Model):
     order_nr = models.AutoField(primary_key=True)
     order_type = models.ForeignKey(MeasurementOrderDefinition, verbose_name='Based measurement order definition')
@@ -117,6 +138,11 @@ class MeasurementOrder(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 
+def after_measurement_saved(instance, **kwargs):
+    for value_type in instance.order_items.all():
+        ch_value, created = CharacteristicValue.objects.get_or_create(order=instance.order, value_type=value_type)
+        ch_value.measurements.add(instance)
+        ch_value.save()
 
 
 class Measurement(models.Model):
@@ -129,40 +155,64 @@ class Measurement(models.Model):
     measurement_devices = models.ManyToManyField(MeasurementDevice, verbose_name='Used measurement devices')
     raw_data_file = models.FileField(verbose_name='Raw data file')
 
+    measurement_tag = models.ForeignKey(MeasurementTag, blank=True, null=True)
+
     def __unicode__(self):
-        return "Measurement form " + str(self.date)
+        return "Measurement from " + str(self.date)
 
     def __str__(self):
         return str(self.__unicode__())
 
+
+post_save.connect(after_measurement_saved, sender=Measurement)
+
+
+def after_characteristic_value_saved(instance, update_fields, **kwargs):
+    if not update_fields or 'measurements' in update_fields:
+        dummy = instance.value
+
 class CharacteristicValue(models.Model):
+    order = models.ForeignKey(MeasurementOrder)
     value_type = models.ForeignKey(CharacteristicValueDescription)
     measurements = models.ManyToManyField(Measurement)
+    calc_rule_version = models.IntegerField(blank=True, default=-1)
+    finished = models.BooleanField(default=False)
+    calc_value = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ['order', 'value_type']
 
     def __init__(self, *args, **kwargs):
         super(CharacteristicValue, self).__init__(*args,**kwargs)
-        self.__calc_value = None
-        self.__calc_rule = None
+
 
     @property
     def value(self):
-        if self.__calc_value and self.__calc_rule == self.value_type.calculation_rule:
-            return self.__calc_value
+        current_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).last().id
+        if self.calc_value and self.calc_rule_version == current_rule_version:
+            return self.calc_value
         return self.__calculate_value()
 
     def __calculate_value(self):
-        self.__calc_rule = self.value_type.calculation_rule
-        self.__calc_value = self.__calc_rule.calculate(self.measurements)
-        return self.__calc_value
+        self.calc_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).last().id
+        calc_value = self.value_type.calculation_rule.calculate(self.measurements)
+        if calc_value:
+            self.calc_value = calc_value
+            self.finished = True
+            self.save(update_fields=['calc_rule_version', 'calc_value', 'finished'])
+        return self.calc_value
 
     def get_value_type_name(self):
         return self.value_type.value_name
 
     def __unicode__(self):
-        return self.value_type.value_name + ': ' + str(self.value)
+        return self.order.order_nr + ' ' + self.value_type.value_name
 
     def __str__(self):
         return str(self.__unicode__())
 
     def __repr__(self):
-        return '<' + self.__class__.__name__ + ': ' + self.value_type.value_name + ': ' + str(self.value) + '>'
+        return '<' + self.__class__.__name__ + ': ' + self.value_type.value_name + ' >'
+
+
+post_save.connect(after_characteristic_value_saved, sender=CharacteristicValue)

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import Measurement, CharacteristicValue, CharacteristicValueDescription
 from .models import CalculationRule, MeasurementOrder, MeasurementDevice
-from .models import MeasurementItem, MeasurementOrderDefinition
+from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementTag
 
 
 # Register your models here.
@@ -22,6 +22,7 @@ admin.site.register(MeasurementOrderDefinition)
 admin.site.register(MeasurementOrder)
 admin.site.register(MeasurementItem)
 admin.site.register(MeasurementDevice)
+admin.site.register(MeasurementTag)
 admin.site.register(CharacteristicValue, CharacteristicValueAdmin)
 admin.site.register(CharacteristicValueDescription, CharacteristicValueDescriptionAdmin)
 admin.site.register(CalculationRule, CalculationRuleAdmin)
