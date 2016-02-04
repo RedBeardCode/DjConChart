@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 import pytest
 
 from .utilies import create_correct_sample_data
-from ..models import CharacteristicValue, MeasurementOrder, Measurement, MeasurementTag
-from ..models import CalculationRule
+from ..models import CharacteristicValue, MeasurementOrder, Measurement
+from ..models import CalculationRule, MeasurementTag, CharacteristicValueDescription
 
 
 @pytest.mark.django_db
@@ -115,3 +116,21 @@ def test_cv_rule_change(admin_client):
         assert cv._calc_value == 1.0
         assert cv.value == 2.0
         assert cv._calc_value == 2.0
+
+
+@pytest.mark.django_db
+def test_cv_wrong_value_type(admin_client):
+    create_correct_sample_data()
+    orders = MeasurementOrder.objects.filter(order_type__name='OrderDefinition1')
+    cv_type = CharacteristicValueDescription.objects.get(value_name='height')
+    for order in orders:
+        user = User.objects.get(username='admin')
+        item = order.measurement_items.all()[0]
+        meas = Measurement.objects.create(date=datetime.now(), order=order,
+                                          meas_item=item, examiner=user)
+        meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+        meas.order_items.add(cv_type)
+        meas.remarks = str(cv_type)
+        meas.raw_data_file = ContentFile('erste_messung.txt')
+        with pytest.raises(ValidationError):
+            meas.save()

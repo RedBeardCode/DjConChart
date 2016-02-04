@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -183,6 +184,11 @@ class CharacteristicValue(models.Model):
         unique_together = ['order', 'value_type']
 
     def __init__(self, *args, **kwargs):
+        if 'order' in kwargs and 'value_type' in kwargs:
+            order = kwargs['order']
+            value_type = kwargs['value_type']
+            if value_type not in order.order_type.characteristic_values.all():
+                raise ValidationError('Characteristic Value is not demanded in order')
         super(CharacteristicValue, self).__init__(*args,**kwargs)
 
 
