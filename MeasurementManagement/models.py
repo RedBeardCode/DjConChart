@@ -175,9 +175,9 @@ class CharacteristicValue(models.Model):
     order = models.ForeignKey(MeasurementOrder)
     value_type = models.ForeignKey(CharacteristicValueDescription)
     measurements = models.ManyToManyField(Measurement)
-    calc_rule_version = models.IntegerField(blank=True, default=-1)
-    finished = models.BooleanField(default=False)
-    calc_value = models.FloatField(blank=True, null=True)
+    _calc_rule_version = models.IntegerField(blank=True, default=-1)
+    _finished = models.BooleanField(default=False)
+    _calc_value = models.FloatField(blank=True, null=True)
 
     class Meta:
         unique_together = ['order', 'value_type']
@@ -188,19 +188,19 @@ class CharacteristicValue(models.Model):
 
     @property
     def value(self):
-        current_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).last().id
-        if self.calc_value and self.calc_rule_version == current_rule_version:
-            return self.calc_value
+        current_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).first().id
+        if self._calc_value and self._calc_rule_version == current_rule_version:
+            return self._calc_value
         return self.__calculate_value()
 
     def __calculate_value(self):
-        self.calc_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).last().id
+        self._calc_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).last().id
         calc_value = self.value_type.calculation_rule.calculate(self.measurements)
         if calc_value:
-            self.calc_value = calc_value
-            self.finished = True
-            self.save(update_fields=['calc_rule_version', 'calc_value', 'finished'])
-        return self.calc_value
+            self._calc_value = calc_value
+            self._finished = True
+            self.save(update_fields=['_calc_rule_version', '_calc_value', '_finished'])
+        return self._calc_value
 
     def get_value_type_name(self):
         return self.value_type.value_name

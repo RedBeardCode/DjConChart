@@ -32,7 +32,8 @@ def test_admin_calculation_rule(admin_client, live_server):
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/calculationrule/')
         login_as_admin(selenium)
-        assert selenium.find_elements_by_link_text('dummy')
+        assert selenium.find_elements_by_link_text('calc_rule')
+        assert selenium.find_elements_by_link_text('calc_multi_rule')
         tbody = selenium.find_element_by_id('result_list').find_element_by_tag_name('tbody')
         assert tbody
         lines = tbody.find_elements_by_tag_name('tr')

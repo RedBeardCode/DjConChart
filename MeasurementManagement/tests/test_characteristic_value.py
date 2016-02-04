@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from django.contrib.auth.models import User
-
 from django.core.files.base import ContentFile
 import pytest
 
 from .utilies import create_correct_sample_data
 from ..models import CharacteristicValue, MeasurementOrder, Measurement, MeasurementTag
+from ..models import CalculationRule
 
 
 @pytest.mark.django_db
@@ -29,7 +29,7 @@ def test_cv_single_creation(admin_client):
             count += 1
             assert CharacteristicValue.objects.get(order=order, value_type=cv_type)
     assert len(CharacteristicValue.objects.all()) == count
-    assert len(CharacteristicValue.objects.filter(finished=True)) == count - 3
+    assert len(CharacteristicValue.objects.filter(_finished=True)) == count - 3
 
 
 @pytest.mark.django_db
@@ -53,7 +53,7 @@ def test_cv_multi_creation(admin_client):
         meas.save()
     assert len(CharacteristicValue.objects.all()) == count
     for cv in CharacteristicValue.objects.all():
-        assert cv.finished
+        assert cv._finished
         assert cv.value == 1.0
 
 
@@ -78,6 +78,40 @@ def test_cv_multi_meas_creation(admin_client):
                 meas.save()
     assert len(CharacteristicValue.objects.all()) == count / 2
     for cv in CharacteristicValue.objects.all():
-        assert cv.finished
+        assert cv._finished
         assert cv.value == 42
 
+
+CALC_RULE_CODE = '''
+def calculate(meas_dict):
+    return 2.0\n'''
+
+
+@pytest.mark.django_db
+def test_cv_rule_change(admin_client):
+    create_correct_sample_data()
+    orders = MeasurementOrder.objects.filter(order_type__name='OrderDefinition1')
+    for order in orders:
+        cv_types = order.order_type.characteristic_values.all()
+        user = User.objects.get(username='admin')
+        item = order.measurement_items.all()[0]
+        for cv_type in cv_types:
+            meas = Measurement.objects.create(date=datetime.now(), order=order,
+                                              meas_item=item, examiner=user)
+            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            meas.order_items.add(cv_type)
+            meas.remarks = str(cv_type)
+            meas.raw_data_file = ContentFile('erste_messung.txt')
+            meas.save()
+            cv = CharacteristicValue.objects.get(order=order, value_type=cv_type)
+            assert cv
+            assert cv.value == 1.0
+            assert cv._finished
+    rule = CalculationRule.objects.get(rule_name='calc_rule')
+    rule.rule_code = CALC_RULE_CODE
+    rule.save()
+    characteristic_values = CharacteristicValue.objects.all()
+    for cv in characteristic_values:
+        assert cv._calc_value == 1.0
+        assert cv.value == 2.0
+        assert cv._calc_value == 2.0

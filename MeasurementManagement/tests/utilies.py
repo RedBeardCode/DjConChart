@@ -30,8 +30,8 @@ def calculate(meas_dict):
 def create_correct_sample_data():
     dummy = MeasurementTag.objects.create(name='width')
     dummy = MeasurementTag.objects.create(name='height')
-    calc_rule = CalculationRule.objects.create(rule_name="dummy", rule_code=CALC_RULE_CODE)
-    calc_multi_rule = CalculationRule.objects.create(rule_name="dummy",
+    calc_rule = CalculationRule.objects.create(rule_name="calc_rule", rule_code=CALC_RULE_CODE)
+    calc_multi_rule = CalculationRule.objects.create(rule_name="calc_multi_rule",
                                                      rule_code=CALC_MULTI_RULE_CODE)
     devices = [MeasurementDevice.objects.create(sn=i, name='Device {:d}'.format(i)) for i in range(5)]
     length = CharacteristicValueDescription.objects.create(value_name='length', description='length',
