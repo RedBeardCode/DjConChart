@@ -20,6 +20,27 @@ class MeasurementDevice(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 
+class AccessLogDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AccessLogDict, self).__init__(*args, **kwargs)
+        self.__read_keys = set()
+
+    def __contains__(self, item):
+        self.__read_keys.add(item)
+        return super(AccessLogDict, self).__contains__(item)
+
+    def __getitem__(self, item):
+        self.__read_keys.add(item)
+        return super(AccessLogDict, self).__getitem__(item)
+
+    def get_missing_keys(self):
+        missing_keys = set()
+        for key in self.__read_keys:
+            if key not in self.keys():
+                missing_keys.add(key)
+        return missing_keys
+
+
 @revisions.register
 class CalculationRule(models.Model):
     rule_name = models.TextField(verbose_name='Name of the calculation rule')
@@ -28,6 +49,7 @@ class CalculationRule(models.Model):
     def __init__(self, *args, **kwargs):
         super(CalculationRule, self).__init__(*args, **kwargs)
         self.__is_changed = True
+        self.__missing_keys = set()
 
     def __unicode__(self):
         return self.rule_name
@@ -35,12 +57,15 @@ class CalculationRule(models.Model):
     def __str__(self):
         return str(self.__unicode__())
 
-
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.rule_name + '>'
 
+    @property
+    def missing_keys(self):
+        return self.__missing_keys
+
     def calculate(self, measurements):
-        meas_dict = {}
+        meas_dict = AccessLogDict()
         for meas in measurements.all():
             if meas.measurement_tag:
                 meas_dict[meas.measurement_tag.name] = meas
@@ -52,13 +77,17 @@ class CalculationRule(models.Model):
         exec('\n'.join(code_lines))
         self.__calc_func = locals()[func_name]
         self.__is_changed = False
-        return self.__calc_func(meas_dict)
+        calc_return = self.__calc_func(meas_dict)
+        self.__missing_keys = meas_dict.get_missing_keys()
+        return calc_return
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         self.__is_changed = True
         with transaction.atomic(), revisions.create_revision():
             super(CalculationRule, self).save(force_insert, force_update, using, update_fields)
+        CharacteristicValue.objects.filter(value_type__calculation_rule__rule_name=self.rule_name).update(
+            _is_valid=False)
 
     def is_changed(self):
         return self.__is_changed
@@ -75,6 +104,7 @@ class MeasurementTag(models.Model):
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.name + '>'
+
 
 class CharacteristicValueDescription(models.Model):
     value_name = models.CharField(max_length=127, verbose_name='Name of the characterisitc value')
@@ -172,11 +202,12 @@ def after_characteristic_value_saved(instance, update_fields, **kwargs):
     if not update_fields or 'measurements' in update_fields:
         dummy = instance.value
 
+
 class CharacteristicValue(models.Model):
     order = models.ForeignKey(MeasurementOrder)
     value_type = models.ForeignKey(CharacteristicValueDescription)
     measurements = models.ManyToManyField(Measurement)
-    _calc_rule_version = models.IntegerField(blank=True, default=-1)
+    _is_valid = models.BooleanField(default=False)
     _finished = models.BooleanField(default=False)
     _calc_value = models.FloatField(blank=True, null=True)
 
@@ -194,25 +225,36 @@ class CharacteristicValue(models.Model):
 
     @property
     def value(self):
-        current_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).first().id
-        if self._calc_value and self._calc_rule_version == current_rule_version:
+        if self.is_valid and self._finished:
             return self._calc_value
         return self.__calculate_value()
 
     def __calculate_value(self):
-        self._calc_rule_version = revisions.revision.get_for_object(self.value_type.calculation_rule).last().id
         calc_value = self.value_type.calculation_rule.calculate(self.measurements)
+        self._is_valid = True
         if calc_value:
             self._calc_value = calc_value
             self._finished = True
-            self.save(update_fields=['_calc_rule_version', '_calc_value', '_finished'])
+            self.save(update_fields=['_is_valid', '_calc_value', '_finished'])
         return self._calc_value
 
     def get_value_type_name(self):
         return self.value_type.value_name
 
+    @property
+    def is_valid(self):
+        return self._is_valid
+
+    @property
+    def missing_keys(self):
+        if self._finished:
+            return set()
+        rule = self.value_type.calculation_rule
+        dummy = rule.calculate(self.measurements)
+        return rule.missing_keys
+
     def __unicode__(self):
-        return self.order.order_nr + ' ' + self.value_type.value_name
+        return str(self.order.order_nr) + ' ' + self.value_type.value_name
 
     def __str__(self):
         return str(self.__unicode__())

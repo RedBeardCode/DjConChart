@@ -4,8 +4,9 @@ from datetime import datetime
 from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 
-from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag
+from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 from .models import CharacteristicValueDescription
 from .multiform import MultiFormsView
@@ -138,3 +139,32 @@ def get_ajax_meas_item(request):
             name_response.append(item.name)
 
     return JsonResponse(response)
+
+
+def recalc_characteristic_values(request, type=''):
+    context = {}
+    context['num_of_invalid'] = CharacteristicValue.objects.filter(_is_valid=False).count()
+    unfinished_values = CharacteristicValue.objects.filter(_finished=False)
+    context['num_not_finished'] = unfinished_values.count()
+    missing_keys = {}
+    for cv in unfinished_values:
+        missing_keys[str(cv)] = ','.join(cv.missing_keys)
+    context['missing_keys'] = missing_keys
+    return render_to_response('recalc_view.html', context)
+
+
+def recalculate_invalid(request):
+    if request.is_ajax() and request.method == 'POST':
+        invalid_values = CharacteristicValue.objects.filter(_is_valid=False)
+        for val in invalid_values:
+            dummy = val.value
+    return JsonResponse({})
+
+
+def recalculate_progress(request):
+    if request.is_ajax() and request.method == 'POST' and request.POST['start_num']:
+        num_invalid_val = CharacteristicValue.objects.filter(_is_valid=False).count()
+        start_num = int(request.POST['start_num'])
+        progress = int((start_num - num_invalid_val) * 100.0 / start_num)
+        return JsonResponse({'progress': str(progress), 'finished': num_invalid_val == 0})
+    return JsonResponse({'progress': '0', 'finished': True})

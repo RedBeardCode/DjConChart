@@ -1,7 +1,10 @@
 import datetime
 
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+
 from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefinition, CharacteristicValueDescription, \
-    MeasurementTag
+    MeasurementTag, Measurement
 from MeasurementManagement.models import MeasurementDevice, MeasurementItem, CalculationRule
 
 FAKE_TIME = datetime.datetime(2020, 12, 5, 17, 5, 55)
@@ -55,3 +58,22 @@ def create_correct_sample_data():
         item = MeasurementItem.objects.create(sn='{:07d}'.format(i), name='Item {:d}'.format(i))
         order = MeasurementOrder.objects.create(order_type=order_definitions[i % 3])
         order.measurement_items.add(item)
+
+
+def create_sample_characteristic_values():
+    orders = MeasurementOrder.objects.all()
+    count = 0
+    for order in orders:
+        cv_types = order.order_type.characteristic_values.all()
+        user = User.objects.all()[0]
+        item = order.measurement_items.all()[0]
+        for cv_type in cv_types:
+            meas = Measurement.objects.create(date=datetime.datetime.now(), order=order,
+                                              meas_item=item, examiner=user)
+            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            meas.order_items.add(cv_type)
+            meas.remarks = str(cv_type)
+            meas.raw_data_file = ContentFile('erste_messung.txt')
+            meas.save()
+            count += 1
+

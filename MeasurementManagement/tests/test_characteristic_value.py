@@ -108,14 +108,23 @@ def test_cv_rule_change(admin_client):
             assert cv
             assert cv.value == 1.0
             assert cv._finished
+            assert cv.is_valid == True
+            assert cv._is_valid == True
     rule = CalculationRule.objects.get(rule_name='calc_rule')
     rule.rule_code = CALC_RULE_CODE
     rule.save()
     characteristic_values = CharacteristicValue.objects.all()
+    assert len(characteristic_values) == len(CharacteristicValue.objects.filter(_is_valid=False))
     for cv in characteristic_values:
         assert cv._calc_value == 1.0
+        assert cv.is_valid == False
+        assert cv._is_valid == False
+        assert cv._finished == True
         assert cv.value == 2.0
         assert cv._calc_value == 2.0
+        assert cv.is_valid == True
+        assert cv._is_valid == True
+        assert cv._finished == True
 
 
 @pytest.mark.django_db

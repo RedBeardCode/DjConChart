@@ -1,9 +1,12 @@
+from datetime import datetime
+
+from django.contrib.auth.models import User
 import pytest
 from selenium import webdriver
 import reversion as revisions
 
-from .utilies import login_as_admin
-from ..models import CalculationRule
+from .utilies import login_as_admin, create_correct_sample_data
+from ..models import CalculationRule, MeasurementOrder, Measurement, MeasurementTag
 
 
 @pytest.mark.django_db
@@ -108,3 +111,34 @@ def test_rule_history_new_view(admin_client, live_server):
         assert len(versions) == 2
     finally:
         selenium.close()
+
+
+@pytest.mark.django_db
+def test_rule_missing_key(admin_client):
+    class MockRelationManager(object):
+        def __init__(self, measurements):
+            self.__measurements = measurements
+
+        def all(self):
+            return self.__measurements
+
+    create_correct_sample_data()
+    calc_rule = CalculationRule.objects.get(rule_name='calc_multi_rule')
+    order = MeasurementOrder.objects.filter(order_type__name='OrderDefinition3')[0]
+    user = User.objects.get(username='admin')
+    item = order.measurement_items.all()[0]
+    m_width = Measurement.objects.create(date=datetime.now(), order=order,
+                                          meas_item=item, examiner=user)
+    m_width.measurement_tag = MeasurementTag.objects.get(name='width')
+    m_height = Measurement.objects.create(date=datetime.now(), order=order,
+                                          meas_item=item, examiner=user)
+    m_height.measurement_tag = MeasurementTag.objects.get(name='height')
+    calc_rule.calculate(MockRelationManager([]))
+    assert 'width' in calc_rule.missing_keys
+    calc_rule.calculate(MockRelationManager([m_width]))
+    assert 'height' in calc_rule.missing_keys
+    calc_rule.calculate(MockRelationManager([m_width, m_height]))
+    assert calc_rule.missing_keys == set()
+
+
+

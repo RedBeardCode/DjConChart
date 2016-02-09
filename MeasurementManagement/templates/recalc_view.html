@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div id="invalid_values"></div>
+    <label>Number of invalid characteristic values: {{ num_of_invalid }}</label>
+
+    <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+             aria-valuemax="{{ num_of_invalid }}" style="width: 0%;">
+            <span id="progress_value"> 0%</span>
+        </div>
+    </div>
+
+    <button type="button" id="recalc_values" class="btn btn-default" onclick="recalc_values()">Recalculation of invalid
+        values
+    </button>
+    {% if num_not_finished > 0 %}
+        <p><label>Number of unfinished characteristic values: {{ num_not_finished }}</label>
+            <button type="button" id="collapse_unfinished" class="btn btn-default" data-toggle="collapse"
+                    data-target="#unfinished_values">
+                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+            </button>
+        </p>
+        <div id="unfinished_values" class="collapse">
+            <ul>
+                {% for cv, missing_key in missing_keys.items %}
+                    <li>{{ cv }}: {{ missing_key }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block inlinescripts %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            init_ajax_csrf();
+        });
+        function recalc_values() {
+            setTimeout(recalc_progress, 5000);
+            $.ajax({
+                url: '{% url "recalculate_invalid" %}',
+                success: function (data, textStatus, XMLHttpRequest) {
+                },
+                type: 'POST',
+            });
+
+        }
+        function recalc_progress() {
+            $.ajax({
+                url: '{% url "recalculate_progress" %}',
+                success: function (data, textStatus, XMLHttpRequest) {
+
+                    $('#progress_value').text(data.progress + '%');
+                    $('.progress-bar').width(data.progress + '%');
+                    if (!data.finished) {
+                        setTimeout(recalc_progress, 5000);
+                    }
+                },
+                type: 'POST',
+                data: {start_num: {{ num_of_invalid }}},
+                datatype: 'JSON',
+            });
+        }
+    </script>
+{% endblock %}
+
