@@ -166,5 +166,6 @@ def recalculate_progress(request):
         num_invalid_val = CharacteristicValue.objects.filter(_is_valid=False).count()
         start_num = int(request.POST['start_num'])
         progress = int((start_num - num_invalid_val) * 100.0 / start_num)
-        return JsonResponse({'progress': str(progress), 'finished': num_invalid_val == 0})
-    return JsonResponse({'progress': '0', 'finished': True})
+        return JsonResponse(
+            {'progress': str(progress), 'remaining': str(num_invalid_val), 'finished': num_invalid_val == 0})
+    return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
