@@ -207,6 +207,7 @@ class CharacteristicValue(models.Model):
     order = models.ForeignKey(MeasurementOrder)
     value_type = models.ForeignKey(CharacteristicValueDescription)
     measurements = models.ManyToManyField(Measurement)
+    date = models.DateTimeField(auto_now=True)
     _is_valid = models.BooleanField(default=False)
     _finished = models.BooleanField(default=False)
     _calc_value = models.FloatField(blank=True, null=True)
@@ -235,7 +236,8 @@ class CharacteristicValue(models.Model):
         if calc_value:
             self._calc_value = calc_value
             self._finished = True
-            self.save(update_fields=['_is_valid', '_calc_value', '_finished'])
+            self.date = self.measurements.last().date
+            self.save(update_fields=['_is_valid', '_calc_value', '_finished', 'date'])
         return self._calc_value
 
     def get_value_type_name(self):
