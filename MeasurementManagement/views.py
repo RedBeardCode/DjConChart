@@ -1,10 +1,15 @@
 # Create your views here.
 from datetime import datetime
 
+from bokeh.models import Range1d
 from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
+from bokeh.plotting import figure, curdoc
+from bokeh.client import push_session
+
+from bokeh.embed import autoload_server
 
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
@@ -169,3 +174,37 @@ def recalculate_progress(request):
         return JsonResponse(
             {'progress': str(progress), 'remaining': str(num_invalid_val), 'finished': num_invalid_val == 0})
     return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
+
+
+def plot_characteristic_values(request):
+    context = {}
+    script = __create_plot_code()
+    context['script'] = script
+    return render_to_response('plot_charateristic_value.html', context=context)
+
+
+def __create_plot_code():
+    # TODO: was als xachse?
+    values = __fetch_plot_data()
+    plot = figure(x_range=values.index.format())
+    plot.circle(values.id, values['_calc_value'], color='navy', alpha=0.5)
+    plot.line(values.id, values['_calc_value'], color='navy', alpha=0.5)
+    plot.logo = None
+    mean_value = values['_calc_value'].mean()
+    delta = mean_value * 0.3
+    if not isinstance(plot.y_range, Range1d):
+        plot.y_range = Range1d(start=mean_value - delta, end=mean_value + delta)
+    session = push_session(curdoc())
+    script = autoload_server(plot, session_id=session.id)
+    return script
+
+
+def __fetch_plot_data(max_number=100, max_recalc=50):
+    values = CharacteristicValue.objects.filter(_finished=True)[:max_number]
+    if values.filter(_is_valid=True).count() > max_recalc:
+        pass
+        # TODO:Warning to much to recalc
+    for calc_value in values.filter(_is_valid=True):
+        dummy = calc_value.value  # Trigger calculation
+    values.filter(_is_valid=True).update()
+    return values.to_timeseries(index='date', fieldnames=['id', '_calc_values'])

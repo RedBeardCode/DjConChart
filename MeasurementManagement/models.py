@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
 import reversion as revisions
+from django_pandas.managers import DataFrameManager
 # Create your models here.
 
 class MeasurementDevice(models.Model):
@@ -211,6 +212,8 @@ class CharacteristicValue(models.Model):
     _is_valid = models.BooleanField(default=False)
     _finished = models.BooleanField(default=False)
     _calc_value = models.FloatField(blank=True, null=True)
+
+    objects = DataFrameManager()
 
     class Meta:
         unique_together = ['order', 'value_type']
