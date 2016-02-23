@@ -1,14 +1,13 @@
 # Create your views here.
 from datetime import datetime
 
-from bokeh.models import Range1d
+from bokeh.models import FactorRange
 from django.views.generic import CreateView
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from bokeh.plotting import figure, curdoc
 from bokeh.client import push_session
-
 from bokeh.embed import autoload_server
 
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue
@@ -184,27 +183,20 @@ def plot_characteristic_values(request):
 
 
 def __create_plot_code():
-    # TODO: was als xachse?
     values = __fetch_plot_data()
-    plot = figure(x_range=values.index.format())
-    plot.circle(values.id, values['_calc_value'], color='navy', alpha=0.5)
-    plot.line(values.id, values['_calc_value'], color='navy', alpha=0.5)
+    factors = ['{}-{}'.format(val[0], val[1]) for val in values.values]
+    plot = figure(x_range=FactorRange(factors=factors))
+    plot.circle(factors, values['_calc_value'], color='navy', alpha=0.5)
+    plot.line(factors, values['_calc_value'], color='navy', alpha=0.5)
     plot.logo = None
-    mean_value = values['_calc_value'].mean()
-    delta = mean_value * 0.3
-    if not isinstance(plot.y_range, Range1d):
-        plot.y_range = Range1d(start=mean_value - delta, end=mean_value + delta)
+    plot.xaxis.major_label_orientation = "vertical"
+    plot.xaxis.major_label_standoff = 70
     session = push_session(curdoc())
     script = autoload_server(plot, session_id=session.id)
     return script
 
 
 def __fetch_plot_data(max_number=100, max_recalc=50):
-    values = CharacteristicValue.objects.filter(_finished=True)[:max_number]
-    if values.filter(_is_valid=True).count() > max_recalc:
-        pass
-        # TODO:Warning to much to recalc
-    for calc_value in values.filter(_is_valid=True):
-        dummy = calc_value.value  # Trigger calculation
-    values.filter(_is_valid=True).update()
-    return values.to_timeseries(index='date', fieldnames=['id', '_calc_values'])
+    values = CharacteristicValue.objects.filter(_finished=True)
+    return values[max(0, values.count() - max_number):].to_dataframe(
+        fieldnames=['id', 'measurements__meas_item__sn', '_calc_value'])
