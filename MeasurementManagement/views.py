@@ -1,5 +1,6 @@
 # Create your views here.
 from datetime import datetime
+from math import pi
 
 from bokeh.models import FactorRange
 from django.views.generic import CreateView
@@ -189,8 +190,8 @@ def __create_plot_code():
     plot.circle(factors, values['_calc_value'], color='navy', alpha=0.5)
     plot.line(factors, values['_calc_value'], color='navy', alpha=0.5)
     plot.logo = None
-    plot.xaxis.major_label_orientation = "vertical"
-    plot.xaxis.major_label_standoff = 70
+    plot.xaxis.major_label_orientation = pi / 4
+    plot.xaxis.major_label_standoff = 10
     session = push_session(curdoc())
     script = autoload_server(plot, session_id=session.id)
     return script
