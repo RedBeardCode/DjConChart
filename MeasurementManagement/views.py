@@ -1,6 +1,7 @@
 # Create your views here.
 from datetime import datetime
 from math import pi
+from re import findall
 
 from bokeh.models import FactorRange
 from django.views.generic import CreateView
@@ -176,15 +177,21 @@ def recalculate_progress(request):
     return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
 
 
-def plot_characteristic_values(request):
+def plot_characteristic_values(request, *args):
+    filter_args = {}
+    if args:
+        filter_strings = findall(r'(\w+/[\w\.]+)', args[0])
+        for single_filter in filter_strings:
+            key_value = single_filter.split('/')
+            filter_args[key_value[0]] = key_value[1]
     context = {}
-    script = __create_plot_code()
+    values = __fetch_plot_data(filter_args)
+    script = __create_plot_code(values)
     context['script'] = script
     return render_to_response('plot_charateristic_value.html', context=context)
 
 
-def __create_plot_code():
-    values = __fetch_plot_data()
+def __create_plot_code(values):
     factors = ['{}-{}'.format(val[0], val[1]) for val in values.values]
     plot = figure(x_range=FactorRange(factors=factors))
     plot.circle(factors, values['_calc_value'], color='navy', alpha=0.5)
@@ -197,7 +204,7 @@ def __create_plot_code():
     return script
 
 
-def __fetch_plot_data(max_number=100, max_recalc=50):
-    values = CharacteristicValue.objects.filter(_finished=True)
+def __fetch_plot_data(filter_args, max_number=100):
+    values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
     return values[max(0, values.count() - max_number):].to_dataframe(
         fieldnames=['id', 'measurements__meas_item__sn', '_calc_value'])
