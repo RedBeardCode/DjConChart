@@ -259,6 +259,7 @@ class CharacteristicValue(models.Model):
 
     class Meta:
         unique_together = ['order', 'value_type']
+        ordering = ['-date']
 
     def __init__(self, *args, **kwargs):
         if 'order' in kwargs and 'value_type' in kwargs:
