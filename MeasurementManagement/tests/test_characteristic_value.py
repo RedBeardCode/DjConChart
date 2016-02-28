@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 import pytest
 
-from .utilies import create_correct_sample_data
+from .utilies import create_correct_sample_data, create_sample_characteristic_values
 from ..models import CharacteristicValue, MeasurementOrder, Measurement
 from ..models import CalculationRule, MeasurementTag, CharacteristicValueDescription
 
@@ -146,3 +146,31 @@ def test_cv_wrong_value_type(admin_client):
         meas.raw_data_file = ContentFile('erste_messung.txt')
         with pytest.raises(ValidationError):
             meas.save()
+
+
+@pytest.mark.django_db
+def test_cv_filter_value(admin_client):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    value_qs = CharacteristicValue.objects.filter(value__gt=1)
+    calc_value_qs = CharacteristicValue.objects.filter(_calc_value__gt=1)
+    for cv in calc_value_qs:
+        assert cv in value_qs
+    value_qs = CharacteristicValue.objects.filter(value__lt=2)
+    calc_value_qs = CharacteristicValue.objects.filter(_calc_value__lt=2)
+    for cv in calc_value_qs:
+        assert cv in value_qs
+
+
+@pytest.mark.django_db
+def test_cv_to_dataframe(admin_client):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    value_qs = CharacteristicValue.objects.all()
+    data_frame = value_qs.to_dataframe()
+    assert 'value' in data_frame.columns
+    assert '_calc_value' not in data_frame.columns
+    data_frame = value_qs.to_dataframe(fieldnames=['value'])
+    assert 'value' in data_frame.columns
+    data_frame = value_qs.to_dataframe(fieldnames=['_calc_value'])
+    assert 'value' not in data_frame.columns

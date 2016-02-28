@@ -1,10 +1,13 @@
+from re import compile
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
+from django_pandas.io import read_frame
 import reversion as revisions
-from django_pandas.managers import DataFrameManager
+from django_pandas.managers import DataFrameQuerySet
 # Create your models here.
 
 class MeasurementDevice(models.Model):
@@ -204,6 +207,45 @@ def after_characteristic_value_saved(instance, update_fields, **kwargs):
         dummy = instance.value
 
 
+class CalcValueQuerySet(DataFrameQuerySet):
+    value_re = compile('^value([_]{2})')
+    MAX_NUM_CALCULATION = 100
+
+    def __init__(self, *args, **kwargs):
+        super(CalcValueQuerySet, self).__init__(*args, **kwargs)
+
+    def filter(self, *args, **kwargs):
+        for key in kwargs:
+            if key.startswith('value'):
+                new_key = self.value_re.sub('_calc_value\g<1>', key)
+                kwargs[new_key] = kwargs.pop(key)
+        return super(CalcValueQuerySet, self).filter(*args, **kwargs)
+
+    def recalculation(self):
+        for value in self:
+            dummy = value.value
+
+    def to_dataframe(self, fieldnames=(), verbose=True, index=None,
+                     coerce_float=False):
+        outdated_values = self.filter(_is_valid=False)
+        if self.filter(_is_valid=False).count() > self.MAX_NUM_CALCULATION:
+            raise UserWarning('More then {} characteristic values have to be recalculated for this request.\n'
+                              'Please recalcutate the values manually (RecalcView) first')
+        outdated_values.recalculation()
+        read_calc_value = '_calc_value' in fieldnames
+        if 'value' in fieldnames:
+            fieldnames[fieldnames.index('value')] = '_calc_value'
+        frame = read_frame(self, fieldnames=fieldnames, verbose=verbose,
+                           index_col=index, coerce_float=coerce_float)
+        if '_calc_value' in frame.columns and not read_calc_value:
+            new_labels = list(frame.columns)
+            new_labels[new_labels.index('_calc_value')] = 'value'
+            frame.columns = new_labels
+        return frame
+
+
+CalcValueManager = models.Manager.from_queryset(CalcValueQuerySet)
+
 class CharacteristicValue(models.Model):
     order = models.ForeignKey(MeasurementOrder)
     value_type = models.ForeignKey(CharacteristicValueDescription)
@@ -213,7 +255,7 @@ class CharacteristicValue(models.Model):
     _finished = models.BooleanField(default=False)
     _calc_value = models.FloatField(blank=True, null=True)
 
-    objects = DataFrameManager()
+    objects = CalcValueManager()
 
     class Meta:
         unique_together = ['order', 'value_type']
