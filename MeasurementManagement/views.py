@@ -1,7 +1,6 @@
 # Create your views here.
 from datetime import datetime
 from math import pi
-from re import findall
 
 from bokeh.models import FactorRange
 from django.views.generic import CreateView
@@ -177,13 +176,10 @@ def recalculate_progress(request):
     return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
 
 
-def plot_characteristic_values(request, *args):
+def plot_characteristic_values(request):
     filter_args = {}
-    if args:
-        filter_strings = findall(r'(\w+/[\w\.]+)', args[0])
-        for single_filter in filter_strings:
-            key_value = single_filter.split('/')
-            filter_args[key_value[0]] = key_value[1]
+    if request.GET:
+        filter_args = request.GET.dict()
     context = {}
     values = __fetch_plot_data(filter_args)
     script = __create_plot_code(values)
