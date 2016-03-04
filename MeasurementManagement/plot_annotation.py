@@ -51,6 +51,28 @@ class LowerInterventionAnnotation(MultiStdAnnotation):
     def __init__(self, **kwargs):
         super(LowerInterventionAnnotation, self).__init__(PlotAnnotation.LOWER_INTERVENTION_LEVEL, **kwargs)
 
+class FixedMaxAnnotation(PlotAnnotation):
+    def __init__(self, max_bottom, fill_color='red', **kwargs):
+        super(FixedMaxAnnotation, self).__init__(fill_color=fill_color, **kwargs)
+        self.__max_bottom = max_bottom
+
+    def bottom(self, y_values):
+        return self.__max_bottom
+
+    def top(self, y_values):
+        return None
+
+class FixedMinAnnotation(PlotAnnotation):
+    def __init__(self, min_top, fill_color='red', **kwargs):
+        super(FixedMinAnnotation, self).__init__(fill_color=fill_color, **kwargs)
+        self.__min_top = min_top
+
+    def bottom(self, y_values):
+        return None
+
+    def top(self, y_values):
+        return self.__min_top
+
 
 class PlotAnnotationContainer(object):
     def __init__(self, create_default=True):
