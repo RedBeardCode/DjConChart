@@ -11,6 +11,7 @@ from bokeh.plotting import figure, curdoc
 from bokeh.client import push_session
 from bokeh.embed import autoload_server
 
+from MeasurementManagement.plot_annotation import PlotAnnotationContainer, FixedMaxAnnotation, FixedMinAnnotation
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 from .models import CharacteristicValueDescription
@@ -187,7 +188,9 @@ def plot_characteristic_values(request):
     return render_to_response('plot_charateristic_value.html', context=context)
 
 
-def __create_plot_code(values):
+def __create_plot_code(values, annotations=PlotAnnotationContainer()):
+    annotations.add_annotation('max', FixedMaxAnnotation(2))
+    annotations.add_annotation('min', FixedMinAnnotation(1))
     factors = ['{}-{}'.format(val[0], val[1]) for val in values.values]
     plot = figure(x_range=FactorRange(factors=factors))
     plot.circle(factors, values['_calc_value'], color='navy', alpha=0.5)
@@ -195,6 +198,11 @@ def __create_plot_code(values):
     plot.logo = None
     plot.xaxis.major_label_orientation = pi / 4
     plot.xaxis.major_label_standoff = 10
+    min_anno, max_anno = annotations.calc_min_max_annotation(values['_calc_value'])
+    range = max_anno - min_anno
+    annotations.plot(plot, values['_calc_value'])
+    plot.y_range.start = min_anno - range
+    plot.y_range.end = max_anno + range
     session = push_session(curdoc())
     script = autoload_server(plot, session_id=session.id)
     return script
