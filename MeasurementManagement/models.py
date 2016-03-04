@@ -10,6 +10,17 @@ import reversion as revisions
 from django_pandas.managers import DataFrameQuerySet
 # Create your models here.
 
+
+class Product(models.Model):
+    product_name = models.CharField(max_length=30)
+
+    def __unicode__(self):
+        return self.product_name
+
+    def __repr__(self):
+        return '<' + self.__class__.__name__ + ': ' + self.product_name + ' >'
+
+
 class MeasurementDevice(models.Model):
     name = models.CharField(max_length=127)
     sn = models.CharField(max_length=11)
@@ -129,7 +140,7 @@ class CharacteristicValueDescription(models.Model):
 class MeasurementItem(models.Model):
     sn = models.CharField(max_length=11, verbose_name='Serial number of the measurement item')
     name = models.CharField(max_length=255, verbose_name='Name of the measurement item', blank=True)
-
+    product = models.ForeignKey(Product, verbose_name='Product')
     def __unicode__(self):
         return  self.name + ': ' + self.sn
 
@@ -142,6 +153,7 @@ class MeasurementItem(models.Model):
 
 class MeasurementOrderDefinition(models.Model):
     name = models.CharField(max_length=127, verbose_name='Name of the measurement order')
+    product = models.ForeignKey(Product, verbose_name='Product to be measured')
     characteristic_values = models.ManyToManyField(CharacteristicValueDescription,
                                                    verbose_name='Characterisctic values to be measured')
 
