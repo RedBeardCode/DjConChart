@@ -3,9 +3,9 @@ import datetime
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 
-from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefinition, CharacteristicValueDescription, \
-    MeasurementTag, Measurement
 from MeasurementManagement.models import MeasurementDevice, MeasurementItem, CalculationRule
+from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefinition, CharacteristicValueDescription, \
+    MeasurementTag, Measurement, Product
 
 FAKE_TIME = datetime.datetime(2020, 12, 5, 17, 5, 55)
 
@@ -47,15 +47,21 @@ def create_correct_sample_data():
                                                            calculation_rule=calc_multi_rule)
     height.possible_meas_devices.add(*devices)
 
-    order_definition1 = MeasurementOrderDefinition.objects.create(name="OrderDefinition1")
+    products = []
+    products.append(Product.objects.create(product_name='product1'))
+    products.append(Product.objects.create(product_name='product2'))
+    products.append(Product.objects.create(product_name='product3'))
+
+    order_definition1 = MeasurementOrderDefinition.objects.create(name="OrderDefinition1", product=products[0])
     order_definition1.characteristic_values.add(length)
-    order_definition2 = MeasurementOrderDefinition.objects.create(name="OrderDefinition2")
+    order_definition2 = MeasurementOrderDefinition.objects.create(name="OrderDefinition2", product=products[1])
     order_definition2.characteristic_values.add(length, width)
-    order_definition3 = MeasurementOrderDefinition.objects.create(name="OrderDefinition3")
+    order_definition3 = MeasurementOrderDefinition.objects.create(name="OrderDefinition3", product=products[2])
     order_definition3.characteristic_values.add(length, width, height)
     order_definitions = [order_definition1, order_definition2, order_definition3]
     for i in range(10):
-        item = MeasurementItem.objects.create(sn='{:07d}'.format(i), name='Item {:d}'.format(i))
+        item = MeasurementItem.objects.create(sn='{:07d}'.format(i), name='Item {:d}'.format(i),
+                                              product=products[i % 3])
         order = MeasurementOrder.objects.create(order_type=order_definitions[i % 3])
         order.measurement_items.add(item)
 

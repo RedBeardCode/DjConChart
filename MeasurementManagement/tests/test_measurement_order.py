@@ -51,6 +51,8 @@ def test_create_meas_order_def_view(admin_client, live_server):
         meas_items = Select(selenium.find_element_by_id('id_characteristic_values'))
         meas_items.select_by_index(0)
         meas_items.select_by_index(2)
+        product = Select(selenium.find_element_by_id('id_product'))
+        product.select_by_index(1)
         selenium.find_element_by_tag_name('form').submit()
         assert selenium.current_url == live_server + '/'
         assert len(MeasurementOrderDefinition.objects.all()) == order_defs_before + 1

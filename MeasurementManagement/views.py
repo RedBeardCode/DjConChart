@@ -2,21 +2,21 @@
 from datetime import datetime
 from math import pi
 
+from bokeh.client import push_session
+from bokeh.embed import autoload_server
 from bokeh.models import FactorRange
-from django.views.generic import CreateView
+from bokeh.plotting import figure, curdoc
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from bokeh.plotting import figure, curdoc
-from bokeh.client import push_session
-from bokeh.embed import autoload_server
+from django.views.generic import CreateView
 
 from MeasurementManagement.plot_annotation import PlotAnnotationContainer, FixedMaxAnnotation, FixedMinAnnotation
-from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue
-from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
-from .models import CharacteristicValueDescription
-from .multiform import MultiFormsView
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
+from .models import CharacteristicValueDescription
+from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue, Product
+from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
+from .multiform import MultiFormsView
 
 
 class NewCharacteristicValueDescription(CreateView):
@@ -42,13 +42,13 @@ class NewMeasurementOrder(CreateView):
 class NewMeasurementOrderDefinition(CreateView):
     template_name = "new_base.html"
     model = MeasurementOrderDefinition
-    fields = ['name', 'characteristic_values']
+    fields = ['name', 'characteristic_values', 'product']
     success_url = '/'
 
 class NewMeasurementItem(CreateView):
     template_name = "new_base.html"
     model = MeasurementItem
-    fields = ['sn', 'name']
+    fields = ['sn', 'name', 'product']
     success_url = '/'
 
 class NewCalculationRule(CreateView):
@@ -91,8 +91,11 @@ class NewMeasurementItemAndOrder(MultiFormsView):
     def forms_valid(self, forms, form_name=''):
         items = []
         form = forms['item']
-        for sn, name in zip(form.data.getlist('sn'), form.data.getlist('name')):
-            items.append(MeasurementItem.objects.get_or_create(sn=sn, name=name)[0])
+        for sn, name, product_id in zip(form.data.getlist('sn'),
+                                        form.data.getlist('name'),
+                                        form.data.getlist('product')):
+            product = Product.objects.get(id=product_id)
+            items.append(MeasurementItem.objects.get_or_create(sn=sn, name=name, product=product)[0])
         order_type = MeasurementOrderDefinition.objects.get(pk=int(forms['order'].data['order_type']))
         order = MeasurementOrder.objects.create(order_type=order_type)
         for item in items:
@@ -103,6 +106,7 @@ class NewMeasurementItemAndOrder(MultiFormsView):
     def forms_invalid(self, forms):
         forms['sns'] = forms['item'].data.getlist('sn')
         forms['names'] = forms['item'].data.getlist('name')
+        forms['products'] = forms['item'].data.getlist('product')
         return self.render_to_response(self.get_context_data(forms=forms))
 
 
@@ -149,7 +153,7 @@ def get_ajax_meas_item(request):
 
 def recalc_characteristic_values(request, type=''):
     context = {}
-    context['num_of_invalid'] = CharacteristicValue.objects.filter(_is_valid=False).count()
+    context['num_of_invalid'] = CharacteristicValue.objects.filter(_is_valid=False, _finished=True).count()
     unfinished_values = CharacteristicValue.objects.filter(_finished=False)
     context['num_not_finished'] = unfinished_values.count()
     missing_keys = {}
@@ -161,7 +165,7 @@ def recalc_characteristic_values(request, type=''):
 
 def recalculate_invalid(request):
     if request.is_ajax() and request.method == 'POST':
-        invalid_values = CharacteristicValue.objects.filter(_is_valid=False)
+        invalid_values = CharacteristicValue.objects.filter(_is_valid=False, _finished=True)
         for val in invalid_values:
             dummy = val.value
     return JsonResponse({})
@@ -169,7 +173,7 @@ def recalculate_invalid(request):
 
 def recalculate_progress(request):
     if request.is_ajax() and request.method == 'POST' and request.POST['start_num']:
-        num_invalid_val = CharacteristicValue.objects.filter(_is_valid=False).count()
+        num_invalid_val = CharacteristicValue.objects.filter(_is_valid=False, _finished=True).count()
         start_num = int(request.POST['start_num'])
         progress = int((start_num - num_invalid_val) * 100.0 / start_num)
         return JsonResponse(

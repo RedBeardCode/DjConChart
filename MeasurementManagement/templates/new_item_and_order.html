@@ -68,6 +68,7 @@
                 {%  autoescape off %}
                     var sns = {{ forms.sns }};
                     var names = {{ forms.names }};
+                    var products =; {{ forms.products }}
                 {% endautoescape %}
                 for (i = 0; i < {{ forms.sns|length }}-1; i++) {
                     add_item();
@@ -75,9 +76,15 @@
                 for (i = {{ forms.sns|length }}-1; i >= 0; i--) {
                     $('.meas-item-group #id_sn')[i].value = sns[i];
                     $('.meas-item-group #id_name')[i].value = names[i];
+                    $('.meas-item-group #id_product')[i].value = products[i];
                     if (sns[i] != '') {
-                        $('.meas-item-group p').eq(i).remove();
+                        $('[id*="error_1_id_sn"]').eq(i).remove();
                         $('.form-group#div_id_sn').eq(i).removeClass('has-error');
+                    }
+                    if (products[i] != '') {
+                        $('[id*="error_1_id_product"]').eq(i).remove();
+                        $('.form-group#div_id_product').eq(i).removeClass('has-error');
+
                     }
                     if (i > 0) {
                         $('.alert').last().remove();

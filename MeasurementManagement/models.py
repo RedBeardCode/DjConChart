@@ -1,21 +1,25 @@
 from re import compile
 
+import reversion as revisions
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models.signals import post_save
 from django_pandas.io import read_frame
-import reversion as revisions
 from django_pandas.managers import DataFrameQuerySet
 # Create your models here.
 
 
 class Product(models.Model):
-    product_name = models.CharField(max_length=30)
+    # TODO: add tests, add view with tests
+    product_name = models.CharField(max_length=30, unique=True)
 
     def __unicode__(self):
         return self.product_name
+
+    def __str__(self):
+        return str(self.__unicode__())
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.product_name + ' >'

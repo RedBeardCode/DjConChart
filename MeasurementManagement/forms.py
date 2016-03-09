@@ -9,7 +9,7 @@ from .models import MeasurementItem, MeasurementOrder
 class NewMeasurementItemForm(ModelForm):
     class Meta:
         model = MeasurementItem
-        fields = ['sn', 'name']
+        fields = ['sn', 'name', 'product']
         widgets = {'sn': TextInput(attrs={'autocomplete': 'off', 'class': 'sn_autocomplete'})}
 
     def clean(self):

@@ -15,6 +15,7 @@ def test_all_elements(admin_client, live_server):
         assert selenium.find_element_by_id('id_order_type')
         assert selenium.find_element_by_id('id_sn')
         assert selenium.find_element_by_id('id_name')
+        assert selenium.find_element_by_id('id_product')
         assert selenium.find_element_by_class_name('add_meas_item_btn')
     finally:
         selenium.close()
@@ -33,9 +34,11 @@ def test_add_meas_item_ui(admin_client, live_server):
         button.click()
         assert len(selenium.find_elements_by_id('id_sn')) == 2
         assert len(selenium.find_elements_by_id('id_name')) == 2
+        assert len(selenium.find_elements_by_id('id_product')) == 2
         button.click()
         assert len(selenium.find_elements_by_id('id_sn')) == 3
         assert len(selenium.find_elements_by_id('id_name')) == 3
+        assert len(selenium.find_elements_by_id('id_product')) == 3
 
         groups = selenium.find_elements_by_class_name('meas-item-group')
         for index, group in enumerate(groups):
@@ -69,6 +72,10 @@ def test_add_meas_order_one_item(admin_client, live_server):
         sn = selenium.find_element_by_id('id_sn')
         sn.send_keys('4711')
         selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        product = Select(selenium.find_element_by_id('id_product'))
+        product.select_by_index(1)
+        selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/'
         assert len(MeasurementOrder.objects.all()) == num_orders_before + 1
         assert len(MeasurementItem.objects.all()) == num_items_before + 1
@@ -91,10 +98,12 @@ def test_add_meas_order_two_item(admin_client, live_server):
         selenium.find_element_by_class_name('add_meas_item_btn').click()
         sns = selenium.find_elements_by_id('id_sn')
         names = selenium.find_elements_by_id('id_name')
+        products = selenium.find_elements_by_id('id_product')
         index = 0
-        for sn, name in zip(sns, names):
+        for sn, name, product, in zip(sns, names, products):
             name.send_keys('Teddy the bear')
             sn.send_keys(str(4712 + index))
+            Select(product).select_by_index(index % 3 + 1)
             index += 1
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/'
@@ -120,35 +129,49 @@ def test_add_meas_order_multi_fail(admin_client, live_server):
         selenium.find_element_by_class_name('add_meas_item_btn').click()
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/new_item_and_order/')
-        assert len(selenium.find_elements_by_class_name('has-error')) == 4
-        err_msg = selenium.find_elements_by_id('error_1_id_sn')
-        assert len(err_msg) == 4
-        for msg in err_msg:
-            assert msg.text == "This field is required."
+        check_err_msg(selenium, 4, 4)
         selenium.find_elements_by_id('id_sn')[0].send_keys('4711')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/new_item_and_order/')
-        assert len(selenium.find_elements_by_class_name('has-error')) == 3
-        err_msg = selenium.find_elements_by_id('error_1_id_sn')
-        assert len(err_msg) == 3
+        check_err_msg(selenium, 3, 4)
+        Select(selenium.find_elements_by_id('id_product')[0]).select_by_index(1)
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        check_err_msg(selenium, 3, 3)
         selenium.find_elements_by_id('id_sn')[1].send_keys('4712')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/new_item_and_order/')
-        assert len(selenium.find_elements_by_class_name('has-error')) == 2
-        err_msg = selenium.find_elements_by_id('error_1_id_sn')
-        assert len(err_msg) == 2
+        check_err_msg(selenium, 2, 3)
+        Select(selenium.find_elements_by_id('id_product')[1]).select_by_index(2)
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        check_err_msg(selenium, 2, 2)
         selenium.find_elements_by_id('id_sn')[2].send_keys('4713')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/new_item_and_order/')
-        assert len(selenium.find_elements_by_class_name('has-error')) == 1
-        err_msg = selenium.find_elements_by_id('error_1_id_sn')
-        assert len(err_msg) == 1
+        check_err_msg(selenium, 1, 2)
+        Select(selenium.find_elements_by_id('id_product')[2]).select_by_index(3)
+        selenium.find_element_by_name('action').click()
+        assert selenium.current_url == (live_server.url + '/new_item_and_order/')
+        check_err_msg(selenium, 1, 1)
         selenium.find_elements_by_id('id_sn')[3].send_keys('4714')
+        Select(selenium.find_elements_by_id('id_product')[3]).select_by_index(1)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/')
-
     finally:
         selenium.close()
+
+
+def check_err_msg(selenium, num_sn_err, num_product_err):
+    assert len(selenium.find_elements_by_class_name('has-error')) == num_sn_err + num_product_err
+    err_msg_sn = selenium.find_elements_by_id('error_1_id_sn')
+    assert len(err_msg_sn) == num_sn_err
+    for msg in err_msg_sn:
+        assert msg.text == "This field is required."
+    err_msg_product = selenium.find_elements_by_id('error_1_id_product')
+    assert len(err_msg_product) == num_product_err
+    for msg in err_msg_product:
+        assert msg.text == "This field is required."
 
 
 @pytest.mark.django_db
@@ -233,6 +256,7 @@ def test_ac_single_item_create(admin_client, live_server):
         name = selenium.find_element_by_id('id_name')
         assert name.get_attribute('value') == ''
         name.send_keys('Wasser')
+        Select(selenium.find_element_by_id('id_product')).select_by_index(1)
         selenium.find_element_by_name('action').click()
         assert MeasurementItem.objects.count() == num_items + 1
     finally:
