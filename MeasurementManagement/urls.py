@@ -5,9 +5,9 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
 from .views import NewMeasurement, NewCalculationRule, NewMeasurementTag, recalc_characteristic_values, \
-    recalculate_invalid, recalculate_progress, plot_characteristic_values
-from .views import NewMeasurementItem, NewMeasurementOrder, NewMeasurementOrderDefinition
+    recalculate_invalid, recalculate_progress, plot_characteristic_values, NewProduct
 from .views import NewMeasurementDevice, NewCharacteristicValueDescription, NewMeasurementItemAndOrder
+from .views import NewMeasurementItem, NewMeasurementOrder, NewMeasurementOrderDefinition
 from .views import get_ajax_order_info, get_ajax_meas_item
 
 admin.autodiscover()
@@ -36,6 +36,9 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_measurement_tag/$',
                            login_required(NewMeasurementTag.as_view()),
                            name="new_measurement_tag"),
+                       url(r'^new_product/$',
+                           login_required(NewProduct.as_view()),
+                           name="new_product"),
                        url(r'^new_item_and_order/$',
                            login_required(NewMeasurementItemAndOrder.as_view()),
                            name="new_item_and_order"),

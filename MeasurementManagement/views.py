@@ -64,6 +64,14 @@ class NewMeasurementTag(CreateView):
     fields = ['name']
     success_url = "/"
 
+
+class NewProduct(CreateView):
+    template_name = "new_base.html"
+    model = Product
+    fields = ['product_name']
+    success_url = "/"
+
+
 class NewMeasurement(CreateView):
     template_name = "new_measurement.html"
     model = Measurement
