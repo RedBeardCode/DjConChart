@@ -68,7 +68,7 @@
                 {%  autoescape off %}
                     var sns = {{ forms.sns }};
                     var names = {{ forms.names }};
-                    var products =; {{ forms.products }}
+                    var products = {{ forms.products }};
                 {% endautoescape %}
                 for (i = 0; i < {{ forms.sns|length }}-1; i++) {
                     add_item();
