@@ -194,13 +194,13 @@ def plot_characteristic_values(request):
     if request.GET:
         filter_args = request.GET.dict()
     context = {}
-    values = __fetch_plot_data(filter_args)
-    script = __create_plot_code(values)
+    script = __create_plot_code(filter_args)
     context['script'] = script
     return render_to_response('plot_charateristic_value.html', context=context)
 
 
-def __create_plot_code(values, annotations=PlotAnnotationContainer()):
+def __create_plot_code(filter_args, annotations=PlotAnnotationContainer()):
+    values = __fetch_plot_data(filter_args)
     annotations.add_annotation('max', FixedMaxAnnotation(2))
     annotations.add_annotation('min', FixedMinAnnotation(1))
     factors = ['{}-{}'.format(val[0], val[1]) for val in values.values]
