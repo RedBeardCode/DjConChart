@@ -331,3 +331,12 @@ class CharacteristicValue(models.Model):
 
 
 post_save.connect(after_characteristic_value_saved, sender=CharacteristicValue)
+
+
+class PlotQueryFilter(models.Model):
+    description = models.CharField(verbose_name='Description of the plotted data')
+    short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', )
+    filter_args = models.TextField(verbose_name='List of dictionaries with filter lookup strings')
+
+    def get_filter_args(self):
+        pass
