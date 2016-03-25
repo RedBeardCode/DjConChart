@@ -1,3 +1,4 @@
+import pickle
 from re import compile
 
 import reversion as revisions
@@ -8,6 +9,8 @@ from django.db import transaction
 from django.db.models.signals import post_save
 from django_pandas.io import read_frame
 from django_pandas.managers import DataFrameQuerySet
+
+
 # Create your models here.
 
 
@@ -336,7 +339,21 @@ post_save.connect(after_characteristic_value_saved, sender=CharacteristicValue)
 class PlotQueryFilter(models.Model):
     description = models.CharField(max_length=128, verbose_name='Description of the plotted data')
     short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', )
-    filter_args = models.TextField(verbose_name='List of dictionaries with filter lookup strings')
+    __filter_args = models.TextField(verbose_name='Pickle of list of dictionaries with filter lookup strings')
+    __plot_args = models.TextField(verbose_name='Pickle of List of dictionaries with plot parameter')
 
-    def get_filter_args(self):
-        pass
+    @property
+    def filter_args(self):
+        return pickle.loads(self.__filter_args)
+
+    @filter_args.setter
+    def filter_args(self, value):
+        self.__filter_args = pickle.dumps(value)
+
+    @property
+    def plot_args(self):
+        return pickle.loads(self.__plot_args)
+
+    @plot_args.setter
+    def plot_args(self, value):
+        self.__plot_args = pickle.dumps(value)
