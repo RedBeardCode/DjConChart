@@ -148,7 +148,7 @@ def test_admin_measurement_order(admin_client, live_server):
 @pytest.mark.django_db
 def test_admin_measurement_tag(admin_client, live_server):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver.Chrome()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementtag/')
         login_as_admin(selenium)
