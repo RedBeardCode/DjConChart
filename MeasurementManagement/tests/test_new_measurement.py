@@ -46,7 +46,7 @@ def test_order_choice(admin_client, live_server, webdriver):
             'OrderDefinition{:d} {:d} for Item {:d}: {:07d},'.format(i % 3 + 1, i + first_index, i, i)
             for i in
             range(10)]
-        order_names = [opt.text for opt in order.options]
+        order_names = [opt.text.strip() for opt in order.options]
         assert target_names == order_names
         assert order.first_selected_option.text == '---------'
     finally:
@@ -67,12 +67,12 @@ def test_default_values(admin_client, live_server, webdriver):
         form_date = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
         assert form_date - start_create_data < time_delta
         assert Select(selenium.find_element_by_id('id_order')).first_selected_option.text == '---------'
-        assert selenium.find_element_by_id('id_order_items').text == 'Please select first the order'
+        assert selenium.find_element_by_id('id_order_items').text.strip() == 'Please select first the order'
         assert Select(selenium.find_element_by_id('id_examiner')).first_selected_option.text == 'admin'
         assert selenium.find_element_by_id('id_remarks').text == ''
         assert Select(
-            selenium.find_element_by_id('id_meas_item')).first_selected_option.text == 'Please select first the order'
-        assert selenium.find_element_by_id('id_measurement_devices').text == 'Please select first the order'
+            selenium.find_element_by_id('id_meas_item')).first_selected_option.text.strip() == 'Please select first the order'
+        assert selenium.find_element_by_id('id_measurement_devices').text.strip() == 'Please select first the order'
     finally:
         selenium.close()
 
