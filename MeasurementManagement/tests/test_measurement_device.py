@@ -1,13 +1,12 @@
 import pytest
-from selenium import webdriver
 
 from .utilies import login_as_admin
 from ..models import MeasurementDevice
 
 
 @pytest.mark.django_db
-def test_create_meas_device_view(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_meas_device_view(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement_device/')
         login_as_admin(selenium)

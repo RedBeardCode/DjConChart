@@ -1,17 +1,16 @@
 from datetime import datetime
 
-from django.contrib.auth.models import User
 import pytest
-from selenium import webdriver
 import reversion as revisions
+from django.contrib.auth.models import User
 
 from .utilies import login_as_admin, create_correct_sample_data
 from ..models import CalculationRule, MeasurementOrder, Measurement, MeasurementTag
 
 
 @pytest.mark.django_db
-def test_create_rule_view(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_rule_view(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_calculation_rule/')
         login_as_admin(selenium)
@@ -26,8 +25,8 @@ def test_create_rule_view(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_rule_view_nocode(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_rule_view_nocode(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_calculation_rule/')
         login_as_admin(selenium)
@@ -41,8 +40,8 @@ def test_create_rule_view_nocode(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_rule_view_noname(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_rule_view_noname(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_calculation_rule/')
         login_as_admin(selenium)
@@ -90,8 +89,8 @@ def test_rule_history():
 
 
 @pytest.mark.django_db
-def test_rule_history_new_view(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_rule_history_new_view(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_calculation_rule/')
         login_as_admin(selenium)

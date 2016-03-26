@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
@@ -14,8 +13,8 @@ from ..models import Measurement, MeasurementOrder
 
 
 
-def test_login_requierd(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_login_requierd(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         username = selenium.find_element_by_id('id_username')
@@ -34,9 +33,9 @@ def test_login_requierd(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_order_choice(admin_client, live_server):
+def test_order_choice(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     first_index = MeasurementOrder.objects.first().pk
     try:
         selenium.get(live_server + '/new_measurement/')
@@ -55,10 +54,10 @@ def test_order_choice(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_default_values(admin_client, live_server):
+def test_default_values(admin_client, live_server, webdriver):
     start_create_data = datetime.datetime.now()
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)
@@ -79,9 +78,9 @@ def test_default_values(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_all_elements(admin_client, live_server):
+def test_all_elements(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)
@@ -105,9 +104,9 @@ def test_all_elements(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_on_change_order(admin_client, live_server):
+def test_on_change_order(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)
@@ -133,9 +132,9 @@ def test_on_change_order(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_reload_failed_submit(admin_client, live_server):
+def test_reload_failed_submit(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)
@@ -164,9 +163,9 @@ def test_reload_failed_submit(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_submit(admin_client, live_server):
+def test_submit(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)
@@ -190,9 +189,9 @@ def test_submit(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_submit_no_remark(admin_client, live_server):
+def test_submit_no_remark(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement/')
         login_as_admin(selenium)

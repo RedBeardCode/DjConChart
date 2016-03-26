@@ -1,13 +1,12 @@
 import pytest
-from selenium import webdriver
 
 from .utilies import login_as_admin
 from ..models import Product
 
 
 @pytest.mark.django_db
-def test_create_product_view(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_product_view(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_product/')
         login_as_admin(selenium)
@@ -21,8 +20,8 @@ def test_create_product_view(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_product_view_noname(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_product_view_noname(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_product/')
         login_as_admin(selenium)

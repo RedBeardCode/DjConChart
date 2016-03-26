@@ -1,5 +1,4 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
 from .utilies import login_as_admin, create_correct_sample_data
@@ -7,8 +6,8 @@ from ..models import CharacteristicValueDescription
 
 
 @pytest.mark.django_db
-def test_create_characteristic_value_desc_view(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_characteristic_value_desc_view(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     num_value_descriptions = len(CharacteristicValueDescription.objects.all())
     try:
@@ -32,8 +31,8 @@ def test_create_characteristic_value_desc_view(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_characteristic_value_desc_noname(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_characteristic_value_desc_noname(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     num_value_descriptions = len(CharacteristicValueDescription.objects.all())
     try:
@@ -55,8 +54,8 @@ def test_create_characteristic_value_desc_noname(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_characteristic_value_desc_nodes(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_characteristic_value_desc_nodes(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     num_value_descriptions = len(CharacteristicValueDescription.objects.all())
     try:
@@ -78,8 +77,8 @@ def test_create_characteristic_value_desc_nodes(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_characteristic_value_desc_norule(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_characteristic_value_desc_norule(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     num_value_descriptions = len(CharacteristicValueDescription.objects.all())
     try:
@@ -101,8 +100,8 @@ def test_create_characteristic_value_desc_norule(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_characteristic_value_desc_nodev(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_characteristic_value_desc_nodev(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     num_value_descriptions = len(CharacteristicValueDescription.objects.all())
     try:

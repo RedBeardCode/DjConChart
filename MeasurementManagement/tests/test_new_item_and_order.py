@@ -1,5 +1,4 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
 from .utilies import login_as_admin, create_correct_sample_data
@@ -7,8 +6,8 @@ from ..models import MeasurementOrder, MeasurementItem
 
 
 @pytest.mark.django_db
-def test_all_elements(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_all_elements(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_item_and_order/')
         login_as_admin(selenium)
@@ -22,8 +21,8 @@ def test_all_elements(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_add_meas_item_ui(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_add_meas_item_ui(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_item_and_order/')
         login_as_admin(selenium)
@@ -53,8 +52,8 @@ def test_add_meas_item_ui(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_add_meas_order_one_item(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_add_meas_order_one_item(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         num_orders_before = len(MeasurementOrder.objects.all())
@@ -85,8 +84,8 @@ def test_add_meas_order_one_item(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_add_meas_order_two_item(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_add_meas_order_two_item(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         num_orders_before = len(MeasurementOrder.objects.all())
@@ -116,8 +115,8 @@ def test_add_meas_order_two_item(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_add_meas_order_multi_fail(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_add_meas_order_multi_fail(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -175,8 +174,8 @@ def check_err_msg(selenium, num_sn_err, num_product_err):
 
 
 @pytest.mark.django_db
-def test_add_meas_order_duplicate_sn(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -198,8 +197,8 @@ def test_add_meas_order_duplicate_sn(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_ac_single_item_type(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_ac_single_item_type(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -218,8 +217,8 @@ def test_ac_single_item_type(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_ac_single_item_select(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_ac_single_item_select(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -238,8 +237,8 @@ def test_ac_single_item_select(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_ac_single_item_create(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_ac_single_item_create(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -264,8 +263,8 @@ def test_ac_single_item_create(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_ac_multi_item_select(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_ac_multi_item_select(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')

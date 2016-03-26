@@ -1,8 +1,7 @@
 import pytest
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from MeasurementManagement.models import CalculationRule
 from .utilies import login_as_admin, create_correct_sample_data, create_sample_characteristic_values
@@ -13,8 +12,8 @@ def calculate(meas_dict):
 
 
 @pytest.mark.django_db
-def test_recalv_finished_div(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_recalv_finished_div(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     create_sample_characteristic_values()
     try:
@@ -26,14 +25,16 @@ def test_recalv_finished_div(admin_client, live_server):
         assert len(unfinished_list) == 3
         collapse_button = selenium.find_element_by_id('collapse_unfinished')
         collapse_button.click()
-        assert selenium.find_element_by_id('unfinished_values').is_displayed()
+        section_header = WebDriverWait(selenium, 1).until(
+            EC.visibility_of(selenium.find_element_by_id('unfinished_values')))
+        assert section_header
     finally:
         selenium.close()
 
 
 @pytest.mark.django_db
-def test_recalv_invalid(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_recalv_invalid(admin_client, live_server, webdriver):
+    selenium = webdriver()
     create_correct_sample_data()
     create_sample_characteristic_values()
     calc_rule = CalculationRule.objects.get(rule_name='calc_rule')

@@ -1,14 +1,13 @@
 import pytest
-from selenium import webdriver
 
 from MeasurementManagement.models import MeasurementOrder
 from .utilies import login_as_admin, create_correct_sample_data
 
 
 @pytest.mark.django_db
-def test_admin_start(admin_client, live_server):
+def test_admin_start(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/')
         login_as_admin(selenium)
@@ -27,9 +26,9 @@ def test_admin_start(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_calculation_rule(admin_client, live_server):
+def test_admin_calculation_rule(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/calculationrule/')
         login_as_admin(selenium)
@@ -44,9 +43,9 @@ def test_admin_calculation_rule(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_characteristic_value_descriptions(admin_client, live_server):
+def test_admin_characteristic_value_descriptions(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/characteristicvaluedescription/')
         login_as_admin(selenium)
@@ -61,9 +60,9 @@ def test_admin_characteristic_value_descriptions(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_device(admin_client, live_server):
+def test_admin_measurement_device(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementdevice/')
         login_as_admin(selenium)
@@ -80,9 +79,9 @@ def test_admin_measurement_device(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_item(admin_client, live_server):
+def test_admin_measurement_item(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementitem/')
         login_as_admin(selenium)
@@ -104,9 +103,9 @@ def test_admin_measurement_item(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_order_definition(admin_client, live_server):
+def test_admin_measurement_order_definition(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementorderdefinition/')
         login_as_admin(selenium)
@@ -121,10 +120,10 @@ def test_admin_measurement_order_definition(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_order(admin_client, live_server):
+def test_admin_measurement_order(admin_client, live_server, webdriver):
     create_correct_sample_data()
     first_index = MeasurementOrder.objects.first().pk
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementorder/')
         login_as_admin(selenium)
@@ -146,9 +145,9 @@ def test_admin_measurement_order(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_tag(admin_client, live_server):
+def test_admin_measurement_tag(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/measurementtag/')
         login_as_admin(selenium)
@@ -162,9 +161,9 @@ def test_admin_measurement_tag(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_admin_product(admin_client, live_server):
+def test_admin_product(admin_client, live_server, webdriver):
     create_correct_sample_data()
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/admin/MeasurementManagement/product/')
         login_as_admin(selenium)

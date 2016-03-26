@@ -1,5 +1,4 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
 from .utilies import login_as_admin, create_correct_sample_data
@@ -7,8 +6,8 @@ from ..models import MeasurementOrder, MeasurementOrderDefinition
 
 
 @pytest.mark.django_db
-def test_all_elements(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_all_elements(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement_order/')
         login_as_admin(selenium)
@@ -19,10 +18,10 @@ def test_all_elements(admin_client, live_server):
 
 
 @pytest.mark.djangs_db
-def test_create_meas_order_view(admin_client, live_server):
+def test_create_meas_order_view(admin_client, live_server, webdriver):
     create_correct_sample_data()
     orders_before = len(MeasurementOrder.objects.all())
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement_order/')
         login_as_admin(selenium)
@@ -39,10 +38,10 @@ def test_create_meas_order_view(admin_client, live_server):
 
 
 @pytest.mark.djangs_db
-def test_create_meas_order_def_view(admin_client, live_server):
+def test_create_meas_order_def_view(admin_client, live_server, webdriver):
     create_correct_sample_data()
     order_defs_before = len(MeasurementOrderDefinition.objects.all())
-    selenium = webdriver.Firefox()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement_order_definition/')
         login_as_admin(selenium)

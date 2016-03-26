@@ -1,5 +1,4 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.support.select import Select
 
 from .utilies import login_as_admin
@@ -7,8 +6,8 @@ from ..models import MeasurementItem, Product
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_meas_item_view(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         Product.objects.create(product_name='product1')
         selenium.get(live_server + '/new_measurement_item/')
@@ -27,8 +26,8 @@ def test_create_meas_item_view(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view_noname(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_meas_item_view_noname(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         Product.objects.create(product_name='product1')
         selenium.get(live_server + '/new_measurement_item/')
@@ -45,8 +44,8 @@ def test_create_meas_item_view_noname(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view_nosn(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_meas_item_view_nosn(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/new_measurement_item/')
         login_as_admin(selenium)
@@ -60,8 +59,8 @@ def test_create_meas_item_view_nosn(admin_client, live_server):
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view_noproduct(admin_client, live_server):
-    selenium = webdriver.Firefox()
+def test_create_meas_item_view_noproduct(admin_client, live_server, webdriver):
+    selenium = webdriver()
     try:
         Product.objects.create(product_name='product1')
         selenium.get(live_server + '/new_measurement_item/')
