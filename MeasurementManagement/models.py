@@ -10,12 +10,11 @@ from django.db.models.signals import post_save
 from django_pandas.io import read_frame
 from django_pandas.managers import DataFrameQuerySet
 
-
 # Create your models here.
+from MeasurementManagement.plot_annotation import PlotAnnotationContainer
 
 
 class Product(models.Model):
-    # TODO: add tests, add view with tests
     product_name = models.CharField(max_length=30, unique=True)
 
     def __unicode__(self):
@@ -336,24 +335,69 @@ class CharacteristicValue(models.Model):
 post_save.connect(after_characteristic_value_saved, sender=CharacteristicValue)
 
 
-class PlotQueryFilter(models.Model):
+class PlotConfig(models.Model):
     description = models.CharField(max_length=100, verbose_name='Description of the plotted data')
     short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', )
-    _filter_args = models.TextField(verbose_name='Pickle of list of dictionaries with filter lookup strings')
-    _plot_args = models.TextField(verbose_name='Pickle of List of dictionaries with plot parameter')
+    _filter_args = models.BinaryField(blank=True,
+                                      verbose_name='Pickle of list of dictionaries with filter lookup strings')
+    _plot_args = models.BinaryField(blank=True, verbose_name='Pickle of List of dictionaries with plot parameter')
+    _annotations = models.BinaryField(blank=True, verbose_name='Plot annotations which should be shown')
 
+    def __init__(self, *args, **kwargs):
+        super(PlotConfig, self).__init__(*args, **kwargs)
+        self.__last_filter_args = None
+        self.__last_plot_args = None
+        self.__last_annotations = None
+    
     @property
     def filter_args(self):
-        return pickle.loads(self.__filter_args)
+        if not self._filter_args:
+            return None
+        if not self.__last_filter_args:
+            self.__last_filter_args = pickle.loads(self._filter_args)
+        return self.__last_filter_args
 
     @filter_args.setter
-    def filter_args(self, value):
-        self.__filter_args = pickle.dumps(value)
+    def filter_args(self, filter_args):
+        self.__last_filter_args = filter_args
+        self._filter_args = pickle.dumps(filter_args)
 
     @property
     def plot_args(self):
-        return pickle.loads(self.__plot_args)
+        if not self._plot_args:
+            return None
+        if not self.__last_plot_args:
+            self.__last_plot_args = pickle.loads(self._plot_args)
+        return self.__last_plot_args
 
     @plot_args.setter
-    def plot_args(self, value):
-        self.__plot_args = pickle.dumps(value)
+    def plot_args(self, plot_args):
+        self.__last_plot_args = plot_args
+        self._plot_args = pickle.dumps(plot_args)
+
+    @property
+    def annotations(self):
+        if not self._annotations:
+            return None
+        if not self.__last_annotations:
+            self.__last_annotations = pickle.loads(self._annotations)
+        return self.__last_annotations
+
+    @annotations.setter
+    def annotations(self, annotations_dict):
+        self.__last_annotations = annotations_dict
+        self._annotations = pickle.dumps(annotations_dict)
+
+    def get_annotation_container(self):
+        if not self.annotations:
+            return None
+        container = PlotAnnotationContainer(create_default=False)
+        for key in self.annotations:
+            container.add_annotation(key, self.annotations[key])
+        return container
+
+    def refresh_from_db(self, using=None, fields=None, **kwargs):
+        self.__last_filter_args = None
+        self.__last_plot_args = None
+        self.__last_annotations = None
+        super(PlotConfig, self).refresh_from_db(using, fields, **kwargs)

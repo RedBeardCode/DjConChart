@@ -106,3 +106,9 @@ class PlotAnnotationContainer(object):
 
     def remove_annotation(self, name):
         self.__annotations.pop(name)
+
+    def count(self):
+        return len(self.__annotations)
+
+    def names(self):
+        return self.__annotations.keys()

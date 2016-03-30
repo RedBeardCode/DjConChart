@@ -7,13 +7,13 @@ from bokeh.embed import autoload_server
 from bokeh.models import FactorRange
 from bokeh.plotting import figure, curdoc
 from django.contrib.admin.widgets import AdminSplitDateTime
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.views.generic import CreateView
 
-from MeasurementManagement.plot_annotation import PlotAnnotationContainer, FixedMaxAnnotation, FixedMinAnnotation
+from MeasurementManagement.plot_annotation import PlotAnnotationContainer
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
-from .models import CharacteristicValueDescription
+from .models import CharacteristicValueDescription, PlotConfig
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue, Product
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 from .multiform import MultiFormsView
@@ -190,23 +190,30 @@ def recalculate_progress(request):
 
 
 def plot_characteristic_values(request):
+    # Todo: Is replaced through plot_given_configuration
     filter_args = {}
     if request.GET:
         filter_args = request.GET.dict()
     context = {}
     script = __create_plot_code(filter_args)
     context['script'] = script
-    return render_to_response('plot_charateristic_value.html', context=context)
+    return render_to_response('single_plot.html', context=context)
 
 
-def __create_plot_code(filter_args, annotations=PlotAnnotationContainer()):
+def __create_plot_code(filter_args, plot_args={}, annotations=PlotAnnotationContainer()):
     values = __fetch_plot_data(filter_args)
-    annotations.add_annotation('max', FixedMaxAnnotation(2))
-    annotations.add_annotation('min', FixedMinAnnotation(1))
+    if not annotations:
+        annotations = PlotAnnotationContainer()
+    if not plot_args:
+        plot_args = {}
     factors = ['{}-{}'.format(val[0], val[1]) for val in values.values]
     plot = figure(x_range=FactorRange(factors=factors))
-    plot.circle(factors, values['_calc_value'], color='navy', alpha=0.5)
-    plot.line(factors, values['_calc_value'], color='navy', alpha=0.5)
+    if 'color' not in plot_args:
+        plot_args['color'] = 'navy'
+    if 'alpha' not in plot_args:
+        plot_args['alpha'] = 0.5
+    plot.circle(factors, values['_calc_value'], **plot_args)
+    plot.line(factors, values['_calc_value'], **plot_args)
     plot.logo = None
     plot.xaxis.major_label_orientation = pi / 4
     plot.xaxis.major_label_standoff = 10
@@ -224,3 +231,15 @@ def __fetch_plot_data(filter_args, max_number=100):
     values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
     return values[max(0, values.count() - max_number):].to_dataframe(
         fieldnames=['id', 'measurements__meas_item__sn', '_calc_value'])
+
+
+def plot_given_configuration(request, configuration):
+    try:
+        plot_config = PlotConfig.objects.get(short_name=configuration)
+    except PlotConfig.DoesNotExist:
+        raise Http404
+    script = __create_plot_code(plot_config.filter_args[0],
+                                plot_config.plot_args,
+                                annotations=plot_config.get_annotation_container())
+    context = {'script': script}
+    return render_to_response('single_plot.html', context=context)
