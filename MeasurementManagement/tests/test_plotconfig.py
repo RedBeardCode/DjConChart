@@ -79,4 +79,3 @@ def test_plot_url(admin_client, live_server, webdriver):
     finally:
         selenium.close()
 
-# TODO: Next Issuses Multiple Plots and Product view
