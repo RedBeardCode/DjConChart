@@ -7,6 +7,7 @@ from bokeh.embed import autoload_server
 from bokeh.models import FactorRange
 from bokeh.plotting import figure, curdoc
 from django.contrib.admin.widgets import AdminSplitDateTime
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.views.generic import CreateView
@@ -195,40 +196,73 @@ def plot_characteristic_values(request):
     if request.GET:
         filter_args = request.GET.dict()
     context = {}
-    script = __create_plot_code(filter_args)
+    script = __create_plot_code([filter_args])
     context['script'] = script
     return render_to_response('single_plot.html', context=context)
 
 
-def __create_plot_code(filter_args, plot_args={}, annotations=PlotAnnotationContainer()):
-    values = __fetch_plot_data(filter_args)
+def __create_plot_code(filter_args, plot_args=[{}], annotations=None):
+    num_filter_args = len(filter_args)
+    if not plot_args:
+        plot_args = [{}]
+    if len(plot_args) < num_filter_args:
+        plot_args = plot_args + [{}] * (num_filter_args - len(plot_args))
     if not annotations:
         annotations = PlotAnnotationContainer()
-    if not plot_args:
-        plot_args = {}
-    factors = ['{}-{}'.format(val[0], val[1]) for val in values.values]
-    plot = figure(x_range=FactorRange(factors=factors))
-    if 'color' not in plot_args:
-        plot_args['color'] = 'navy'
-    if 'alpha' not in plot_args:
-        plot_args['alpha'] = 0.5
-    plot.circle(factors, values['_calc_value'], **plot_args)
-    plot.line(factors, values['_calc_value'], **plot_args)
-    plot.logo = None
-    plot.xaxis.major_label_orientation = pi / 4
-    plot.xaxis.major_label_standoff = 10
-    min_anno, max_anno = annotations.calc_min_max_annotation(values['_calc_value'])
-    range = max_anno - min_anno
-    annotations.plot(plot, values['_calc_value'])
-    plot.y_range.start = min_anno - range
-    plot.y_range.end = max_anno + range
+    plot = None
+    factors, single_factors, values, all_values = __create_x_y_values(filter_args)
+    plot = __plot_values(annotations, factors, plot, plot_args, single_factors, values, all_values)
     session = push_session(curdoc())
     script = autoload_server(plot, session_id=session.id)
     return script
 
 
+def __plot_values(annotations, factors, plot, plot_args, single_factors, values, all_values):
+    plot = figure(x_range=FactorRange(factors=factors))
+    plot.logo = None
+    plot.xaxis.major_label_orientation = pi / 4
+    plot.xaxis.major_label_standoff = 10
+    for s_fac, val, pl_arg in zip(single_factors, values, plot_args):
+        if not val['_calc_value'].empty:
+            if 'color' not in pl_arg:
+                pl_arg['color'] = 'navy'
+            if 'alpha' not in pl_arg:
+                pl_arg['alpha'] = 0.5
+            plot.circle(s_fac, val['_calc_value'], **pl_arg)
+            plot.line(s_fac, val['_calc_value'], **pl_arg)
+    min_anno, max_anno = annotations.calc_min_max_annotation(val['_calc_value'])
+    annotations.plot(plot, val['_calc_value'])
+    range = max_anno - min_anno
+    if range:
+        plot.y_range.start = min_anno - range
+        plot.y_range.end = max_anno + range
+    return plot
+
+
+def __create_x_y_values(filter_args):
+    single_factors = []
+    values = []
+    combined_filters = Q()
+    for index, fi_arg in enumerate(filter_args):
+        values.append(__fetch_plot_data(fi_arg))
+        s_fac = __create_x_labels(values[index])
+        single_factors.append(s_fac)
+        combined_filters |= Q(**fi_arg)
+    all_values = __fetch_plot_data(combined_filters)
+    factors = __create_x_labels(all_values)
+    return factors, single_factors, values, all_values
+
+
+def __create_x_labels(values):
+    return ['{}-{}'.format(val[0], val[1]) for val in values.values]
+
+
+
 def __fetch_plot_data(filter_args, max_number=100):
-    values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
+    if isinstance(filter_args, Q):
+        values = CharacteristicValue.objects.filter(filter_args, _finished=True)
+    else:
+        values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
     return values[max(0, values.count() - max_number):].to_dataframe(
         fieldnames=['id', 'measurements__meas_item__sn', '_calc_value'])
 
@@ -238,7 +272,7 @@ def plot_given_configuration(request, configuration):
         plot_config = PlotConfig.objects.get(short_name=configuration)
     except PlotConfig.DoesNotExist:
         raise Http404
-    script = __create_plot_code(plot_config.filter_args[0],
+    script = __create_plot_code(plot_config.filter_args,
                                 plot_config.plot_args,
                                 annotations=plot_config.get_annotation_container())
     context = {'script': script}

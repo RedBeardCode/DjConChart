@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django_pandas.io import read_frame
 from django_pandas.managers import DataFrameQuerySet
@@ -177,7 +178,6 @@ class MeasurementOrder(models.Model):
     order_nr = models.AutoField(primary_key=True)
     order_type = models.ForeignKey(MeasurementOrderDefinition, verbose_name='Based measurement order definition')
     measurement_items = models.ManyToManyField(MeasurementItem, verbose_name='Measured items')
-    # TODO: Write __init__ with an formater-function argument to define the format of the order_nr. Simply set a own value before save file:///home/farmer/B%C3%BCcher/docs/django-docs-1.7-en/ref/models/instances.html?highlight=auto%20increment#explicitly-specifying-auto-primary-key-values
     def __unicode__(self):
         items_str = ''
         for item in self.measurement_items.all():
@@ -233,6 +233,11 @@ class CalcValueQuerySet(DataFrameQuerySet):
         super(CalcValueQuerySet, self).__init__(*args, **kwargs)
 
     def filter(self, *args, **kwargs):
+        for query in args:
+            if isinstance(query, Q):
+                for index, exp in enumerate(query.children):
+                    if isinstance(exp, tuple):
+                        query.children[index] = (self.value_re.sub('_calc_value\g<1>', exp[0]), exp[1])
         for key in kwargs:
             if key.startswith('value'):
                 new_key = self.value_re.sub('_calc_value\g<1>', key)
@@ -277,7 +282,7 @@ class CharacteristicValue(models.Model):
 
     class Meta:
         unique_together = ['order', 'value_type']
-        ordering = ['-date']
+        ordering = ['date']
 
     def __init__(self, *args, **kwargs):
         if 'order' in kwargs and 'value_type' in kwargs:
