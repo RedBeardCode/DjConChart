@@ -4,7 +4,7 @@ from math import pi
 
 from bokeh.client import push_session
 from bokeh.embed import autoload_server
-from bokeh.models import FactorRange
+from bokeh.models import FactorRange, HoverTool, ColumnDataSource
 from bokeh.plotting import figure, curdoc
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.db.models import Q
@@ -220,6 +220,8 @@ def __create_plot_code(filter_args, plot_args=[{}], annotations=None):
 def __plot_values(annotations, factors, plot, plot_args, single_factors, values, all_values):
     plot = figure(x_range=FactorRange(factors=factors))
     plot.logo = None
+    hover_tool = __create_tooltips()
+    plot.add_tools(hover_tool)
     plot.xaxis.major_label_orientation = pi / 4
     plot.xaxis.major_label_standoff = 10
     for s_fac, val, pl_arg in zip(single_factors, values, plot_args):
@@ -228,8 +230,8 @@ def __plot_values(annotations, factors, plot, plot_args, single_factors, values,
                 pl_arg['color'] = 'navy'
             if 'alpha' not in pl_arg:
                 pl_arg['alpha'] = 0.5
-            plot.circle(s_fac, val['_calc_value'], **pl_arg)
-            plot.line(s_fac, val['_calc_value'], **pl_arg)
+            plot.circle(s_fac, '_calc_value', source=ColumnDataSource(val), **pl_arg)
+            plot.line(s_fac, '_calc_value', source=ColumnDataSource(val), **pl_arg)
     min_anno, max_anno = annotations.calc_min_max_annotation(val['_calc_value'])
     annotations.plot(plot, val['_calc_value'])
     range = max_anno - min_anno
@@ -237,6 +239,25 @@ def __plot_values(annotations, factors, plot, plot_args, single_factors, values,
         plot.y_range.start = min_anno - range
         plot.y_range.end = max_anno + range
     return plot
+
+
+def __create_tooltips():
+    tooltips = """
+    <div>
+    <small>
+    <em><strong> @order__order_type__name: @order__order_nr</strong></em>
+     <ul>
+     <li>Serial: @measurements__meas_item__sn</li>
+     <li>Value: @_calc_value</li>
+     <li>Date: @date</li>
+     <li>Examiner: @measurements__examiner</li>
+     <li>Remarks: @measurements__remarks</li>
+     </ul>
+     </small>
+    </div>
+    """
+    hover_tool = HoverTool(tooltips=tooltips)
+    return hover_tool
 
 
 def __create_x_y_values(filter_args):
@@ -254,7 +275,7 @@ def __create_x_y_values(filter_args):
 
 
 def __create_x_labels(values):
-    return ['{}-{}'.format(val[0], val[1]) for val in values.values]
+    return ['{}-{}'.format(id, sn) for id, sn in zip(values['id'], values['measurements__meas_item__sn'])]
 
 
 
@@ -263,9 +284,28 @@ def __fetch_plot_data(filter_args, max_number=100):
         values = CharacteristicValue.objects.filter(filter_args, _finished=True)
     else:
         values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
-    return values[max(0, values.count() - max_number):].to_dataframe(
-        fieldnames=['id', 'measurements__meas_item__sn', '_calc_value'])
 
+    dt = values[max(0, values.count() - max_number):].to_dataframe(
+        fieldnames=['id', 'measurements__meas_item__sn', '_calc_value', 'date', 'order__order_type__name',
+                    'order__order_nr', 'measurements__examiner', 'measurements__remarks'])
+    dt['date'] = dt['date'].dt.strftime('%Y-%m-%d %H:%M')
+    grouped = dt.groupby('id')
+
+    def combine_it(val_set):
+        return '; '.join(val_set)
+
+    def take_first(val_set):
+        return val_set[:1]
+
+    dt = grouped.agg({'id': take_first,
+                      'measurements__meas_item__sn': take_first,
+                      '_calc_value': take_first,
+                      'date': take_first,
+                      'order__order_type__name': take_first,
+                      'order__order_nr': take_first,
+                      'measurements__examiner': combine_it,
+                      'measurements__remarks': combine_it})
+    return dt
 
 def plot_given_configuration(request, configuration):
     try:

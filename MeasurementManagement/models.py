@@ -133,7 +133,8 @@ class CharacteristicValueDescription(models.Model):
     description = models.TextField(verbose_name='Description of the characteristic value')
     calculation_rule = models.ForeignKey(CalculationRule)
     possible_meas_devices = models.ManyToManyField(MeasurementDevice)
-    measurement_tags = models.ManyToManyField(MeasurementTag, blank=True)
+    #Ich denke unnötig
+    # measurement_tags = models.ManyToManyField(MeasurementTag, blank=True)
     def __unicode__(self):
         return  self.value_name
 
