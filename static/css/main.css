@@ -44,6 +44,13 @@
    margin-left: 10em;
 }
 
+.list_table {
+   width: 90%;
+}
+
+.paginator {
+   text-align: center;
+}
 
 
 

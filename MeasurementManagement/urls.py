@@ -5,7 +5,9 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
 from .views import NewMeasurement, NewCalculationRule, NewMeasurementTag, recalc_characteristic_values, \
-    recalculate_invalid, recalculate_progress, plot_characteristic_values, NewProduct, plot_given_configuration
+    recalculate_invalid, recalculate_progress, plot_characteristic_values, NewProduct, plot_given_configuration, \
+    ListCharacteristicValueDescription, DeleteCharacteristicValueDescription, \
+    UpdateCharacteristicValueDescription
 from .views import NewMeasurementDevice, NewCharacteristicValueDescription, NewMeasurementItemAndOrder
 from .views import NewMeasurementItem, NewMeasurementOrder, NewMeasurementOrderDefinition
 from .views import get_ajax_order_info, get_ajax_meas_item
@@ -30,9 +32,18 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_measurement_device/$',
                            login_required(NewMeasurementDevice.as_view()),
                            name="new_measurement_device"),
-                       url(r'^new_characteristic_value_description/$',
+                       url(r'^characteristic_value_description/new/$',
                            login_required(NewCharacteristicValueDescription.as_view()),
                            name="new_characteristic_value_description"),
+                       url(r'^characteristic_value_description/$',
+                           login_required(ListCharacteristicValueDescription.as_view()),
+                           name="list_characteristic_value_description"),
+                       url(r'^characteristic_value_description/(?P<pk>\d+)/$',
+                           login_required(UpdateCharacteristicValueDescription.as_view()),
+                           name="update_characteristic_value_description"),
+                       url(r'^characteristic_value_description/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteCharacteristicValueDescription.as_view()),
+                           name="delete_characteristic_value_description"),
                        url(r'^new_measurement_tag/$',
                            login_required(NewMeasurementTag.as_view()),
                            name="new_measurement_tag"),

@@ -7,10 +7,11 @@ from bokeh.embed import autoload_server
 from bokeh.models import FactorRange, HoverTool, ColumnDataSource
 from bokeh.plotting import figure, curdoc
 from django.contrib.admin.widgets import AdminSplitDateTime
+from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
 from MeasurementManagement.plot_annotation import PlotAnnotationContainer
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
@@ -20,60 +21,113 @@ from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevi
 from .multiform import MultiFormsView
 
 
-class NewCharacteristicValueDescription(CreateView):
+class PassPermissionNamesMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super(PassPermissionNamesMixin, self).get_context_data(**kwargs)
+        context['add_permission'] = 'MeasurementManagement.add_' + self.model._meta.model_name
+        context['change_permission'] = 'MeasurementManagement.change_' + self.model._meta.model_name
+        context['delete_permission'] = 'MeasurementManagement.delete_' + self.model._meta.model_name
+        context['current_path'] = self.request.META['PATH_INFO']
+        return context
+
+
+class NewCharacteristicValueDescription(PassPermissionNamesMixin, CreateView):
     template_name = "new_base.html"
     model = CharacteristicValueDescription
     fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
     success_url = '/'
 
-class NewMeasurementDevice(CreateView):
+
+class DeleteCharacteristicValueDescription(DeleteView):
+    template_name = "delete_base.html"
+    model = CharacteristicValueDescription
+    success_url = reverse_lazy('list_characteristic_value_description')
+
+
+class TitledListView(ListView):
+    title = None
+    model_name = None
+    paginate_by = 20
+
+    def __init__(self, *args, title=None, model_name=None, **kwargs):
+        super(TitledListView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(TitledListView, self).get_context_data(**kwargs)
+        if not self.title:
+            self.title = 'List of ' + str(self.model._meta.verbose_name_plural)
+        if not self.model_name:
+            self.model_name = str(self.model._meta.verbose_name_plural)
+        context['title'] = self.title
+        context['model_name'] = self.model_name
+        return context
+
+
+class ListCharacteristicValueDescription(TitledListView):
+    template_name = "list_characteristic_value_description.html"
+    model = CharacteristicValueDescription
+    fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
+
+
+# TODO: Links für Zürck und Delete Buttons, Weiter Models
+
+class UpdateCharacteristicValueDescription(PassPermissionNamesMixin, UpdateView):
+    template_name = "new_base.html"
+    model = CharacteristicValueDescription
+    fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
+    success_url = '/'
+
+
+class NewMeasurementDevice(PassPermissionNamesMixin, CreateView):
     template_name = "new_base.html"
     model = MeasurementDevice
     fields = ['name', 'sn']
     success_url = '/'
 
-class NewMeasurementOrder(CreateView):
+
+class NewMeasurementOrder(PassPermissionNamesMixin, CreateView):
     template_name = "new_measurement_order.html"
     model = MeasurementOrder
     fields = ['order_type', 'measurement_items']
     success_url = '/'
 
 
-
-class NewMeasurementOrderDefinition(CreateView):
+class NewMeasurementOrderDefinition(PassPermissionNamesMixin, CreateView):
     template_name = "new_base.html"
     model = MeasurementOrderDefinition
     fields = ['name', 'characteristic_values', 'product']
     success_url = '/'
 
-class NewMeasurementItem(CreateView):
+
+class NewMeasurementItem(PassPermissionNamesMixin, CreateView):
     template_name = "new_base.html"
     model = MeasurementItem
     fields = ['sn', 'name', 'product']
     success_url = '/'
 
-class NewCalculationRule(CreateView):
+
+class NewCalculationRule(PassPermissionNamesMixin, CreateView):
     template_name = "new_calculation_rule.html"
     model = CalculationRule
     fields = ['rule_name', 'rule_code']
     success_url = '/'
 
 
-class NewMeasurementTag(CreateView):
+class NewMeasurementTag(PassPermissionNamesMixin, CreateView):
     template_name = "new_base.html"
     model = MeasurementTag
     fields = ['name']
     success_url = "/"
 
 
-class NewProduct(CreateView):
+class NewProduct(PassPermissionNamesMixin, CreateView):
     template_name = "new_base.html"
     model = Product
     fields = ['product_name']
     success_url = "/"
 
 
-class NewMeasurement(CreateView):
+class NewMeasurement(PassPermissionNamesMixin, CreateView):
     template_name = "new_measurement.html"
     model = Measurement
     fields = ['date', 'order', 'order_items', 'examiner', 'remarks',

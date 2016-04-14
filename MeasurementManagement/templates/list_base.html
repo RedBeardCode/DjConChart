@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <table class="table table-striped list_table">
+        <th>Name</th>
+        <th>Description</th>
+        {% for cvd in object_list %}
+            {% block table_line %}
+                <tr class="clickable-row" data-href="/">
+                    <td>{{ cvd }}</td>
+                </tr>
+            {% endblock %}
+        {% empty %}
+            <tr>
+                <td>No {{ model_name }} yet.</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% block page-navigation %}
+        {% if is_paginated %}
+            <div class="paginator">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}" aria-label="Back">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <a href="#" aria-label="Back">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for page in paginator.page_range %}
+                        {% if page_obj.number == page %}
+                            <li class="active"><a href="?page={{ page }}">{{ page }}</a></li>
+                        {% else %}
+                            <li><a href="?page={{ page }}">{{ page }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endblock %}
+
+{% endblock %}
+
+{% block inlinescripts %}
+    <script type="text/javascript">
+
+        $(document).ready(function ($) {
+            $('.clickable-row').click(function () {
+                window.document.location = $(this).data("href");
+            });
+        });
+    </script>
+{% endblock %}

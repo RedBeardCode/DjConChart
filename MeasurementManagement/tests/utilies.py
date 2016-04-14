@@ -1,6 +1,6 @@
 import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.core.files.base import ContentFile
 
 from MeasurementManagement.models import MeasurementDevice, MeasurementItem, CalculationRule
@@ -9,6 +9,29 @@ from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefin
 
 FAKE_TIME = datetime.datetime(2020, 12, 5, 17, 5, 55)
 
+
+def create_limited_users():
+    limited_user = User.objects.create(username='limited_user')
+    limited_user.set_password('test')
+    limited_user.save()
+    change_user = User.objects.create(username='change_user')
+    change_user.set_password('test')
+    change_permissions = Permission.objects.filter(codename__contains='change')
+    change_user.user_permissions = change_permissions
+    change_user.save()
+    delete_user = User.objects.create(username='delete_user')
+    delete_user.set_password('test')
+    delete_permissions = Permission.objects.filter(codename__contains='delete')
+    delete_user.user_permissions = delete_permissions
+    delete_user.save()
+
+
+def login_as_limited_user(selenium, user='limited_user'):
+    username = selenium.find_element_by_id('id_username')
+    pwd = selenium.find_element_by_id('id_password')
+    username.send_keys(user)
+    pwd.send_keys('test')
+    selenium.find_element_by_tag_name('form').submit()
 
 def login_as_admin(selenium):
     username = selenium.find_element_by_id('id_username')
