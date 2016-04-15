@@ -21,17 +21,19 @@ from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevi
 from .multiform import MultiFormsView
 
 
-class PassPermissionNamesMixin(object):
+class AddContextInfoMixIn(object):
     def get_context_data(self, **kwargs):
-        context = super(PassPermissionNamesMixin, self).get_context_data(**kwargs)
-        context['add_permission'] = 'MeasurementManagement.add_' + self.model._meta.model_name
-        context['change_permission'] = 'MeasurementManagement.change_' + self.model._meta.model_name
-        context['delete_permission'] = 'MeasurementManagement.delete_' + self.model._meta.model_name
+        context = super(AddContextInfoMixIn, self).get_context_data(**kwargs)
         context['current_path'] = self.request.META['PATH_INFO']
+        context['class_name'] = self.model._meta.model_name
+        context['add_class'] = self.model._meta.app_label + '.add_' + self.model._meta.model_name
+        context['change_class'] = self.model._meta.app_label + '.change_' + self.model._meta.model_name
+        context['delete_class'] = self.model._meta.app_label + '.delete_' + self.model._meta.model_name
+
         return context
 
 
-class NewCharacteristicValueDescription(PassPermissionNamesMixin, CreateView):
+class NewCharacteristicValueDescription(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = CharacteristicValueDescription
     fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
@@ -44,12 +46,13 @@ class DeleteCharacteristicValueDescription(DeleteView):
     success_url = reverse_lazy('list_characteristic_value_description')
 
 
-class TitledListView(ListView):
+class TitledListView(AddContextInfoMixIn, ListView):
     title = None
     model_name = None
+    list_link_name = None
     paginate_by = 20
 
-    def __init__(self, *args, title=None, model_name=None, **kwargs):
+    def __init__(self, *args, title=None, model_name=None, list_link_name=None, **kwargs):
         super(TitledListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -58,8 +61,11 @@ class TitledListView(ListView):
             self.title = 'List of ' + str(self.model._meta.verbose_name_plural)
         if not self.model_name:
             self.model_name = str(self.model._meta.verbose_name_plural)
+        if not self.list_link_name:
+            self.list_link_name = '_'.join(str(self.model._meta.verbose_name).split())
         context['title'] = self.title
         context['model_name'] = self.model_name
+        context['list_link_name'] = self.list_link_name
         return context
 
 
@@ -71,63 +77,63 @@ class ListCharacteristicValueDescription(TitledListView):
 
 # TODO: Links für Zürck und Delete Buttons, Weiter Models
 
-class UpdateCharacteristicValueDescription(PassPermissionNamesMixin, UpdateView):
+class UpdateCharacteristicValueDescription(AddContextInfoMixIn, UpdateView):
     template_name = "new_base.html"
     model = CharacteristicValueDescription
     fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
     success_url = '/'
 
 
-class NewMeasurementDevice(PassPermissionNamesMixin, CreateView):
+class NewMeasurementDevice(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = MeasurementDevice
     fields = ['name', 'sn']
     success_url = '/'
 
 
-class NewMeasurementOrder(PassPermissionNamesMixin, CreateView):
+class NewMeasurementOrder(AddContextInfoMixIn, CreateView):
     template_name = "new_measurement_order.html"
     model = MeasurementOrder
     fields = ['order_type', 'measurement_items']
     success_url = '/'
 
 
-class NewMeasurementOrderDefinition(PassPermissionNamesMixin, CreateView):
+class NewMeasurementOrderDefinition(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = MeasurementOrderDefinition
     fields = ['name', 'characteristic_values', 'product']
     success_url = '/'
 
 
-class NewMeasurementItem(PassPermissionNamesMixin, CreateView):
+class NewMeasurementItem(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = MeasurementItem
     fields = ['sn', 'name', 'product']
     success_url = '/'
 
 
-class NewCalculationRule(PassPermissionNamesMixin, CreateView):
+class NewCalculationRule(AddContextInfoMixIn, CreateView):
     template_name = "new_calculation_rule.html"
     model = CalculationRule
     fields = ['rule_name', 'rule_code']
     success_url = '/'
 
 
-class NewMeasurementTag(PassPermissionNamesMixin, CreateView):
+class NewMeasurementTag(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = MeasurementTag
     fields = ['name']
     success_url = "/"
 
 
-class NewProduct(PassPermissionNamesMixin, CreateView):
+class NewProduct(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = Product
     fields = ['product_name']
     success_url = "/"
 
 
-class NewMeasurement(PassPermissionNamesMixin, CreateView):
+class NewMeasurement(AddContextInfoMixIn, CreateView):
     template_name = "new_measurement.html"
     model = Measurement
     fields = ['date', 'order', 'order_items', 'examiner', 'remarks',

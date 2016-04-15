@@ -1,7 +1,7 @@
 {% extends "list_base.html" %}
 {% block table_line %}
-    <tr class="clickable-row" data-href="{% url 'list_characteristic_value_description' %}{{ cvd.pk }}/">
-        <td>{{ cvd.value_name }}</td>
-        <td>{{ cvd.description }}</td>
+    <tr class="clickable-row" data-href="{% url 'list_characteristic_value_description' %}{{ object.pk }}/">
+        <td>{{ object.value_name }}</td>
+        <td>{{ object.description }}</td>
     </tr>
 {% endblock %}

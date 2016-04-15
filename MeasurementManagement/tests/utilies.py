@@ -14,6 +14,11 @@ def create_limited_users():
     limited_user = User.objects.create(username='limited_user')
     limited_user.set_password('test')
     limited_user.save()
+    add_user = User.objects.create(username='add_user')
+    add_user.set_password('test')
+    add_permissions = Permission.objects.filter(codename__contains='add')
+    add_user.user_permissions = add_permissions
+    add_user.save()
     change_user = User.objects.create(username='change_user')
     change_user.set_password('test')
     change_permissions = Permission.objects.filter(codename__contains='change')

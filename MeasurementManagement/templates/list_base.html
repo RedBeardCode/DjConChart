@@ -3,13 +3,25 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <h1>{{ title }}</h1>
+
+    {% if add_class in perms %}
+        <div class="list_table">
+        <span style="float: right; height: 3em;">
+            <a type="button" class="btn btn-default " aria-label="Add new {{ model_name }}"
+               href="/{{ list_link_name }}/new/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add new {{ model_name }}
+            </a>
+        </span>
+        </div>
+    {% endif %}
     <table class="table table-striped list_table">
         <th>Name</th>
         <th>Description</th>
-        {% for cvd in object_list %}
+        {% for object in object_list %}
             {% block table_line %}
                 <tr class="clickable-row" data-href="/">
-                    <td>{{ cvd }}</td>
+                    <td>{{ object }}</td>
                 </tr>
             {% endblock %}
         {% empty %}

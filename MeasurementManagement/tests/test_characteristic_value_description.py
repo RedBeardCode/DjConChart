@@ -219,6 +219,7 @@ def test_characteristic_value_desc_buttons_limited_user(live_server, webdriver):
         selenium.close()
 
 
+@pytest.mark.djangodb
 def test_characteristic_value_desc_buttons_change_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -235,6 +236,7 @@ def test_characteristic_value_desc_buttons_change_user(live_server, webdriver):
         selenium.close()
 
 
+@pytest.mark.djangodb
 def test_characteristic_value_desc_buttons_del_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -247,5 +249,56 @@ def test_characteristic_value_desc_buttons_del_user(live_server, webdriver):
         assert len(buttons) == 2
         assert buttons[0].text == 'Delete'
         assert buttons[1].text == 'Back'
+    finally:
+        selenium.close()
+
+
+@pytest.mark.djangodb
+def test_characteristic_value_desc_buttons_add_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    selenium = webdriver()
+    try:
+        first_value = CharacteristicValueDescription.objects.all().first()
+        selenium.get(live_server + '/characteristic_value_description/{}/'.format(first_value.pk))
+        login_as_limited_user(selenium, 'add_user')
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 1
+        assert buttons[0].text == 'Back'
+        selenium.get(live_server + '/characteristic_value_description/new/')
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 2
+        assert buttons[0].text == 'Submit'
+        assert buttons[1].text == 'Back'
+    finally:
+        selenium.close()
+
+
+@pytest.mark.djangodb
+def test_characteristic_value_desc_list_new_button(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/characteristic_value_description/')
+        login_as_admin(selenium)
+        buttons = selenium.find_elements_by_tag_name('a')
+        assert len(buttons) == 1
+        assert buttons[0].text == 'Add new characteristic value descriptions'
+        buttons[0].click()
+        assert selenium.current_url == live_server + '/characteristic_value_description/new/'
+    finally:
+        selenium.close()
+
+
+@pytest.mark.djangodb
+def test_characteristic_value_desc_list_new_button_limit_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/characteristic_value_description/')
+        login_as_limited_user(selenium)
+        buttons = selenium.find_elements_by_tag_name('a')
+        assert len(buttons) == 0
     finally:
         selenium.close()
