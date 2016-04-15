@@ -9,8 +9,9 @@ from .views import NewCharacteristicValueDescription, ListCharacteristicValueDes
 from .views import NewMeasurement, NewCalculationRule, recalc_characteristic_values, \
     recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
 from .views import NewMeasurementDevice, ListMeasurementDevice, UpdateMeasurementDevice, DeleteMeasurementDevice
-from .views import NewMeasurementItem, NewMeasurementOrder
+from .views import NewMeasurementItem
 from .views import NewMeasurementItemAndOrder
+from .views import NewMeasurementOrder, ListMeasurementOrder, UpdateMeasurementOrder, DeleteMeasurementOrder
 from .views import NewMeasurementOrderDefinition, ListMeasurementOrderDefinition, \
     UpdateMeasurementOrderDefinition, DeleteMeasurementOrderDefinition
 from .views import NewMeasurementTag, ListMeasurementTag, UpdateMeasurementTag, DeleteMeasurementTag
@@ -28,9 +29,19 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_measurement_item/$',
                            login_required(NewMeasurementItem.as_view()),
                            name="new_measurement_item"),
-                       url(r'^new_measurement_order/$',
+
+                       url(r'^measurement_order/new/$',
                            login_required(NewMeasurementOrder.as_view()),
-                           name="new_measurement_Order"),
+                           name="new_measurement_order"),
+                       url(r'^measurement_order/$',
+                           login_required(ListMeasurementOrder.as_view()),
+                           name="list_measurement_order"),
+                       url(r'^measurement_order/(?P<pk>\d+)/$',
+                           login_required(UpdateMeasurementOrder.as_view()),
+                           name="update_measurement_order"),
+                       url(r'^measurement_order/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteMeasurementOrder.as_view()),
+                           name="delete_measurement_order"),
 
                        url(r'^measurement_order_definition/new/$',
                            login_required(NewMeasurementOrderDefinition.as_view()),
