@@ -32,20 +32,6 @@ class AddContextInfoMixIn(object):
 
         return context
 
-
-class NewCharacteristicValueDescription(AddContextInfoMixIn, CreateView):
-    template_name = "new_base.html"
-    model = CharacteristicValueDescription
-    fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
-    success_url = '/'
-
-
-class DeleteCharacteristicValueDescription(DeleteView):
-    template_name = "delete_base.html"
-    model = CharacteristicValueDescription
-    success_url = reverse_lazy('list_characteristic_value_description')
-
-
 class TitledListView(AddContextInfoMixIn, ListView):
     title = None
     model_name = None
@@ -69,19 +55,30 @@ class TitledListView(AddContextInfoMixIn, ListView):
         return context
 
 
+class NewCharacteristicValueDescription(AddContextInfoMixIn, CreateView):
+    template_name = "new_base.html"
+    model = CharacteristicValueDescription
+    fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
+    success_url = '/'
+
+
 class ListCharacteristicValueDescription(TitledListView):
     template_name = "list_characteristic_value_description.html"
     model = CharacteristicValueDescription
     fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
 
 
-# TODO: Links für Zürck und Delete Buttons, Weiter Models
-
 class UpdateCharacteristicValueDescription(AddContextInfoMixIn, UpdateView):
     template_name = "new_base.html"
     model = CharacteristicValueDescription
     fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
     success_url = '/'
+
+
+class DeleteCharacteristicValueDescription(DeleteView):
+    template_name = "delete_base.html"
+    model = CharacteristicValueDescription
+    success_url = reverse_lazy('list_characteristic_value_description')
 
 
 class NewMeasurementDevice(AddContextInfoMixIn, CreateView):
@@ -126,11 +123,49 @@ class NewMeasurementTag(AddContextInfoMixIn, CreateView):
     success_url = "/"
 
 
+class ListMeasurementTag(TitledListView):
+    template_name = "list_measurement_tag.html"
+    model = MeasurementTag
+    fields = ['name']
+
+
+class UpdateMeasurementTag(AddContextInfoMixIn, UpdateView):
+    template_name = "new_base.html"
+    model = MeasurementTag
+    fields = ['name']
+    success_url = '/'
+
+
+class DeleteMeasurementTag(DeleteView):
+    template_name = "delete_base.html"
+    model = MeasurementTag
+    success_url = reverse_lazy('list_measurement_tag')
+
+
 class NewProduct(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = Product
     fields = ['product_name']
     success_url = "/"
+
+
+class ListProduct(TitledListView):
+    template_name = "list_product.html"
+    model = Product
+    fields = ['product_name']
+
+
+class UpdateProduct(AddContextInfoMixIn, UpdateView):
+    template_name = "new_base.html"
+    model = Product
+    fields = ['product_name']
+    success_url = '/'
+
+
+class DeleteProduct(DeleteView):
+    template_name = "delete_base.html"
+    model = Product
+    success_url = reverse_lazy('list_product')
 
 
 class NewMeasurement(AddContextInfoMixIn, CreateView):

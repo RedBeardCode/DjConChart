@@ -1,4 +1,9 @@
 {% extends "list_base.html" %}
+{% block table_header %}
+    <th>Name</th>
+    <th>Description</th>
+{% endblock %}
+
 {% block table_line %}
     <tr class="clickable-row" data-href="{% url 'list_characteristic_value_description' %}{{ object.pk }}/">
         <td>{{ object.value_name }}</td>

@@ -4,12 +4,14 @@ from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
-from .views import NewMeasurement, NewCalculationRule, NewMeasurementTag, recalc_characteristic_values, \
-    recalculate_invalid, recalculate_progress, plot_characteristic_values, NewProduct, plot_given_configuration, \
-    ListCharacteristicValueDescription, DeleteCharacteristicValueDescription, \
-    UpdateCharacteristicValueDescription
-from .views import NewMeasurementDevice, NewCharacteristicValueDescription, NewMeasurementItemAndOrder
+from .views import NewCharacteristicValueDescription, ListCharacteristicValueDescription, \
+    UpdateCharacteristicValueDescription, DeleteCharacteristicValueDescription
+from .views import NewMeasurement, NewCalculationRule, recalc_characteristic_values, \
+    recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
+from .views import NewMeasurementDevice, NewMeasurementItemAndOrder
 from .views import NewMeasurementItem, NewMeasurementOrder, NewMeasurementOrderDefinition
+from .views import NewMeasurementTag, ListMeasurementTag, UpdateMeasurementTag, DeleteMeasurementTag
+from .views import NewProduct, ListProduct, UpdateProduct, DeleteProduct
 from .views import get_ajax_order_info, get_ajax_meas_item
 
 admin.autodiscover()
@@ -32,6 +34,7 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_measurement_device/$',
                            login_required(NewMeasurementDevice.as_view()),
                            name="new_measurement_device"),
+
                        url(r'^characteristic_value_description/new/$',
                            login_required(NewCharacteristicValueDescription.as_view()),
                            name="new_characteristic_value_description"),
@@ -44,12 +47,33 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^characteristic_value_description/(?P<pk>\d+)/delete/$',
                            login_required(DeleteCharacteristicValueDescription.as_view()),
                            name="delete_characteristic_value_description"),
-                       url(r'^new_measurement_tag/$',
+
+                       url(r'^measurement_tag/new/$',
                            login_required(NewMeasurementTag.as_view()),
                            name="new_measurement_tag"),
-                       url(r'^new_product/$',
+                       url(r'^measurement_tag/$',
+                           login_required(ListMeasurementTag.as_view()),
+                           name="list_measurement_tag"),
+                       url(r'^measurement_tag/(?P<pk>\d+)/$',
+                           login_required(UpdateMeasurementTag.as_view()),
+                           name="update_measurement_tag"),
+                       url(r'^measurement_tag/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteMeasurementTag.as_view()),
+                           name="delete_measurement_tag"),
+
+                       url(r'^product/new/$',
                            login_required(NewProduct.as_view()),
                            name="new_product"),
+                       url(r'^product/$',
+                           login_required(ListProduct.as_view()),
+                           name="list_product"),
+                       url(r'^product/(?P<pk>\d+)/$',
+                           login_required(UpdateProduct.as_view()),
+                           name="update_product"),
+                       url(r'^product/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteProduct.as_view()),
+                           name="delete_product"),
+
                        url(r'^new_item_and_order/$',
                            login_required(NewMeasurementItemAndOrder.as_view()),
                            name="new_item_and_order"),

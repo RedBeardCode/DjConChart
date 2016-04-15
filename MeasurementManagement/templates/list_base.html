@@ -16,8 +16,9 @@
         </div>
     {% endif %}
     <table class="table table-striped list_table">
-        <th>Name</th>
-        <th>Description</th>
+        {% block table_header %}
+            <th>Name</th>
+        {% endblock %}
         {% for object in object_list %}
             {% block table_line %}
                 <tr class="clickable-row" data-href="/">
