@@ -88,6 +88,25 @@ class NewMeasurementDevice(AddContextInfoMixIn, CreateView):
     success_url = '/'
 
 
+class ListMeasurementDevice(TitledListView):
+    template_name = "list_measurement_device.html"
+    model = MeasurementDevice
+    fields = ['name', 'sn']
+
+
+class UpdateMeasurementDevice(AddContextInfoMixIn, UpdateView):
+    template_name = "new_base.html"
+    model = MeasurementDevice
+    fields = ['name', 'sn']
+    success_url = '/'
+
+
+class DeleteMeasurementDevice(DeleteView):
+    template_name = "delete_base.html"
+    model = MeasurementDevice
+    success_url = reverse_lazy('list_measurement_device')
+
+
 class NewMeasurementOrder(AddContextInfoMixIn, CreateView):
     template_name = "new_measurement_order.html"
     model = MeasurementOrder
@@ -100,6 +119,32 @@ class NewMeasurementOrderDefinition(AddContextInfoMixIn, CreateView):
     model = MeasurementOrderDefinition
     fields = ['name', 'characteristic_values', 'product']
     success_url = '/'
+
+
+class NewMeasurementOrderDefinition(AddContextInfoMixIn, CreateView):
+    template_name = "new_base.html"
+    model = MeasurementOrderDefinition
+    fields = ['name', 'characteristic_values', 'product']
+    success_url = '/'
+
+
+class ListMeasurementOrderDefinition(TitledListView):
+    template_name = "list_measurement_order_definition.html"
+    model = MeasurementOrderDefinition
+    fields = ['name', 'characteristic_values', 'product']
+
+
+class UpdateMeasurementOrderDefinition(AddContextInfoMixIn, UpdateView):
+    template_name = "new_base.html"
+    model = MeasurementOrderDefinition
+    fields = ['name', 'characteristic_values', 'product']
+    success_url = '/'
+
+
+class DeleteMeasurementOrderDefinition(DeleteView):
+    template_name = "delete_base.html"
+    model = MeasurementOrderDefinition
+    success_url = reverse_lazy('list_measurement_order_definition')
 
 
 class NewMeasurementItem(AddContextInfoMixIn, CreateView):

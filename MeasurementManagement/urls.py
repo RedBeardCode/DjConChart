@@ -8,8 +8,11 @@ from .views import NewCharacteristicValueDescription, ListCharacteristicValueDes
     UpdateCharacteristicValueDescription, DeleteCharacteristicValueDescription
 from .views import NewMeasurement, NewCalculationRule, recalc_characteristic_values, \
     recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
-from .views import NewMeasurementDevice, NewMeasurementItemAndOrder
-from .views import NewMeasurementItem, NewMeasurementOrder, NewMeasurementOrderDefinition
+from .views import NewMeasurementDevice, ListMeasurementDevice, UpdateMeasurementDevice, DeleteMeasurementDevice
+from .views import NewMeasurementItem, NewMeasurementOrder
+from .views import NewMeasurementItemAndOrder
+from .views import NewMeasurementOrderDefinition, ListMeasurementOrderDefinition, \
+    UpdateMeasurementOrderDefinition, DeleteMeasurementOrderDefinition
 from .views import NewMeasurementTag, ListMeasurementTag, UpdateMeasurementTag, DeleteMeasurementTag
 from .views import NewProduct, ListProduct, UpdateProduct, DeleteProduct
 from .views import get_ajax_order_info, get_ajax_meas_item
@@ -28,12 +31,32 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_measurement_order/$',
                            login_required(NewMeasurementOrder.as_view()),
                            name="new_measurement_Order"),
-                       url(r'^new_measurement_order_definition/$',
+
+                       url(r'^measurement_order_definition/new/$',
                            login_required(NewMeasurementOrderDefinition.as_view()),
                            name="new_measurement_order_definition"),
-                       url(r'^new_measurement_device/$',
+                       url(r'^measurement_order_definition/$',
+                           login_required(ListMeasurementOrderDefinition.as_view()),
+                           name="list_measurement_order_definition"),
+                       url(r'^measurement_order_definition/(?P<pk>\d+)/$',
+                           login_required(UpdateMeasurementOrderDefinition.as_view()),
+                           name="update_measurement_order_definition"),
+                       url(r'^measurement_order_definition/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteMeasurementOrderDefinition.as_view()),
+                           name="delete_measurement_order_definition"),
+
+                       url(r'^measurement_device/new/$',
                            login_required(NewMeasurementDevice.as_view()),
                            name="new_measurement_device"),
+                       url(r'^measurement_device/$',
+                           login_required(ListMeasurementDevice.as_view()),
+                           name="list_measurement_device"),
+                       url(r'^measurement_device/(?P<pk>\d+)/$',
+                           login_required(UpdateMeasurementDevice.as_view()),
+                           name="update_measurement_device"),
+                       url(r'^measurement_device/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteMeasurementDevice.as_view()),
+                           name="delete_measurement_device"),
 
                        url(r'^characteristic_value_description/new/$',
                            login_required(NewCharacteristicValueDescription.as_view()),
@@ -73,7 +96,7 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^product/(?P<pk>\d+)/delete/$',
                            login_required(DeleteProduct.as_view()),
                            name="delete_product"),
-
+                       # Diverse Views
                        url(r'^new_item_and_order/$',
                            login_required(NewMeasurementItemAndOrder.as_view()),
                            name="new_item_and_order"),
@@ -86,6 +109,7 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^plot/(.*)/$',
                            login_required(plot_given_configuration),
                            name="plot_given_configuration"),
+                       # Ajax Views
                        url(r'^get_order_info/$', get_ajax_order_info, name='get_order_info'),
                        url(r'^get_meas_item/$', get_ajax_meas_item, name='get_meas_item'),
                        url(r'^recalculate_invalid/$', recalculate_invalid, name='recalculate_invalid'),
