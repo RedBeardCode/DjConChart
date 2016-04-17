@@ -16,9 +16,8 @@
             <a class="btn btn-default" role="button" href="{{ current_path }}delete/">Delete</a>
         {% endif %}
 
-        <button class="btn btn-default" onclick="history.back();">Back</button>
+        <a class="btn btn-default" role="button" href="javascript:history.back(-1)">Go back</a>
 
     </form>
 
 {% endblock %}
-

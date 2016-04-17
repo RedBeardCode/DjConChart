@@ -174,7 +174,7 @@ def test_characteristic_value_desc_back(admin_client, live_server, webdriver):
             selenium.get(start_url)
             selenium.get(live_server + '/characteristic_value_description/{}/'.format(first_value.pk))
             back_button = selenium.find_elements_by_class_name('btn-default')[2]
-            assert back_button.text == 'Back'
+            assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
     finally:
@@ -214,7 +214,7 @@ def test_characteristic_value_desc_buttons_limited_user(live_server, webdriver):
         login_as_limited_user(selenium)
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 1
-        assert buttons[0].text == 'Back'
+        assert buttons[0].text == 'Go back'
     finally:
         selenium.close()
 
@@ -231,7 +231,7 @@ def test_characteristic_value_desc_buttons_change_user(live_server, webdriver):
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
         assert buttons[0].text == 'Update'
-        assert buttons[1].text == 'Back'
+        assert buttons[1].text == 'Go back'
     finally:
         selenium.close()
 
@@ -248,7 +248,7 @@ def test_characteristic_value_desc_buttons_del_user(live_server, webdriver):
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
         assert buttons[0].text == 'Delete'
-        assert buttons[1].text == 'Back'
+        assert buttons[1].text == 'Go back'
     finally:
         selenium.close()
 
@@ -264,12 +264,12 @@ def test_characteristic_value_desc_buttons_add_user(live_server, webdriver):
         login_as_limited_user(selenium, 'add_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 1
-        assert buttons[0].text == 'Back'
+        assert buttons[0].text == 'Go back'
         selenium.get(live_server + '/characteristic_value_description/new/')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
         assert buttons[0].text == 'Submit'
-        assert buttons[1].text == 'Back'
+        assert buttons[1].text == 'Go back'
     finally:
         selenium.close()
 
