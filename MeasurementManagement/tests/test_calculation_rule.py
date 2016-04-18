@@ -21,7 +21,7 @@ def test_create_rule_view(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/'
         assert len(CalculationRule.objects.all()) == 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -36,7 +36,7 @@ def test_create_rule_view_nocode(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/new_calculation_rule/'
         assert len(CalculationRule.objects.all()) == 0
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -49,7 +49,7 @@ def test_create_rule_view_noname(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/new_calculation_rule/'
         assert len(CalculationRule.objects.all()) == 0
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -109,7 +109,7 @@ def test_rule_history_new_view(admin_client, live_server, webdriver):
         versions = revisions.get_for_object(rule)
         assert len(versions) == 2
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db

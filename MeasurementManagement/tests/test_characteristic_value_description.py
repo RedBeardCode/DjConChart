@@ -27,7 +27,7 @@ def test_create_characteristic_value_desc_view(admin_client, live_server, webdri
         assert selenium.current_url == live_server + '/'
         assert len(CharacteristicValueDescription.objects.all()) == num_value_descriptions + 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -50,7 +50,7 @@ def test_create_characteristic_value_desc_noname(admin_client, live_server, webd
         assert selenium.current_url == live_server + '/characteristic_value_description/new/'
         assert len(CharacteristicValueDescription.objects.all()) == num_value_descriptions
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -73,7 +73,7 @@ def test_create_characteristic_value_desc_nodes(admin_client, live_server, webdr
         assert selenium.current_url == live_server + '/characteristic_value_description/new/'
         assert len(CharacteristicValueDescription.objects.all()) == num_value_descriptions
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -96,7 +96,7 @@ def test_create_characteristic_value_desc_norule(admin_client, live_server, webd
         assert selenium.current_url == live_server + '/characteristic_value_description/new/'
         assert len(CharacteristicValueDescription.objects.all()) == num_value_descriptions
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -117,7 +117,7 @@ def test_create_characteristic_value_desc_nodev(admin_client, live_server, webdr
         assert selenium.current_url == live_server + '/characteristic_value_description/new/'
         assert len(CharacteristicValueDescription.objects.all()) == num_value_descriptions
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -139,7 +139,7 @@ def test_list_characteristic_value_desc(admin_client, live_server, webdriver):
             assert len(columns) == 2
             assert columns[0].text == columns[1].text
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -158,7 +158,7 @@ def test_list_characteristic_value_desc_click(admin_client, live_server, webdriv
                 all_chara_val_des[index].pk)
 
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -178,7 +178,7 @@ def test_characteristic_value_desc_back(admin_client, live_server, webdriver):
             back_button.click()
             assert selenium.current_url == start_url
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -200,7 +200,7 @@ def test_characteristic_value_desc_delete(admin_client, live_server, webdriver):
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/characteristic_value_description/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -216,7 +216,7 @@ def test_characteristic_value_desc_buttons_limited_user(live_server, webdriver):
         assert len(buttons) == 1
         assert buttons[0].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -233,7 +233,7 @@ def test_characteristic_value_desc_buttons_change_user(live_server, webdriver):
         assert buttons[0].text == 'Update'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -250,7 +250,7 @@ def test_characteristic_value_desc_buttons_del_user(live_server, webdriver):
         assert buttons[0].text == 'Delete'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -271,7 +271,7 @@ def test_characteristic_value_desc_buttons_add_user(live_server, webdriver):
         assert buttons[0].text == 'Submit'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -287,7 +287,7 @@ def test_characteristic_value_desc_list_new_button(admin_client, live_server, we
         buttons[0].click()
         assert selenium.current_url == live_server + '/characteristic_value_description/new/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -301,4 +301,4 @@ def test_characteristic_value_desc_list_new_button_limit_user(live_server, webdr
         buttons = selenium.find_elements_by_tag_name('a')
         assert len(buttons) == 0
     finally:
-        selenium.close()
+        selenium.quit()

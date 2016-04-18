@@ -29,7 +29,7 @@ def test_recalv_finished_div(admin_client, live_server, webdriver):
             EC.visibility_of(selenium.find_element_by_id('unfinished_values')))
         assert section_header
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -56,4 +56,4 @@ def test_recalv_invalid(admin_client, live_server, webdriver):
         assert selenium.find_element_by_id('progress_value').text == '100%'
         assert selenium.find_element_by_class_name('progress-bar').get_attribute('style') == 'width: 100%;'
     finally:
-        selenium.close()
+        selenium.quit()

@@ -17,7 +17,7 @@ def test_all_elements(admin_client, live_server, webdriver):
         assert selenium.find_element_by_id('id_product')
         assert selenium.find_element_by_class_name('add_meas_item_btn')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -48,7 +48,7 @@ def test_add_meas_item_ui(admin_client, live_server, webdriver):
                 assert 'rgba(255, 255, 255, 1)' == color
 
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -80,7 +80,7 @@ def test_add_meas_order_one_item(admin_client, live_server, webdriver):
         assert len(MeasurementItem.objects.all()) == num_items_before + 1
         assert MeasurementItem.objects.get(sn=4711)
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -111,7 +111,7 @@ def test_add_meas_order_two_item(admin_client, live_server, webdriver):
         assert MeasurementItem.objects.get(sn=4712)
         assert MeasurementItem.objects.get(sn=4713)
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -158,7 +158,7 @@ def test_add_meas_order_multi_fail(admin_client, live_server, webdriver):
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == (live_server.url + '/')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 def check_err_msg(selenium, num_sn_err, num_product_err):
@@ -193,7 +193,7 @@ def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
         assert alert[0].text == 'Duplicated measurement item'
 
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -213,7 +213,7 @@ def test_ac_single_item_type(admin_client, live_server, webdriver):
         selenium.find_element_by_id('id_name').send_keys("")
         assert selenium.find_element_by_id('id_name').get_attribute('value') == 'Item 1'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -233,7 +233,7 @@ def test_ac_single_item_select(admin_client, live_server, webdriver):
         suggestions[3].click()
         assert selenium.find_element_by_id('id_name').get_attribute('value') == 'Item 3'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -259,7 +259,7 @@ def test_ac_single_item_create(admin_client, live_server, webdriver):
         selenium.find_element_by_name('action').click()
         assert MeasurementItem.objects.count() == num_items + 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -289,4 +289,4 @@ def test_ac_multi_item_select(admin_client, live_server, webdriver):
         assert sns[1].get_attribute('value') == ''
         assert sns[2].get_attribute('value') == ''
     finally:
-        selenium.close()
+        selenium.quit()

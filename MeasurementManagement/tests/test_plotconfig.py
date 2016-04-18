@@ -77,5 +77,4 @@ def test_plot_url(admin_client, live_server, webdriver):
             # no bokeh server running
             assert selenium.find_element_by_tag_name('body').text == 'Server Error (500)'
     finally:
-        selenium.close()
-
+        selenium.quit()

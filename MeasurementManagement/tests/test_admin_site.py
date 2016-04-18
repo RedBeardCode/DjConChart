@@ -22,7 +22,7 @@ def test_admin_start(admin_client, live_server, webdriver):
         assert selenium.find_elements_by_link_text('Measurement tags')
         assert selenium.find_elements_by_link_text('Products')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -39,7 +39,7 @@ def test_admin_calculation_rule(admin_client, live_server, webdriver):
         lines = tbody.find_elements_by_tag_name('tr')
         assert len(tbody.find_elements_by_tag_name('tr')) == 2
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -56,7 +56,7 @@ def test_admin_characteristic_value_descriptions(admin_client, live_server, webd
         assert tbody.find_element_by_link_text('width')
         assert tbody.find_element_by_link_text('length')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -75,7 +75,7 @@ def test_admin_measurement_device(admin_client, live_server, webdriver):
         assert tbody.find_element_by_link_text('Device 1: 1')
         assert tbody.find_element_by_link_text('Device 0: 0')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -99,7 +99,7 @@ def test_admin_measurement_item(admin_client, live_server, webdriver):
         assert tbody.find_element_by_link_text('Item 1: 0000001')
         assert tbody.find_element_by_link_text('Item 0: 0000000')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -116,7 +116,7 @@ def test_admin_measurement_order_definition(admin_client, live_server, webdriver
         assert tbody.find_element_by_link_text('OrderDefinition2')
         assert tbody.find_element_by_link_text('OrderDefinition1')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -141,7 +141,7 @@ def test_admin_measurement_order(admin_client, live_server, webdriver):
         assert tbody.find_element_by_link_text('OrderDefinition3 {} for Item 8: 0000008,'.format(first_index + 8))
         assert tbody.find_element_by_link_text('OrderDefinition1 {} for Item 9: 0000009,'.format(first_index + 9))
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -157,7 +157,7 @@ def test_admin_measurement_tag(admin_client, live_server, webdriver):
         assert tbody.find_element_by_link_text('width')
         assert tbody.find_element_by_link_text('height')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -174,4 +174,4 @@ def test_admin_product(admin_client, live_server, webdriver):
         assert tbody.find_element_by_link_text('product2')
         assert tbody.find_element_by_link_text('product3')
     finally:
-        selenium.close()
+        selenium.quit()

@@ -18,7 +18,7 @@ def test_create_meas_device_view(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/'
         assert len(MeasurementDevice.objects.all()) == 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -41,7 +41,7 @@ def test_list_measurement_device(admin_client, live_server, webdriver):
             assert columns[0].text == all_meas_devices[index].name
             assert columns[1].text == all_meas_devices[index].sn
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -60,7 +60,7 @@ def test_list_measurement_device_click(admin_client, live_server, webdriver):
                 all_meas_devices[index].pk)
 
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -80,7 +80,7 @@ def test_measurement_device_back(admin_client, live_server, webdriver):
             back_button.click()
             assert selenium.current_url == start_url
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -102,7 +102,7 @@ def test_measurement_device_delete(admin_client, live_server, webdriver):
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/measurement_device/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -118,7 +118,7 @@ def test_measurement_device_buttons_limited_user(live_server, webdriver):
         assert len(buttons) == 1
         assert buttons[0].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -135,7 +135,7 @@ def test_measurement_device_buttons_change_user(live_server, webdriver):
         assert buttons[0].text == 'Update'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -152,7 +152,7 @@ def test_measurement_device_buttons_del_user(live_server, webdriver):
         assert buttons[0].text == 'Delete'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -173,7 +173,7 @@ def test_measurement_device_buttons_add_user(live_server, webdriver):
         assert buttons[0].text == 'Submit'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -189,7 +189,7 @@ def test_measurement_device_list_new_button(admin_client, live_server, webdriver
         buttons[0].click()
         assert selenium.current_url == live_server + '/measurement_device/new/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -203,4 +203,4 @@ def test_measurement_device_list_new_button_limit_user(live_server, webdriver):
         buttons = selenium.find_elements_by_tag_name('a')
         assert len(buttons) == 0
     finally:
-        selenium.close()
+        selenium.quit()

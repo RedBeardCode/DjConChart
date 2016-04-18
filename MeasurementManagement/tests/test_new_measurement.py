@@ -29,7 +29,7 @@ def test_login_requierd(admin_client, live_server, webdriver):
         url = selenium.current_url
         assert url == live_server + '/new_measurement/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -50,7 +50,7 @@ def test_order_choice(admin_client, live_server, webdriver):
         assert target_names == order_names
         assert order.first_selected_option.text == '---------'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -74,7 +74,7 @@ def test_default_values(admin_client, live_server, webdriver):
             selenium.find_element_by_id('id_meas_item')).first_selected_option.text.strip() == 'Please select first the order'
         assert selenium.find_element_by_id('id_measurement_devices').text.strip() == 'Please select first the order'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -100,7 +100,7 @@ def test_all_elements(admin_client, live_server, webdriver):
         assert selenium.find_element_by_id('id_measurement_tag')
         assert selenium.find_element_by_class_name('btn')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -128,7 +128,7 @@ def test_on_change_order(admin_client, live_server, webdriver):
             assert [item.text for item in meas_items.options] == [target_meas_items[i]]
             assert [dev.text for dev in meas_devices.options] == target_meas_devices[i % 3]
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -159,7 +159,7 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
         reload_meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
         assert reload_meas_devices.first_selected_option.text == reload_meas_devices.options[0].text
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -185,7 +185,7 @@ def test_submit(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server.url + '/'
         assert len(Measurement.objects.all()) == 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -210,4 +210,4 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server.url + '/'
         assert len(Measurement.objects.all()) == 1
     finally:
-        selenium.close()
+        selenium.quit()

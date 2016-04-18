@@ -14,7 +14,7 @@ def test_all_elements(admin_client, live_server, webdriver):
         assert selenium.find_element_by_id('id_order_type')
         assert selenium.find_element_by_id('id_measurement_items')
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangs_db
@@ -34,7 +34,7 @@ def test_create_meas_order_view(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/'
         assert len(MeasurementOrder.objects.all()) == orders_before + 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangs_db
@@ -56,7 +56,7 @@ def test_create_meas_order_def_view(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/'
         assert len(MeasurementOrderDefinition.objects.all()) == order_defs_before + 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -81,7 +81,7 @@ def test_list_measurement_order(admin_client, live_server, webdriver):
             mi_string = ' ; '.join([str(mi) for mi in all_meas_order[index].measurement_items.all()])
             assert columns[2].text == mi_string
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -99,7 +99,7 @@ def test_list_measurement_order_click(admin_client, live_server, webdriver):
             assert selenium.current_url == live_server + '/measurement_order/{}/'.format(
                 all_meas_order[index].pk)
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -119,7 +119,7 @@ def test_measurement_order_back(admin_client, live_server, webdriver):
             back_button.click()
             assert selenium.current_url == start_url
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -141,7 +141,7 @@ def test_measurement_order_delete(admin_client, live_server, webdriver):
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/measurement_order/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -157,7 +157,7 @@ def test_measurement_order_buttons_limited_user(live_server, webdriver):
         assert len(buttons) == 1
         assert buttons[0].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -174,7 +174,7 @@ def test_measurement_order_buttons_change_user(live_server, webdriver):
         assert buttons[0].text == 'Update'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -191,7 +191,7 @@ def test_measurement_order_buttons_del_user(live_server, webdriver):
         assert buttons[0].text == 'Delete'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -212,7 +212,7 @@ def test_measurement_order_buttons_add_user(live_server, webdriver):
         assert buttons[0].text == 'Submit'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -228,7 +228,7 @@ def test_measurement_order_list_new_button(admin_client, live_server, webdriver)
         buttons[0].click()
         assert selenium.current_url == live_server + '/measurement_order/new/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -242,7 +242,7 @@ def test_measurement_order_list_new_button_limit_user(live_server, webdriver):
         buttons = selenium.find_elements_by_tag_name('a')
         assert len(buttons) == 0
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -267,7 +267,7 @@ def test_list_measurement_order_definition(admin_client, live_server, webdriver)
             cvd_string = ' ; '.join([cvd.value_name for cvd in all_meas_order_defs[index].characteristic_values.all()])
             assert columns[2].text == cvd_string
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -286,7 +286,7 @@ def test_list_measurement_order_definition_click(admin_client, live_server, webd
                 all_meas_order_defs[index].pk)
 
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -306,7 +306,7 @@ def test_measurement_order_definition_back(admin_client, live_server, webdriver)
             back_button.click()
             assert selenium.current_url == start_url
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -328,7 +328,7 @@ def test_measurement_order_definition_delete(admin_client, live_server, webdrive
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/measurement_order_definition/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -344,7 +344,7 @@ def test_measurement_order_definition_buttons_limited_user(live_server, webdrive
         assert len(buttons) == 1
         assert buttons[0].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -361,7 +361,7 @@ def test_measurement_order_definition_buttons_change_user(live_server, webdriver
         assert buttons[0].text == 'Update'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -378,7 +378,7 @@ def test_measurement_order_definition_buttons_del_user(live_server, webdriver):
         assert buttons[0].text == 'Delete'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -399,7 +399,7 @@ def test_measurement_order_definition_buttons_add_user(live_server, webdriver):
         assert buttons[0].text == 'Submit'
         assert buttons[1].text == 'Go back'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -415,7 +415,7 @@ def test_measurement_order_definition_list_new_button(admin_client, live_server,
         buttons[0].click()
         assert selenium.current_url == live_server + '/measurement_order_definition/new/'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.djangodb
@@ -429,4 +429,4 @@ def test_measurement_order_definition_list_new_button_limit_user(live_server, we
         buttons = selenium.find_elements_by_tag_name('a')
         assert len(buttons) == 0
     finally:
-        selenium.close()
+        selenium.quit()

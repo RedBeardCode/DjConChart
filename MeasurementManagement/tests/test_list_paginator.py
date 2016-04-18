@@ -35,7 +35,7 @@ def test_list_paginator(admin_client, live_server, webdriver):
         assert page_button[5].text == '5'
         assert page_button[6].text == '»'
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -61,7 +61,7 @@ def test_list_paginator_click_num(admin_client, live_server, webdriver):
             else:
                 assert len(selenium.find_elements_by_tag_name('tr')) == 21
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -85,4 +85,4 @@ def test_list_paginator_click_arrow(admin_client, live_server, webdriver):
             assert page_button[i] == selenium.find_element_by_class_name('active')
         assert page_button[6] == selenium.find_element_by_class_name('disabled')
     finally:
-        selenium.close()
+        selenium.quit()

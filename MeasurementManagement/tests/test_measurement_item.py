@@ -22,7 +22,7 @@ def test_create_meas_item_view(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/'
         assert len(MeasurementItem.objects.all()) == 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -40,7 +40,7 @@ def test_create_meas_item_view_noname(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/'
         assert len(MeasurementItem.objects.all()) == 1
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -55,7 +55,7 @@ def test_create_meas_item_view_nosn(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/new_measurement_item/'
         assert len(MeasurementItem.objects.all()) == 0
     finally:
-        selenium.close()
+        selenium.quit()
 
 
 @pytest.mark.django_db
@@ -73,4 +73,4 @@ def test_create_meas_item_view_noproduct(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server + '/new_measurement_item/'
         assert len(MeasurementItem.objects.all()) == 0
     finally:
-        selenium.close()
+        selenium.quit()
