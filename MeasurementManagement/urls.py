@@ -4,9 +4,10 @@ from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
+from .views import NewCalculationRule, ListCalculationRule, UpdateCalculationRule, DeleteCalculationRule
 from .views import NewCharacteristicValueDescription, ListCharacteristicValueDescription, \
     UpdateCharacteristicValueDescription, DeleteCharacteristicValueDescription
-from .views import NewMeasurement, NewCalculationRule, recalc_characteristic_values, \
+from .views import NewMeasurement, recalc_characteristic_values, \
     recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
 from .views import NewMeasurementDevice, ListMeasurementDevice, UpdateMeasurementDevice, DeleteMeasurementDevice
 from .views import NewMeasurementItem, ListMeasurementItem, UpdateMeasurementItem, DeleteMeasurementItem
@@ -23,9 +24,19 @@ admin.autodiscover()
 urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_measurement/$', login_required(NewMeasurement.as_view()),
                            name="new_measurement"),
-                       url(r'^new_calculation_rule/$',
+
+                       url(r'^calculation_rule/new/$',
                            login_required(NewCalculationRule.as_view()),
                            name="new_calculation_rule"),
+                       url(r'^calculation_rule/$',
+                           login_required(ListCalculationRule.as_view()),
+                           name="list_calculation_rule"),
+                       url(r'^calculation_rule/(?P<pk>\d+)/$',
+                           login_required(UpdateCalculationRule.as_view()),
+                           name="update_calculation_rule"),
+                       url(r'^calculation_rule/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteCalculationRule.as_view()),
+                           name="delete_calculation_rule"),
 
                        url(r'^measurement_item/new/$',
                            login_required(NewMeasurementItem.as_view()),

@@ -192,6 +192,25 @@ class NewCalculationRule(AddContextInfoMixIn, CreateView):
     success_url = '/'
 
 
+class ListCalculationRule(TitledListView):
+    template_name = "list_calculation_rule.html"
+    model = CalculationRule
+    fields = ['rule_name', 'rule_code']
+
+
+class UpdateCalculationRule(AddContextInfoMixIn, UpdateView):
+    template_name = "new_calculation_rule.html"
+    model = CalculationRule
+    fields = ['rule_name', 'rule_code']
+    success_url = '/'
+
+
+class DeleteCalculationRule(DeleteView):
+    template_name = "delete_base.html"
+    model = CalculationRule
+    success_url = reverse_lazy('list_calculation_rule')
+
+
 class NewMeasurementTag(AddContextInfoMixIn, CreateView):
     template_name = "new_base.html"
     model = MeasurementTag
