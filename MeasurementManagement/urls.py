@@ -9,7 +9,7 @@ from .views import NewCharacteristicValueDescription, ListCharacteristicValueDes
 from .views import NewMeasurement, NewCalculationRule, recalc_characteristic_values, \
     recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
 from .views import NewMeasurementDevice, ListMeasurementDevice, UpdateMeasurementDevice, DeleteMeasurementDevice
-from .views import NewMeasurementItem
+from .views import NewMeasurementItem, ListMeasurementItem, UpdateMeasurementItem, DeleteMeasurementItem
 from .views import NewMeasurementItemAndOrder
 from .views import NewMeasurementOrder, ListMeasurementOrder, UpdateMeasurementOrder, DeleteMeasurementOrder
 from .views import NewMeasurementOrderDefinition, ListMeasurementOrderDefinition, \
@@ -26,9 +26,19 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^new_calculation_rule/$',
                            login_required(NewCalculationRule.as_view()),
                            name="new_calculation_rule"),
-                       url(r'^new_measurement_item/$',
+
+                       url(r'^measurement_item/new/$',
                            login_required(NewMeasurementItem.as_view()),
                            name="new_measurement_item"),
+                       url(r'^measurement_item/$',
+                           login_required(ListMeasurementItem.as_view()),
+                           name="list_measurement_item"),
+                       url(r'^measurement_item/(?P<pk>\d+)/$',
+                           login_required(UpdateMeasurementItem.as_view()),
+                           name="update_measurement_item"),
+                       url(r'^measurement_item/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteMeasurementItem.as_view()),
+                           name="delete_measurement_item"),
 
                        url(r'^measurement_order/new/$',
                            login_required(NewMeasurementOrder.as_view()),

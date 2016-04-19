@@ -166,6 +166,25 @@ class NewMeasurementItem(AddContextInfoMixIn, CreateView):
     success_url = '/'
 
 
+class ListMeasurementItem(TitledListView):
+    template_name = "list_measurement_item.html"
+    model = MeasurementItem
+    fields = ['sn', 'name', 'product']
+
+
+class UpdateMeasurementItem(AddContextInfoMixIn, UpdateView):
+    template_name = "new_base.html"
+    model = MeasurementItem
+    fields = ['sn', 'name', 'product']
+    success_url = '/'
+
+
+class DeleteMeasurementItem(DeleteView):
+    template_name = "delete_base.html"
+    model = MeasurementItem
+    success_url = reverse_lazy('list_measurement_item')
+
+
 class NewCalculationRule(AddContextInfoMixIn, CreateView):
     template_name = "new_calculation_rule.html"
     model = CalculationRule

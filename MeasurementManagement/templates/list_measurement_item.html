@@ -1,0 +1,14 @@
+{% extends "list_base.html" %}
+{% block table_header %}
+    <th>Serial number</th>
+    <th>Name</th>
+    <th>Product</th>
+{% endblock %}
+
+{% block table_line %}
+    <tr class="clickable-row" data-href="{% url 'list_measurement_item' %}{{ object.pk }}/">
+        <td>{{ object.sn }}</td>
+        <td>{{ object.name }}</td>
+        <td>{{ object.product.product_name }}</td>
+    </tr>
+{% endblock %}
