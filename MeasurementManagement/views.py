@@ -263,15 +263,10 @@ class DeleteProduct(DeleteView):
     success_url = reverse_lazy('list_product')
 
 
-class NewMeasurement(AddContextInfoMixIn, CreateView):
-    template_name = "new_measurement.html"
-    model = Measurement
-    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
-              'meas_item', 'measurement_devices', 'raw_data_file', 'measurement_tag']
-    success_url = "/"
+class MeasurementFormMixin(object):
 
     def get_form(self, form_class=None):
-        form = super(NewMeasurement, self).get_form(form_class)
+        form = super(MeasurementFormMixin, self).get_form(form_class)
         field = form.fields['date']
         field.initial = datetime.now()
         field.widget = AdminSplitDateTime()
@@ -279,6 +274,36 @@ class NewMeasurement(AddContextInfoMixIn, CreateView):
         form.fields['order'].widget.attrs.update({'onchange': 'get_order_items();'})
         form.fields['examiner'].initial = self.request.user
         return form
+
+
+class NewMeasurement(MeasurementFormMixin, AddContextInfoMixIn, CreateView):
+    template_name = "new_measurement.html"
+    model = Measurement
+    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
+              'meas_item', 'measurement_devices', 'raw_data_file', 'measurement_tag']
+    success_url = "/"
+
+
+class ListMeasurement(TitledListView):
+    template_name = "list_measurement.html"
+    model = Measurement
+    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
+              'meas_item', 'measurement_devices', 'raw_data_file', 'measurement_tag']
+
+
+class UpdateMeasurement(MeasurementFormMixin, AddContextInfoMixIn, UpdateView):
+    template_name = "new_measurement.html"
+    model = Measurement
+    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
+              'meas_item', 'measurement_devices', 'raw_data_file', 'measurement_tag']
+    success_url = '/'
+
+
+class DeleteMeasurement(DeleteView):
+    template_name = "delete_base.html"
+    model = Measurement
+    success_url = reverse_lazy('list_measurement')
+
 
 
 class NewMeasurementItemAndOrder(MultiFormsView):

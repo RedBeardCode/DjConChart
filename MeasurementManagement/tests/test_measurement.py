@@ -1,11 +1,14 @@
 import datetime
 
 import pytest
+from django.conf import settings
+from django.utils.dateformat import DateFormat
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
-from .utilies import login_as_admin, create_correct_sample_data
+from .utilies import login_as_admin, create_correct_sample_data, create_limited_users, login_as_limited_user, \
+    create_sample_characteristic_values
 from ..models import Measurement, MeasurementOrder
 
 
@@ -16,7 +19,7 @@ from ..models import Measurement, MeasurementOrder
 def test_login_requierd(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         username = selenium.find_element_by_id('id_username')
         assert username
         assert not (username.text)
@@ -27,7 +30,7 @@ def test_login_requierd(admin_client, live_server, webdriver):
         pwd.send_keys('password')
         selenium.find_element_by_tag_name('form').submit()
         url = selenium.current_url
-        assert url == live_server + '/new_measurement/'
+        assert url == live_server + '/measurement/new/'
     finally:
         selenium.quit()
 
@@ -38,7 +41,7 @@ def test_order_choice(admin_client, live_server, webdriver):
     selenium = webdriver()
     first_index = MeasurementOrder.objects.first().pk
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         order = Select(selenium.find_element_by_id('id_order'))
 
@@ -59,7 +62,7 @@ def test_default_values(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         time_delta = datetime.datetime.now() - start_create_data
         date_str = selenium.find_element_by_id('id_date_0').get_attribute('value') + ' ' + selenium.find_element_by_id(
@@ -82,7 +85,7 @@ def test_all_elements(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         assert selenium.find_element_by_id('id_date_0')
         assert selenium.find_element_by_id('calendarlink0')
@@ -108,7 +111,7 @@ def test_on_change_order(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         order = Select(selenium.find_element_by_id('id_order'))
         order_items = Select(selenium.find_element_by_id('id_order_items'))
@@ -136,7 +139,7 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         order = Select(selenium.find_element_by_id('id_order'))
         order.select_by_index(1)
@@ -148,7 +151,7 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
         meas_devices.select_by_index(0)
         button = selenium.find_element_by_tag_name('button')
         button.click()
-        assert selenium.current_url == live_server.url + '/new_measurement/'
+        assert selenium.current_url == live_server.url + '/measurement/new/'
         WebDriverWait(selenium, 10).until_not(EC.text_to_be_present_in_element((By.ID, 'id_meas_item'), '---------'))
         reload_order = Select(selenium.find_element_by_id('id_order'))
         assert reload_order.first_selected_option.text == reload_order.options[1].text
@@ -167,7 +170,7 @@ def test_submit(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         order = Select(selenium.find_element_by_id('id_order'))
         order.select_by_index(1)
@@ -180,8 +183,8 @@ def test_submit(admin_client, live_server, webdriver):
         selenium.find_element_by_id('id_remarks').send_keys('Remark')
         file_name = selenium.find_element_by_id('id_raw_data_file')
         file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
-        button = selenium.find_element_by_tag_name('button')
-        button.click()
+        button = selenium.find_elements_by_tag_name('button')
+        button[0].click()
         assert selenium.current_url == live_server.url + '/'
         assert len(Measurement.objects.all()) == 1
     finally:
@@ -193,7 +196,7 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
-        selenium.get(live_server + '/new_measurement/')
+        selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         order = Select(selenium.find_element_by_id('id_order'))
         order.select_by_index(1)
@@ -205,9 +208,205 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
         meas_devices.select_by_index(0)
         file_name = selenium.find_element_by_id('id_raw_data_file')
         file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
-        button = selenium.find_element_by_tag_name('button')
-        button.click()
+        button = selenium.find_elements_by_tag_name('button')
+        button[0].click()
         assert selenium.current_url == live_server.url + '/'
         assert len(Measurement.objects.all()) == 1
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_list_measurement(admin_client, live_server, webdriver):
+    selenium = webdriver()
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    try:
+        selenium.get(live_server + '/measurement/')
+        login_as_admin(selenium)
+        title = selenium.find_element_by_tag_name('h1').text
+        assert title == 'List of measurements'
+        table_rows = selenium.find_elements_by_class_name('clickable-row')
+        assert len(table_rows) == 19
+        all_meas = Measurement.objects.all()
+        for index, row in enumerate(table_rows):
+            assert row.get_attribute('data-href') == '/measurement/{}/'.format(
+                all_meas[index].pk)
+            columns = row.find_elements_by_tag_name('td')
+            assert len(columns) == 6
+            assert columns[0].text == DateFormat(all_meas[index].date).format(settings.DATETIME_FORMAT)
+            assert columns[1].text == str(all_meas[index].order).strip()
+            assert columns[2].text == ';'.join([str(item) for item in all_meas[index].order_items.all()])
+            assert columns[3].text == all_meas[index].examiner.username
+            assert columns[4].text == str(all_meas[index].meas_item)
+            assert columns[5].text == str(all_meas[index].measurement_tag)
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_list_measurement_click(admin_client, live_server, webdriver):
+    selenium = webdriver()
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    try:
+        selenium.get(live_server + '/measurement/')
+        login_as_admin(selenium)
+        all_meas = Measurement.objects.all()
+        for index in range(2):
+            selenium.get(live_server + '/measurement/')
+            table_rows = selenium.find_elements_by_class_name('clickable-row')
+            table_rows[index].click()
+            assert selenium.current_url == live_server + '/measurement/{}/'.format(
+                all_meas[index].pk)
+
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_measurement_back(admin_client, live_server, webdriver):
+    selenium = webdriver()
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    try:
+        selenium.get(live_server + '/measurement/')
+        login_as_admin(selenium)
+        first_value = Measurement.objects.all().first()
+        selenium.get(live_server + '/recalc_characteristic_values/')
+        for start_url in [live_server + '/measurement/', live_server + '/']:
+            selenium.get(start_url)
+            selenium.get(live_server + '/measurement/{}/'.format(first_value.pk))
+            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            assert back_button.text == 'Go back'
+            back_button.click()
+            assert selenium.current_url == start_url
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_measurement_delete(admin_client, live_server, webdriver):
+    selenium = webdriver()
+    create_correct_sample_data()
+    try:
+        selenium.get(live_server + '/measurement/')
+        login_as_admin(selenium)
+        num_values = Measurement.objects.all().count()
+        for index in range(num_values):
+            table_rows = selenium.find_elements_by_class_name('clickable-row')
+            assert len(table_rows) == 2 - index
+            table_rows[0].click()
+            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button.click()
+            assert selenium.current_url == live_server + '/measurement/{}/delete/'.format(
+                Measurement.objects.all().first().pk)
+            selenium.find_element_by_class_name('btn-warning').click()
+            assert selenium.current_url == live_server + '/measurement/'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_measurement_buttons_limited_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    create_sample_characteristic_values()
+    selenium = webdriver()
+    try:
+        first_value = Measurement.objects.all().first()
+        selenium.get(live_server + '/measurement/{}/'.format(first_value.pk))
+        login_as_limited_user(selenium)
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 1
+        assert buttons[0].text == 'Go back'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.djangodb
+def test_measurement_buttons_change_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    create_sample_characteristic_values()
+    selenium = webdriver()
+    try:
+        first_value = Measurement.objects.all().first()
+        selenium.get(live_server + '/measurement/{}/'.format(first_value.pk))
+        login_as_limited_user(selenium, 'change_user')
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 2
+        assert buttons[0].text == 'Update'
+        assert buttons[1].text == 'Go back'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.djangodb
+def test_measurement_buttons_del_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    create_sample_characteristic_values()
+    selenium = webdriver()
+    try:
+        first_value = Measurement.objects.all().first()
+        selenium.get(live_server + '/measurement/{}/'.format(first_value.pk))
+        login_as_limited_user(selenium, 'delete_user')
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 2
+        assert buttons[0].text == 'Delete'
+        assert buttons[1].text == 'Go back'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.djangodb
+def test_measurement_buttons_add_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    create_sample_characteristic_values()
+    selenium = webdriver()
+    try:
+        first_value = Measurement.objects.all().first()
+        selenium.get(live_server + '/measurement/{}/'.format(first_value.pk))
+        login_as_limited_user(selenium, 'add_user')
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 1
+        assert buttons[0].text == 'Go back'
+        selenium.get(live_server + '/measurement/new/')
+        buttons = selenium.find_elements_by_class_name('btn')
+        assert len(buttons) == 2
+        assert buttons[0].text == 'Submit'
+        assert buttons[1].text == 'Go back'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.djangodb
+def test_measurement_list_new_button(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/measurement/')
+        login_as_admin(selenium)
+        buttons = selenium.find_elements_by_tag_name('a')
+        assert len(buttons) == 1
+        assert buttons[0].text == 'Add new measurements'
+        buttons[0].click()
+        assert selenium.current_url == live_server + '/measurement/new/'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.djangodb
+def test_measurement_list_new_button_limit_user(live_server, webdriver):
+    create_correct_sample_data()
+    create_limited_users()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/measurement/')
+        login_as_limited_user(selenium)
+        buttons = selenium.find_elements_by_tag_name('a')
+        assert len(buttons) == 0
     finally:
         selenium.quit()

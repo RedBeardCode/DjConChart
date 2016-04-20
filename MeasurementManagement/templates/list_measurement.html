@@ -1,0 +1,27 @@
+{% extends "list_base.html" %}
+{% block table_header %}
+    <th>Date</th>
+    <th>Order</th>
+    <th>Order items</th>
+    <th>Examiner</th>
+    <th>Measurement item</th>
+    <th>Measurement tags</th>
+{% endblock %}
+
+{% block table_line %}
+    <tr class="clickable-row" data-href="{% url 'list_measurement' %}{{ object.pk }}/">
+        <td>{{ object.date }}</td>
+        <td>{{ object.order }}</td>
+        <td>
+            {% for item in object.order_items.all %}
+                {{ item }}
+                {% if not forloop.last %}
+                    ;
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ object.examiner }}</td>
+        <td>{{ object.meas_item }}</td>
+        <td>{{ object.measurement_tag }}</td>
+    </tr>
+{% endblock %}

@@ -2,11 +2,13 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <form method="post">
+    {% block form_content %}
+        <form method="post">
         {% csrf_token %}
 
         {{ form|crispy }}
-
+    {% endblock %}
+{% block buttons %}
         {% if change_class in perms and object.pk %}
             <button class="btn btn-default" type="submit"> Update</button>
         {% elif add_class in perms and not object.pk %}
@@ -17,7 +19,7 @@
         {% endif %}
 
         <a class="btn btn-default" role="button" href="javascript:history.back(-1)">Go back</a>
-
+{% endblock %}
     </form>
 
 {% endblock %}

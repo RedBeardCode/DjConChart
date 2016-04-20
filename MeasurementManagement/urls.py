@@ -1,5 +1,3 @@
-__author__ = 'farmer'
-
 from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
@@ -7,8 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .views import NewCalculationRule, ListCalculationRule, UpdateCalculationRule, DeleteCalculationRule
 from .views import NewCharacteristicValueDescription, ListCharacteristicValueDescription, \
     UpdateCharacteristicValueDescription, DeleteCharacteristicValueDescription
-from .views import NewMeasurement, recalc_characteristic_values, \
-    recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
+from .views import NewMeasurement, ListMeasurement, UpdateMeasurement, DeleteMeasurement
 from .views import NewMeasurementDevice, ListMeasurementDevice, UpdateMeasurementDevice, DeleteMeasurementDevice
 from .views import NewMeasurementItem, ListMeasurementItem, UpdateMeasurementItem, DeleteMeasurementItem
 from .views import NewMeasurementItemAndOrder
@@ -18,12 +15,25 @@ from .views import NewMeasurementOrderDefinition, ListMeasurementOrderDefinition
 from .views import NewMeasurementTag, ListMeasurementTag, UpdateMeasurementTag, DeleteMeasurementTag
 from .views import NewProduct, ListProduct, UpdateProduct, DeleteProduct
 from .views import get_ajax_order_info, get_ajax_meas_item
+from .views import recalc_characteristic_values, \
+    recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
 
 admin.autodiscover()
 
+
 urlpatterns = patterns('MeasurementManagement.views',
-                       url(r'^new_measurement/$', login_required(NewMeasurement.as_view()),
+                       url(r'^measurement/new/$',
+                           login_required(NewMeasurement.as_view()),
                            name="new_measurement"),
+                       url(r'^measurement/$',
+                           login_required(ListMeasurement.as_view()),
+                           name="list_measurement"),
+                       url(r'^measurement/(?P<pk>\d+)/$',
+                           login_required(UpdateMeasurement.as_view()),
+                           name="update_measurement"),
+                       url(r'^new_measurement/(?P<pk>\d+)/delete/$',
+                           login_required(DeleteMeasurement.as_view()),
+                           name="delete_measurement"),
 
                        url(r'^calculation_rule/new/$',
                            login_required(NewCalculationRule.as_view()),
