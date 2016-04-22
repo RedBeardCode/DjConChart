@@ -88,6 +88,11 @@ def test_list_measurement_item(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 10
         all_meas_items = MeasurementItem.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 3
+        for index, field_name in enumerate(['sn', 'name', 'product']):
+            assert header[index].text == MeasurementItem._meta.get_field_by_name(field_name)[0].verbose_name
+
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_item/{}/'.format(
                 all_meas_items[index].pk)

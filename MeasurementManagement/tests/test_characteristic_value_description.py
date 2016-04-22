@@ -132,6 +132,11 @@ def test_list_characteristic_value_desc(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 3
         all_chara_val_des = CharacteristicValueDescription.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 2
+        for index, field_name in enumerate(['value_name', 'description']):
+            assert header[index].text == CharacteristicValueDescription._meta.get_field_by_name(field_name)[
+                0].verbose_name
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/characteristic_value_description/{}/'.format(
                 all_chara_val_des[index].pk)

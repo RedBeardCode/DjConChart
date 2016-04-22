@@ -71,6 +71,11 @@ def test_list_measurement_order(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 10
         all_meas_order = MeasurementOrder.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 3
+        for index, field_name in enumerate(['order_nr', 'order_type', 'measurement_items']):
+            assert header[index].text == MeasurementOrder._meta.get_field_by_name(field_name)[0].verbose_name
+
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_order/{}/'.format(
                 all_meas_order[index].pk)
@@ -257,6 +262,11 @@ def test_list_measurement_order_definition(admin_client, live_server, webdriver)
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 3
         all_meas_order_defs = MeasurementOrderDefinition.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 3
+        for index, field_name in enumerate(['name', 'characteristic_values', 'product']):
+            assert header[index].text == MeasurementOrderDefinition._meta.get_field_by_name(field_name)[0].verbose_name
+
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_order_definition/{}/'.format(
                 all_meas_order_defs[index].pk)

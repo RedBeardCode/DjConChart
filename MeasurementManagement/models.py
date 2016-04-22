@@ -29,8 +29,8 @@ class Product(models.Model):
 
 
 class MeasurementDevice(models.Model):
-    name = models.CharField(max_length=127)
-    sn = models.CharField(max_length=11)
+    name = models.CharField(max_length=127, verbose_name='Device name')
+    sn = models.CharField(max_length=11, verbose_name='Serial number')
 
     def __unicode__(self):
         return self.name + ": " + self.sn
@@ -176,7 +176,7 @@ class MeasurementOrderDefinition(models.Model):
 
 
 class MeasurementOrder(models.Model):
-    order_nr = models.AutoField(primary_key=True)
+    order_nr = models.AutoField(primary_key=True, verbose_name='Order number')
     order_type = models.ForeignKey(MeasurementOrderDefinition, verbose_name='Based measurement order definition')
     measurement_items = models.ManyToManyField(MeasurementItem, verbose_name='Measured items')
     def __unicode__(self):
@@ -203,13 +203,14 @@ class Measurement(models.Model):
     date = models.DateTimeField(verbose_name='Date of the measurement')
     order = models.ForeignKey(MeasurementOrder, verbose_name='Measurement order')
     order_items = models.ManyToManyField(CharacteristicValueDescription, verbose_name='Item of the measurement order')
-    examiner = models.ForeignKey(User)
+    examiner = models.ForeignKey(User, verbose_name="Examiner")
     remarks = models.TextField(blank=True, verbose_name='Remarks')
     meas_item = models.ForeignKey(MeasurementItem, verbose_name='Measurement item')
     measurement_devices = models.ManyToManyField(MeasurementDevice, verbose_name='Used measurement devices')
     raw_data_file = models.FileField(verbose_name='Raw data file')
 
-    measurement_tag = models.ForeignKey(MeasurementTag, blank=True, null=True)
+    measurement_tag = models.ForeignKey(MeasurementTag, blank=True, null=True,
+                                        verbose_name="Tag to distinguish the Measurements")
 
     def __unicode__(self):
         return "Measurement from " + str(self.date)

@@ -1,9 +1,4 @@
 {% extends "list_base.html" %}
-{% block table_header %}
-    <th>Name</th>
-    <th>Product</th>
-    <th>Charateristic values</th>
-{% endblock %}
 
 {% block table_line %}
     <tr class="clickable-row" data-href="{% url 'list_measurement_order_definition' %}{{ object.pk }}/">

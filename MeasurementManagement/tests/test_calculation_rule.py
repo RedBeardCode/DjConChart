@@ -152,6 +152,10 @@ def test_list_calculation_rule(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 2
         all_calc_rules = CalculationRule.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 1
+        assert header[0].text == CalculationRule._meta.get_field_by_name('rule_name')[0].verbose_name
+
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/calculation_rule/{}/'.format(
                 all_calc_rules[index].pk)

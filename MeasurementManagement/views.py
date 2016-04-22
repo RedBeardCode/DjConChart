@@ -29,7 +29,12 @@ class AddContextInfoMixIn(object):
         context['add_class'] = self.model._meta.app_label + '.add_' + self.model._meta.model_name
         context['change_class'] = self.model._meta.app_label + '.change_' + self.model._meta.model_name
         context['delete_class'] = self.model._meta.app_label + '.delete_' + self.model._meta.model_name
-
+        if hasattr(self, 'fields') and self.fields:
+            verbose_field_names = []
+            for field_name in self.fields:
+                field = self.model._meta.get_field_by_name(field_name)[0]
+                verbose_field_names.append(field.verbose_name)
+            context['verbose_field_names'] = verbose_field_names
         return context
 
 class TitledListView(AddContextInfoMixIn, ListView):
@@ -65,7 +70,7 @@ class NewCharacteristicValueDescription(AddContextInfoMixIn, CreateView):
 class ListCharacteristicValueDescription(TitledListView):
     template_name = "list_characteristic_value_description.html"
     model = CharacteristicValueDescription
-    fields = ['value_name', 'description', 'calculation_rule', 'possible_meas_devices']
+    fields = ['value_name', 'description']
 
 
 class UpdateCharacteristicValueDescription(AddContextInfoMixIn, UpdateView):
@@ -195,7 +200,7 @@ class NewCalculationRule(AddContextInfoMixIn, CreateView):
 class ListCalculationRule(TitledListView):
     template_name = "list_calculation_rule.html"
     model = CalculationRule
-    fields = ['rule_name', 'rule_code']
+    fields = ['rule_name']
 
 
 class UpdateCalculationRule(AddContextInfoMixIn, UpdateView):
@@ -287,8 +292,7 @@ class NewMeasurement(MeasurementFormMixin, AddContextInfoMixIn, CreateView):
 class ListMeasurement(TitledListView):
     template_name = "list_measurement.html"
     model = Measurement
-    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
-              'meas_item', 'measurement_devices', 'raw_data_file', 'measurement_tag']
+    fields = ['date', 'order', 'order_items', 'examiner', 'meas_item', 'measurement_tag']
 
 
 class UpdateMeasurement(MeasurementFormMixin, AddContextInfoMixIn, UpdateView):

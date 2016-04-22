@@ -45,6 +45,10 @@ def test_list_product(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 3
         all_products = Product.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 1
+        assert header[0].text == Product._meta.get_field_by_name('product_name')[0].verbose_name
+
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/product/{}/'.format(
                 all_products[index].pk)

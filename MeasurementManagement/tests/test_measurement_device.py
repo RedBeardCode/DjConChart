@@ -33,6 +33,11 @@ def test_list_measurement_device(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 5
         all_meas_devices = MeasurementDevice.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 2
+        for index, field_name in enumerate(['name', 'sn']):
+            assert header[index].text == MeasurementDevice._meta.get_field_by_name(field_name)[0].verbose_name
+
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_device/{}/'.format(
                 all_meas_devices[index].pk)

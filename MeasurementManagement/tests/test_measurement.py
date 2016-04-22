@@ -229,6 +229,11 @@ def test_list_measurement(admin_client, live_server, webdriver):
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 19
         all_meas = Measurement.objects.all()
+        header = selenium.find_elements_by_tag_name('th')
+        assert len(header) == 6
+        for index, field_name in enumerate(['date', 'order', 'order_items',
+                                            'examiner', 'meas_item', 'measurement_tag']):
+            assert header[index].text == Measurement._meta.get_field_by_name(field_name)[0].verbose_name
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement/{}/'.format(
                 all_meas[index].pk)

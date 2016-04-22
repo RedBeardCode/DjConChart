@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'MeasurementManagement',
     'debug_toolbar',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,9 +1,4 @@
 {% extends "list_base.html" %}
-{% block table_header %}
-    <th>Order number</th>
-    <th>Order type</th>
-    <th>Measurement items</th>
-{% endblock %}
 
 {% block table_line %}
     <tr class="clickable-row" data-href="{% url 'list_measurement_order' %}{{ object.pk }}/">

@@ -17,7 +17,9 @@
     {% endif %}
     <table class="table table-striped list_table">
         {% block table_header %}
-            <th>Name</th>
+            {% for field_name in verbose_field_names %}
+                <th>{{ field_name }}</th>
+            {% endfor %}
         {% endblock %}
         {% for object in object_list %}
             {% block table_line %}
