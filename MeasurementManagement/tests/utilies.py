@@ -3,7 +3,7 @@ import datetime
 from django.contrib.auth.models import User, Permission
 from django.core.files.base import ContentFile
 
-from MeasurementManagement.models import MeasurementDevice, MeasurementItem, CalculationRule
+from MeasurementManagement.models import MeasurementDevice, MeasurementItem, CalculationRule, PlotConfig
 from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefinition, CharacteristicValueDescription, \
     MeasurementTag, Measurement, Product
 
@@ -111,3 +111,11 @@ def create_sample_characteristic_values():
             meas.save()
             count += 1
 
+
+def create_plot_config():
+    gt05 = PlotConfig.objects.get_or_create(description='Greater 0.5', short_name='gt05')[0]
+    gt05.filter_args = [{'value__gt': 0.5}]
+    gt05.save()
+    le05 = PlotConfig.objects.get_or_create(description='Less equal 0.5', short_name='lte05')[0]
+    le05.filter_args = [{'value__lte': 0.5}]
+    le05.save()

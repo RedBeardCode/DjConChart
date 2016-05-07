@@ -16,7 +16,7 @@ from .views import NewMeasurementTag, ListMeasurementTag, UpdateMeasurementTag, 
 from .views import NewProduct, ListProduct, UpdateProduct, DeleteProduct
 from .views import get_ajax_order_info, get_ajax_meas_item
 from .views import recalc_characteristic_values, \
-    recalculate_invalid, recalculate_progress, plot_characteristic_values, plot_given_configuration
+    recalculate_invalid, recalculate_progress, plot_given_configuration
 
 admin.autodiscover()
 
@@ -145,9 +145,6 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^recalc_characteristic_values/$',
                            login_required(recalc_characteristic_values),
                            name="recalc_characteristic_values"),
-                       url(r'^plot_characteristic_values/$',
-                           login_required(plot_characteristic_values),
-                           name="plot_characteristic_values"),
                        url(r'^plot/(.*)/$',
                            login_required(plot_given_configuration),
                            name="plot_given_configuration"),

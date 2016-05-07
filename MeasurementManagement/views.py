@@ -1,19 +1,13 @@
 # Create your views here.
 from datetime import datetime
-from math import pi
 
-from bokeh.client import push_session
-from bokeh.embed import autoload_server
-from bokeh.models import FactorRange, HoverTool, ColumnDataSource
-from bokeh.plotting import figure, curdoc
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import Q
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
-from MeasurementManagement.plot_annotation import PlotAnnotationContainer
+from MeasurementManagement.plot_util import create_plot_code
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
 from .models import CharacteristicValueDescription, PlotConfig
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue, Product
@@ -409,130 +403,12 @@ def recalculate_progress(request):
     return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
 
 
-def plot_characteristic_values(request):
-    # Todo: Is replaced through plot_given_configuration
-    filter_args = {}
-    if request.GET:
-        filter_args = request.GET.dict()
-    context = {}
-    script = __create_plot_code([filter_args])
-    context['script'] = script
-    return render_to_response('single_plot.html', context=context)
-
-
-def __create_plot_code(filter_args, plot_args=[{}], annotations=None):
-    num_filter_args = len(filter_args)
-    if not plot_args:
-        plot_args = [{}]
-    if len(plot_args) < num_filter_args:
-        plot_args = plot_args + [{}] * (num_filter_args - len(plot_args))
-    if not annotations:
-        annotations = PlotAnnotationContainer()
-    plot = None
-    factors, single_factors, values, all_values = __create_x_y_values(filter_args)
-    plot = __plot_values(annotations, factors, plot, plot_args, single_factors, values, all_values)
-    session = push_session(curdoc())
-    script = autoload_server(plot, session_id=session.id)
-    return script
-
-
-def __plot_values(annotations, factors, plot, plot_args, single_factors, values, all_values):
-    plot = figure(x_range=FactorRange(factors=factors))
-    plot.logo = None
-    hover_tool = __create_tooltips()
-    plot.add_tools(hover_tool)
-    plot.xaxis.major_label_orientation = pi / 4
-    plot.xaxis.major_label_standoff = 10
-    for s_fac, val, pl_arg in zip(single_factors, values, plot_args):
-        if not val['_calc_value'].empty:
-            if 'color' not in pl_arg:
-                pl_arg['color'] = 'navy'
-            if 'alpha' not in pl_arg:
-                pl_arg['alpha'] = 0.5
-            plot.circle(s_fac, '_calc_value', source=ColumnDataSource(val), **pl_arg)
-            plot.line(s_fac, '_calc_value', source=ColumnDataSource(val), **pl_arg)
-    min_anno, max_anno = annotations.calc_min_max_annotation(val['_calc_value'])
-    annotations.plot(plot, val['_calc_value'])
-    range = max_anno - min_anno
-    if range:
-        plot.y_range.start = min_anno - range
-        plot.y_range.end = max_anno + range
-    return plot
-
-
-def __create_tooltips():
-    tooltips = """
-    <div>
-    <small>
-    <em><strong> @order__order_type__name: @order__order_nr</strong></em>
-     <ul>
-     <li>Serial: @measurements__meas_item__sn</li>
-     <li>Value: @_calc_value</li>
-     <li>Date: @date</li>
-     <li>Examiner: @measurements__examiner</li>
-     <li>Remarks: @measurements__remarks</li>
-     </ul>
-     </small>
-    </div>
-    """
-    hover_tool = HoverTool(tooltips=tooltips)
-    return hover_tool
-
-
-def __create_x_y_values(filter_args):
-    single_factors = []
-    values = []
-    combined_filters = Q()
-    for index, fi_arg in enumerate(filter_args):
-        values.append(__fetch_plot_data(fi_arg))
-        s_fac = __create_x_labels(values[index])
-        single_factors.append(s_fac)
-        combined_filters |= Q(**fi_arg)
-    all_values = __fetch_plot_data(combined_filters)
-    factors = __create_x_labels(all_values)
-    return factors, single_factors, values, all_values
-
-
-def __create_x_labels(values):
-    return ['{}-{}'.format(id, sn) for id, sn in zip(values['id'], values['measurements__meas_item__sn'])]
-
-
-
-def __fetch_plot_data(filter_args, max_number=100):
-    if isinstance(filter_args, Q):
-        values = CharacteristicValue.objects.filter(filter_args, _finished=True)
-    else:
-        values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
-
-    dt = values[max(0, values.count() - max_number):].to_dataframe(
-        fieldnames=['id', 'measurements__meas_item__sn', '_calc_value', 'date', 'order__order_type__name',
-                    'order__order_nr', 'measurements__examiner', 'measurements__remarks'])
-    dt['date'] = dt['date'].dt.strftime('%Y-%m-%d %H:%M')
-    grouped = dt.groupby('id')
-
-    def combine_it(val_set):
-        return '; '.join(val_set)
-
-    def take_first(val_set):
-        return val_set[:1]
-
-    dt = grouped.agg({'id': take_first,
-                      'measurements__meas_item__sn': take_first,
-                      '_calc_value': take_first,
-                      'date': take_first,
-                      'order__order_type__name': take_first,
-                      'order__order_nr': take_first,
-                      'measurements__examiner': combine_it,
-                      'measurements__remarks': combine_it})
-    return dt
 
 def plot_given_configuration(request, configuration):
     try:
         plot_config = PlotConfig.objects.get(short_name=configuration)
     except PlotConfig.DoesNotExist:
         raise Http404
-    script = __create_plot_code(plot_config.filter_args,
-                                plot_config.plot_args,
-                                annotations=plot_config.get_annotation_container())
+    script = create_plot_code(plot_config)
     context = {'script': script}
     return render_to_response('single_plot.html', context=context)

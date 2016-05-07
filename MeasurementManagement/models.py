@@ -11,8 +11,8 @@ from django.db.models.signals import post_save
 from django_pandas.io import read_frame
 from django_pandas.managers import DataFrameQuerySet
 
-# Create your models here.
 from MeasurementManagement.plot_annotation import PlotAnnotationContainer
+from MeasurementManagement.plot_util import update_plot_sessions
 
 
 class Product(models.Model):
@@ -199,6 +199,7 @@ def after_measurement_saved(instance, **kwargs):
         ch_value.save()
 
 
+
 class Measurement(models.Model):
     date = models.DateTimeField(verbose_name='Date of the measurement')
     order = models.ForeignKey(MeasurementOrder, verbose_name='Measurement order')
@@ -222,9 +223,11 @@ class Measurement(models.Model):
 post_save.connect(after_measurement_saved, sender=Measurement)
 
 
+
 def after_characteristic_value_saved(instance, update_fields, **kwargs):
     if not update_fields or 'measurements' in update_fields:
         dummy = instance.value
+        update_plot_sessions()
 
 
 class CalcValueQuerySet(DataFrameQuerySet):
@@ -344,7 +347,7 @@ post_save.connect(after_characteristic_value_saved, sender=CharacteristicValue)
 
 class PlotConfig(models.Model):
     description = models.CharField(max_length=100, verbose_name='Description of the plotted data')
-    short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', )
+    short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', unique=True)
     _filter_args = models.BinaryField(blank=True,
                                       verbose_name='Pickle of list of dictionaries with filter lookup strings')
     _plot_args = models.BinaryField(blank=True, verbose_name='Pickle of List of dictionaries with plot parameter')
@@ -355,7 +358,7 @@ class PlotConfig(models.Model):
         self.__last_filter_args = None
         self.__last_plot_args = None
         self.__last_annotations = None
-    
+
     @property
     def filter_args(self):
         if not self._filter_args:
@@ -408,3 +411,8 @@ class PlotConfig(models.Model):
         self.__last_plot_args = None
         self.__last_annotations = None
         super(PlotConfig, self).refresh_from_db(using, fields, **kwargs)
+
+
+class UserPlotSession(models.Model):
+    bokeh_session_id = models.CharField(max_length=64)
+    plot_config = models.ForeignKey(PlotConfig, verbose_name="Plot configuration")
