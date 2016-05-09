@@ -219,6 +219,10 @@ class Measurement(models.Model):
     def __str__(self):
         return str(self.__unicode__())
 
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('update_measurement', kwargs={'pk': self.pk})
+
 
 post_save.connect(after_measurement_saved, sender=Measurement)
 

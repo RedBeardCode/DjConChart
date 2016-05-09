@@ -2,15 +2,18 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block adminscripts %}
-    <script type="text/javascript">window.__admin_media_prefix__ = "{% static "admin/" %}";</script>
+    <script type="text/javascript"
+            xmlns="http://www.w3.org/1999/html">window.__admin_media_prefix__ = "{% static "admin/" %}";</script>
     <script type="text/javascript">window.__admin_utc_offset__ = "0";</script>
 
 
+    <link rel="stylesheet" href="{% static "css/jquery-ui.min.css" %}">
     <script type="text/javascript" src="/admin/jsi18n/"></script>
     <script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/actions.js" %}"></script>
     <script type="text/javascript" src="{% static "admin/js/related-widget-wrapper.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/vendor/jquery-ui.min.js" %}"></script>
 
 {% endblock %}
 {% block form_content %}
@@ -22,6 +25,13 @@
 {% endblock %}
 
 {% block inlinescripts %}
+    <div id="dialog-confirm" title="Measurement already exists!">
+        <p id="dialog-text" style="visibility: hidden">
+            Selected measurement already exists.</br>
+            Chose "Update" for updating the existing measurement.</br>
+            Or press "Edit" to change your input.
+        </p>
+    </div>
     <script type="text/javascript">
 
         function init_select(select_id, itemlist) {
@@ -53,6 +63,41 @@
                 datatype: 'JSON',
             });
         }
+        $("form").submit(function (e) {
+            e.preventDefault();
+            var form = this;
+            $.ajax({
+                type: "POST",
+                url: "{% url 'new_measurement' %}",
+                data: {order_items: $("#id_order_items").val(), order: $("#id_order").val(), check: true},
+                cache: false
+            }).done(function (result) {
+                if (result.exists) {
+                    $(function () {
+                        $('#dialog-text')[0].style.visibility = "visible";
+                        $("#dialog-confirm").dialog({
+                            resizable: false,
+                            modal: true,
+                            buttons: {
+                                "Update": function () {
+                                    window.location.href = result.update_url;
+                                },
+                                "Edit": function () {
+                                    $(this).dialog("close");
+                                    $('#dialog-text')[0].style.visibility = "hidden";
+
+                                }
+                            }
+                        });
+                    });
+                } else {
+                    form.submit();
+                }
+
+
+            });
+        });
+
         $(document).ready(function () {
             var order_pk = $("#id_order").val();
 

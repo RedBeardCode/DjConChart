@@ -52,6 +52,9 @@
    text-align: center;
 }
 
+.ui-dialog-titlebar-close {
+   visibility: hidden;
+}
 
 
 
