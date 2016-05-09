@@ -288,12 +288,15 @@ class NewMeasurement(MeasurementFormMixin, AddContextInfoMixIn, CreateView):
             update_url = ''
             for val_type in request.POST.getlist('order_items[]'):
                 cvs = CharacteristicValue.objects.filter(order=request.POST['order'], value_type=val_type)
-                if cvs.exists:
+                if cvs.exists():
                     cv_exits = True
                     update_url = cvs.first().measurements.first().get_absolute_url()
             return JsonResponse({'exists': cv_exits, 'update_url': update_url})
-        return super(NewMeasurement, self).post(request, *args, **kwargs)
 
+        response = super(NewMeasurement, self).post(request, *args, **kwargs)
+        if self.object:
+            self.object.save()
+        return response
 
 class ListMeasurement(TitledListView):
     template_name = "list_measurement.html"

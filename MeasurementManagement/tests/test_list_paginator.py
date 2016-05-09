@@ -52,7 +52,7 @@ def test_list_paginator_click_num(admin_client, live_server, webdriver):
         assert page_button[1] == selenium.find_element_by_class_name('active')
         for i in range(5, 0, -1):
             page_button[i].find_element_by_tag_name('a').click()
-            assert selenium.current_url == 'http://localhost:8081/characteristic_value_description/?page={}'.format(i)
+            assert selenium.current_url == live_server.url + '/characteristic_value_description/?page={}'.format(i)
             paginator = selenium.find_element_by_class_name('paginator')
             page_button = paginator.find_elements_by_tag_name('li')
             assert page_button[i] == selenium.find_element_by_class_name('active')
@@ -79,7 +79,7 @@ def test_list_paginator_click_arrow(admin_client, live_server, webdriver):
         assert page_button[1] == selenium.find_element_by_class_name('active')
         for i in range(2, 6):
             page_button[-1].find_element_by_tag_name('a').click()
-            assert selenium.current_url == 'http://localhost:8081/characteristic_value_description/?page={}'.format(i)
+            assert selenium.current_url == live_server.url + '/characteristic_value_description/?page={}'.format(i)
             paginator = selenium.find_element_by_class_name('paginator')
             page_button = paginator.find_elements_by_tag_name('li')
             assert page_button[i] == selenium.find_element_by_class_name('active')

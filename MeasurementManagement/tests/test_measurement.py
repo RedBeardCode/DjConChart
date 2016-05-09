@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from .utilies import login_as_admin, create_correct_sample_data, create_limited_users, login_as_limited_user, \
     create_sample_characteristic_values
-from ..models import Measurement, MeasurementOrder
+from ..models import Measurement, MeasurementOrder, CharacteristicValue
 
 
 # Create your tests here.
@@ -169,26 +169,77 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
 def test_submit(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
+
     try:
         selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
-        order = Select(selenium.find_element_by_id('id_order'))
-        order.select_by_index(1)
-        order_items = Select(selenium.find_element_by_id('id_order_items'))
-        order_items.select_by_index(0)
-        meas_items = Select(selenium.find_element_by_id('id_meas_item'))
-        meas_items.select_by_index(0)
-        meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
-        meas_devices.select_by_index(0)
-        selenium.find_element_by_id('id_remarks').send_keys('Remark')
-        file_name = selenium.find_element_by_id('id_raw_data_file')
-        file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
+        __fill_in_single_measurement(selenium)
         button = selenium.find_elements_by_tag_name('button')
         button[0].click()
+        selenium.implicitly_wait(3)
+        selenium.find_element_by_tag_name('h1')  # wait for not found page
         assert selenium.current_url == live_server.url + '/'
-        assert len(Measurement.objects.all()) == 1
+        assert Measurement.objects.count() == 1
+        assert CharacteristicValue.objects.count() == 1
     finally:
         selenium.quit()
+
+
+@pytest.mark.django_db
+def test_update_dlg(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    selenium = webdriver()
+
+    try:
+        selenium.get(live_server + '/measurement/new/')
+        login_as_admin(selenium)
+        __fill_in_single_measurement(selenium)
+        button = selenium.find_elements_by_tag_name('button')
+        dlg = selenium.find_element_by_id("dialog-text")
+        assert dlg.get_attribute('style') == 'visibility: hidden;'
+        button[0].click()
+        selenium.implicitly_wait(3)
+        selenium.find_element_by_tag_name('h1')  # wait for not found page
+        assert selenium.current_url == live_server.url + '/'
+        assert Measurement.objects.count() == 1
+        selenium.get(live_server + '/measurement/new/')
+        __fill_in_single_measurement(selenium)
+        button = selenium.find_elements_by_tag_name('button')
+        button[0].click()
+        dlg = selenium.find_element_by_id("dialog-text")
+        assert dlg.get_attribute('style') == 'visibility: visible;'
+        assert selenium.find_element_by_class_name('ui-dialog')
+        button = selenium.find_elements_by_tag_name('button')
+        assert len(button) == 4
+        assert button[2].text == 'Update'
+        assert button[3].text == 'Edit'
+        button[3].click()
+        dlg = selenium.find_element_by_id("dialog-text")
+        assert dlg.get_attribute('style') == 'visibility: hidden;'
+        assert selenium.current_url == live_server.url + '/measurement/new/'
+        button = selenium.find_elements_by_tag_name('button')
+        button[0].click()
+        button = selenium.find_elements_by_tag_name('button')
+        button[2].click()
+        button = selenium.find_elements_by_tag_name('button')
+        assert selenium.current_url == live_server.url + '/measurement/{}/'.format(Measurement.objects.all().first().pk)
+        assert CharacteristicValue.objects.count() == 1
+    finally:
+        selenium.quit()
+
+
+def __fill_in_single_measurement(selenium):
+    order = Select(selenium.find_element_by_id('id_order'))
+    order.select_by_index(1)
+    order_items = Select(selenium.find_element_by_id('id_order_items'))
+    order_items.select_by_index(0)
+    meas_items = Select(selenium.find_element_by_id('id_meas_item'))
+    meas_items.select_by_index(0)
+    meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
+    meas_devices.select_by_index(0)
+    selenium.find_element_by_id('id_remarks').send_keys('Remark')
+    file_name = selenium.find_element_by_id('id_raw_data_file')
+    file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
 
 
 @pytest.mark.django_db
@@ -210,6 +261,8 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
         file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
         button = selenium.find_elements_by_tag_name('button')
         button[0].click()
+        selenium.implicitly_wait(3)
+        selenium.find_element_by_tag_name('h1')  #wait for not found page
         assert selenium.current_url == live_server.url + '/'
         assert len(Measurement.objects.all()) == 1
     finally:
@@ -285,6 +338,8 @@ def test_measurement_back(admin_client, live_server, webdriver):
             back_button = selenium.find_elements_by_class_name('btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
+            selenium.implicitly_wait(3)
+            selenium.find_element_by_tag_name('h1')  #wait for not found page
             assert selenium.current_url == start_url
     finally:
         selenium.quit()
