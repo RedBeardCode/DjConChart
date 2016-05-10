@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from .utilies import login_as_admin, create_correct_sample_data, create_limited_users, login_as_limited_user, \
-    create_sample_characteristic_values
+    create_sample_characteristic_values, wait_for_root_page
 from ..models import Measurement, MeasurementOrder, CharacteristicValue
 
 
@@ -176,8 +176,7 @@ def test_submit(admin_client, live_server, webdriver):
         __fill_in_single_measurement(selenium)
         button = selenium.find_elements_by_tag_name('button')
         button[0].click()
-        selenium.implicitly_wait(3)
-        selenium.find_element_by_tag_name('h1')  # wait for not found page
+        wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
         assert Measurement.objects.count() == 1
         assert CharacteristicValue.objects.count() == 1
@@ -198,15 +197,15 @@ def test_update_dlg(admin_client, live_server, webdriver):
         dlg = selenium.find_element_by_id("dialog-text")
         assert dlg.get_attribute('style') == 'visibility: hidden;'
         button[0].click()
-        selenium.implicitly_wait(3)
-        selenium.find_element_by_tag_name('h1')  # wait for not found page
+        wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
         assert Measurement.objects.count() == 1
         selenium.get(live_server + '/measurement/new/')
         __fill_in_single_measurement(selenium)
         button = selenium.find_elements_by_tag_name('button')
         button[0].click()
-        dlg = selenium.find_element_by_id("dialog-text")
+        wait = WebDriverWait(selenium, 10)
+        dlg = wait.until(EC.visibility_of_element_located((By.ID, 'dialog-text')))
         assert dlg.get_attribute('style') == 'visibility: visible;'
         assert selenium.find_element_by_class_name('ui-dialog')
         button = selenium.find_elements_by_tag_name('button')
@@ -219,6 +218,7 @@ def test_update_dlg(admin_client, live_server, webdriver):
         assert selenium.current_url == live_server.url + '/measurement/new/'
         button = selenium.find_elements_by_tag_name('button')
         button[0].click()
+        dlg = wait.until(EC.visibility_of_element_located((By.ID, 'dialog-text')))
         button = selenium.find_elements_by_tag_name('button')
         button[2].click()
         button = selenium.find_elements_by_tag_name('button')
@@ -261,8 +261,7 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
         file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
         button = selenium.find_elements_by_tag_name('button')
         button[0].click()
-        selenium.implicitly_wait(3)
-        selenium.find_element_by_tag_name('h1')  #wait for not found page
+        wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
         assert len(Measurement.objects.all()) == 1
     finally:

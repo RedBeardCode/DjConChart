@@ -1,13 +1,14 @@
 import pytest
 from selenium.webdriver.support.ui import Select
 
-from .utilies import login_as_admin, create_correct_sample_data
+from .utilies import login_as_admin, create_correct_sample_data, wait_for_root_page
 from ..models import MeasurementOrder, MeasurementItem
 
 
 @pytest.mark.django_db
 def test_all_elements(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         selenium.get(live_server + '/new_item_and_order/')
         login_as_admin(selenium)
@@ -23,6 +24,7 @@ def test_all_elements(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_add_meas_item_ui(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         selenium.get(live_server + '/new_item_and_order/')
         login_as_admin(selenium)
@@ -54,6 +56,7 @@ def test_add_meas_item_ui(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_add_meas_order_one_item(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         num_orders_before = len(MeasurementOrder.objects.all())
@@ -75,6 +78,7 @@ def test_add_meas_order_one_item(admin_client, live_server, webdriver):
         product = Select(selenium.find_element_by_id('id_product'))
         product.select_by_index(1)
         selenium.find_element_by_name('action').click()
+        wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
         assert len(MeasurementOrder.objects.all()) == num_orders_before + 1
         assert len(MeasurementItem.objects.all()) == num_items_before + 1
@@ -86,6 +90,7 @@ def test_add_meas_order_one_item(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_add_meas_order_two_item(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         num_orders_before = len(MeasurementOrder.objects.all())
@@ -105,6 +110,7 @@ def test_add_meas_order_two_item(admin_client, live_server, webdriver):
             Select(product).select_by_index(index % 3 + 1)
             index += 1
         selenium.find_element_by_name('action').click()
+        wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
         assert len(MeasurementOrder.objects.all()) == num_orders_before + 1
         assert len(MeasurementItem.objects.all()) == num_items_before + 2
@@ -117,6 +123,7 @@ def test_add_meas_order_two_item(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_add_meas_order_multi_fail(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -176,6 +183,7 @@ def check_err_msg(selenium, num_sn_err, num_product_err):
 @pytest.mark.django_db
 def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -199,6 +207,7 @@ def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_ac_single_item_type(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -239,6 +248,7 @@ def test_ac_single_item_select(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_ac_single_item_create(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')
@@ -265,6 +275,7 @@ def test_ac_single_item_create(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_ac_multi_item_select(admin_client, live_server, webdriver):
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         create_correct_sample_data()
         selenium.get(live_server + '/new_item_and_order/')

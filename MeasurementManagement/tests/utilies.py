@@ -58,6 +58,11 @@ def calculate(meas_dict):
         return None
 '''
 
+
+def wait_for_root_page(selenium):
+    selenium.implicitly_wait(3)
+    selenium.find_element_by_tag_name('h1')
+
 def create_correct_sample_data():
     dummy = MeasurementTag.objects.create(name='width')
     dummy = MeasurementTag.objects.create(name='height')
