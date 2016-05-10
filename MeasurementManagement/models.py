@@ -352,6 +352,7 @@ post_save.connect(after_characteristic_value_saved, sender=CharacteristicValue)
 class PlotConfig(models.Model):
     description = models.CharField(max_length=100, verbose_name='Description of the plotted data')
     short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', unique=True)
+    histogram = models.BooleanField(verbose_name='Show histogram', default=True)
     _filter_args = models.BinaryField(blank=True,
                                       verbose_name='Pickle of list of dictionaries with filter lookup strings')
     _plot_args = models.BinaryField(blank=True, verbose_name='Pickle of List of dictionaries with plot parameter')

@@ -5,15 +5,17 @@ from bokeh.client import push_session, pull_session
 from bokeh.document import Document
 from bokeh.embed import autoload_server
 from bokeh.models import FactorRange, ColumnDataSource, HoverTool
+from bokeh.models import HBox
 from bokeh.plotting import Figure
 from django.db.models import Q
+from numpy import histogram
 
 import MeasurementManagement.models
 from .plot_annotation import PlotAnnotationContainer
 
 
 def create_plot_code(configuration):
-    plot = __create_plot_obj(configuration)
+    plot = __create_control_chart_hist(configuration)
     document = Document()
     document.add_root(plot)
     document.title = configuration.description
@@ -25,7 +27,17 @@ def create_plot_code(configuration):
     return script
 
 
-def __create_plot_obj(configuration):
+def __plot_histogram(all_values):
+    plot = Figure()
+    plot.title = 'Histogram'
+    hist, edges = histogram(all_values._calc_value)
+    plot.logo = None
+    plot.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
+              fill_color="#036564", line_color="#033649")
+    return plot
+
+
+def __create_control_chart_hist(configuration):
     num_filter_args = len(configuration.filter_args)
     plot_args = configuration.plot_args
     annotations = configuration.annotations
@@ -36,14 +48,18 @@ def __create_plot_obj(configuration):
     if not annotations:
         annotations = PlotAnnotationContainer()
     factors, single_factors, values, all_values = __create_x_y_values(configuration.filter_args)
-    plot = __plot_values(annotations, factors, plot_args, single_factors, values, all_values)
-    return plot
+    plots = list()
+    plots.append(__plot_control_chart(annotations, factors, plot_args, single_factors, values, all_values))
+    if configuration.histogram:
+        plots.append(__plot_histogram(all_values))
+    return HBox(*plots)
 
 
-def __plot_values(annotations, factors, plot_args, single_factors, values, all_values):
+def __plot_control_chart(annotations, factors, plot_args, single_factors, values, all_values):
     plot = Figure(x_range=FactorRange(factors=factors, name='all_x_factors'))
 
     plot.logo = None
+    plot.title = 'Control chart'
     hover_tool = __create_tooltips()
     plot.add_tools(hover_tool)
     plot.xaxis.major_label_orientation = pi / 4
