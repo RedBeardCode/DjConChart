@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.db.models.signals import post_save
 from django_pandas.io import read_frame
 from django_pandas.managers import DataFrameQuerySet
@@ -15,8 +15,25 @@ from MeasurementManagement.plot_annotation import PlotAnnotationContainer
 from MeasurementManagement.plot_util import update_plot_sessions
 
 
+class ProductQuerySet(QuerySet):
+    def __init__(self, *args, **kwargs):
+        super(ProductQuerySet, self).__init__(*args, **kwargs)
+
+    def get_characteristic_value_descriptions(self):
+        value_types = set()
+        for prod in self.iterator():
+            for mod in prod.measurementorderdefinition_set.all():
+                for cvd in mod.characteristic_values.all():
+                    value_types.add(cvd)
+        return value_types
+
+
+ProductManager = models.Manager.from_queryset(ProductQuerySet)
+
 class Product(models.Model):
     product_name = models.CharField(max_length=30, unique=True)
+
+    objects = ProductManager()
 
     def __unicode__(self):
         return self.product_name
@@ -246,6 +263,20 @@ class CalcValueQuerySet(DataFrameQuerySet):
 
     def count_invalid(self):
         return self.filter(_is_valid=False, _finished=True).count()
+
+    def filter_with_product(self, products, *args, **kwargs):
+        if not hasattr(products, '__iter__'):
+            products = [products]
+        product_id = list()
+        for prod in set(products):
+            if isinstance(prod, Product):
+                product_id.append(prod.pk)
+            else:
+                product_id.append(prod)
+        product_q = Q(order__order_type__product=product_id[0])
+        for id in product_id[1:]:
+            product_q |= Q(order__order_type__product=id)
+        return self.filter(product_q, *args, **kwargs)
 
     def filter(self, *args, **kwargs):
         for query in args:

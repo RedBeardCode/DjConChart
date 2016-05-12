@@ -182,7 +182,7 @@ def test_measurement_item_buttons_limited_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_measurement_item_buttons_change_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -199,7 +199,7 @@ def test_measurement_item_buttons_change_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_measurement_item_buttons_del_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -216,7 +216,7 @@ def test_measurement_item_buttons_del_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_measurement_item_buttons_add_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -237,7 +237,7 @@ def test_measurement_item_buttons_add_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_measurement_item_list_new_button(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
@@ -253,7 +253,7 @@ def test_measurement_item_list_new_button(admin_client, live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_measurement_item_list_new_button_limit_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()

@@ -1,12 +1,12 @@
-from django.utils import timezone
+import pytest
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-import pytest
+from django.utils import timezone
 
 from .utilies import create_correct_sample_data, create_sample_characteristic_values
-from ..models import CharacteristicValue, MeasurementOrder, Measurement
 from ..models import CalculationRule, MeasurementTag, CharacteristicValueDescription
+from ..models import CharacteristicValue, MeasurementOrder, Measurement, Product
 
 
 @pytest.mark.django_db
@@ -174,3 +174,21 @@ def test_cv_to_dataframe(admin_client):
     assert 'value' in data_frame.columns
     data_frame = value_qs.to_dataframe(fieldnames=['_calc_value'])
     assert 'value' not in data_frame.columns
+
+
+@pytest.mark.django_db
+def test_cv_filter_with_product(admin_client):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    products = Product.objects.all()
+    num_cvs = [CharacteristicValue.objects.filter_with_product(prod).count() for prod in products]
+    assert num_cvs == [4, 6, 9]
+    assert CharacteristicValue.objects.filter_with_product(products[:2]).count() == 10
+    assert CharacteristicValue.objects.filter_with_product(products).count() == 19
+    product_pks = [prod.pk for prod in products]
+    num_cvs = [CharacteristicValue.objects.filter_with_product(pk).count() for pk in product_pks]
+    assert num_cvs == [4, 6, 9]
+    assert CharacteristicValue.objects.filter_with_product(product_pks[:2]).count() == 10
+    assert CharacteristicValue.objects.filter_with_product(product_pks).count() == 19
+    assert CharacteristicValue.objects.filter_with_product(product_pks[0], value__gt=1).count() == 0
+    assert CharacteristicValue.objects.filter_with_product(product_pks[0], value__lte=1).count() == 4

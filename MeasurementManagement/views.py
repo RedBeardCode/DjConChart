@@ -442,3 +442,4 @@ def plot_given_configuration(request, configuration):
     except PlotConfig.DoesNotExist:
         raise Http404
     return render_to_response('single_plot.html', context=context)
+

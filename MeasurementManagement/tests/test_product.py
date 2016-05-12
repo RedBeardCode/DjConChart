@@ -1,6 +1,7 @@
 import pytest
 
-from .utilies import login_as_admin, create_correct_sample_data, login_as_limited_user, create_limited_users
+from .utilies import login_as_admin, create_correct_sample_data, login_as_limited_user, create_limited_users, \
+    create_sample_characteristic_values
 from ..models import Product
 
 
@@ -136,7 +137,7 @@ def test_product_buttons_limited_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_product_buttons_change_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -153,7 +154,7 @@ def test_product_buttons_change_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_product_buttons_del_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -170,7 +171,7 @@ def test_product_buttons_del_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_product_buttons_add_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -191,7 +192,7 @@ def test_product_buttons_add_user(live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_product_list_new_button(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
@@ -207,7 +208,7 @@ def test_product_list_new_button(admin_client, live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.djangodb
+@pytest.mark.django_db
 def test_product_list_new_button_limit_user(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
@@ -219,3 +220,13 @@ def test_product_list_new_button_limit_user(live_server, webdriver):
         assert len(buttons) == 0
     finally:
         selenium.quit()
+
+
+@pytest.mark.django_db
+def test_product_get_characteristic_value_descriptions(admin_client):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    assert len(Product.objects.all().get_characteristic_value_descriptions()) == 3
+    assert len(Product.objects.filter(product_name='product1').get_characteristic_value_descriptions()) == 1
+    assert len(Product.objects.filter(product_name='product2').get_characteristic_value_descriptions()) == 2
+    assert len(Product.objects.filter(product_name='product3').get_characteristic_value_descriptions()) == 3
