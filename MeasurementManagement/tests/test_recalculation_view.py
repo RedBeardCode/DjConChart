@@ -49,7 +49,6 @@ def test_recalv_invalid(admin_client, live_server, webdriver):
         assert section_header.text == '16'
         recalc_button = selenium.find_element_by_id('recalc_values')
         recalc_button.click()
-        selenium.implicitly_wait(3)
         section_header = WebDriverWait(selenium, 5).until(
             EC.text_to_be_present_in_element((By.ID, 'invalid_header'), '0/16'))
         assert section_header

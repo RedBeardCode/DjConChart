@@ -21,10 +21,12 @@ $('.progress-bar').width(data.progress + '%');
 if (!data.finished) {
 setTimeout(recalc_progress, 1000);
 }
+{% if recalc_needed %}
 else if (after_finished) {
 after_finished();
 }
-$('#invalid_header').text(data.remaining + '/{{ num_of_invalid }}')
+{% endif %}
+$('#invalid_header').text(data.remaining + '/{{ num_of_invalid }}');
 },
 type: 'POST',
 {% if recalc_needed %}
