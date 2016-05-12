@@ -236,10 +236,16 @@ def after_characteristic_value_saved(instance, update_fields, **kwargs):
 
 class CalcValueQuerySet(DataFrameQuerySet):
     value_re = compile('^value([_]{2})')
-    MAX_NUM_CALCULATION = 100
+    MAX_NUM_CALCULATION = 2
 
     def __init__(self, *args, **kwargs):
         super(CalcValueQuerySet, self).__init__(*args, **kwargs)
+
+    def count_unfinished(self):
+        return self.filter(_finished=False).count()
+
+    def count_invalid(self):
+        return self.filter(_is_valid=False, _finished=True).count()
 
     def filter(self, *args, **kwargs):
         for query in args:
@@ -259,11 +265,9 @@ class CalcValueQuerySet(DataFrameQuerySet):
 
     def to_dataframe(self, fieldnames=(), verbose=True, index=None,
                      coerce_float=False):
-        outdated_values = self.filter(_is_valid=False)
-        if self.filter(_is_valid=False).count() > self.MAX_NUM_CALCULATION:
-            raise UserWarning('More then {} characteristic values have to be recalculated for this request.\n'
-                              'Please recalcutate the values manually (RecalcView) first')
-        outdated_values.recalculation()
+        if self.count_invalid() < self.MAX_NUM_CALCULATION:
+            outdated_values = self.filter(_is_valid=False)
+            outdated_values.recalculation()
         read_calc_value = '_calc_value' in fieldnames
         if 'value' in fieldnames:
             fieldnames[fieldnames.index('value')] = '_calc_value'

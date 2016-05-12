@@ -15,7 +15,7 @@ from .plot_annotation import PlotAnnotationContainer
 
 
 def create_plot_code(configuration):
-    plot = __create_control_chart_hist(configuration)
+    plot, num_invalid = __create_control_chart_hist(configuration)
     document = Document()
     document.add_root(plot)
     document.title = configuration.description
@@ -24,7 +24,7 @@ def create_plot_code(configuration):
         us = MeasurementManagement.models.UserPlotSession.objects.create(bokeh_session_id=session.id,
                                                                          plot_config=configuration)
         script = autoload_server(None, session_id=session.id)
-    return script
+    return script, num_invalid
 
 
 def __plot_histogram(all_values):
@@ -47,12 +47,13 @@ def __create_control_chart_hist(configuration):
         plot_args = plot_args + [{}] * (num_filter_args - len(plot_args))
     if not annotations:
         annotations = PlotAnnotationContainer()
-    factors, single_factors, values, all_values = __create_x_y_values(configuration.filter_args)
+    factors, single_factors, values, all_values, num_invalid = __create_x_y_values(configuration.filter_args)
     plots = list()
     plots.append(__plot_control_chart(annotations, factors, plot_args, single_factors, values, all_values))
     if configuration.histogram:
         plots.append(__plot_histogram(all_values))
-    return HBox(*plots)
+
+    return HBox(*plots), num_invalid
 
 
 def __plot_control_chart(annotations, factors, plot_args, single_factors, values, all_values):
@@ -102,18 +103,23 @@ def __create_tooltips():
     return hover_tool
 
 
+def combine_filter_args(filter_args):
+    combined_filters = Q()
+    for fi_arg in filter_args:
+        combined_filters |= Q(**fi_arg)
+    return combined_filters
+
 def __create_x_y_values(filter_args):
     single_factors = []
     values = []
-    combined_filters = Q()
     for index, fi_arg in enumerate(filter_args):
-        values.append(__fetch_plot_data(fi_arg))
+        val, dummy = __fetch_plot_data(fi_arg)
+        values.append(val)
         s_fac = __create_x_labels(values[index])
         single_factors.append(s_fac)
-        combined_filters |= Q(**fi_arg)
-    all_values = __fetch_plot_data(combined_filters)
+    all_values, num_invalid = __fetch_plot_data(combine_filter_args(filter_args))
     factors = __create_x_labels(all_values)
-    return factors, single_factors, values, all_values
+    return factors, single_factors, values, all_values, num_invalid
 
 
 def __create_x_labels(values):
@@ -129,7 +135,8 @@ def __fetch_plot_data(filter_args, max_number=100):
     dt = values[max(0, values.count() - max_number):].to_dataframe(
         fieldnames=['id', 'measurements__meas_item__sn', '_calc_value', 'date', 'order__order_type__name',
                     'order__order_nr', 'measurements__examiner', 'measurements__remarks'])
-    dt['date'] = dt['date'].dt.strftime('%Y-%m-%d %H:%M')
+    if not dt.date.empty:
+        dt['date'] = dt.date.dt.strftime('%Y-%m-%d %H:%M')
     grouped = dt.groupby('id')
 
     def combine_it(val_set):
@@ -146,7 +153,7 @@ def __fetch_plot_data(filter_args, max_number=100):
                       'order__order_nr': take_first,
                       'measurements__examiner': combine_it,
                       'measurements__remarks': combine_it})
-    return dt
+    return dt, values.count_invalid()
 
 
 def update_plot_sessions():
@@ -164,7 +171,7 @@ def update_plot_sessions():
                 fac_ranges = list(session.document.select({'type': FactorRange}))
                 all_x_fac_range = session.document.select_one({'name': 'all_x_factors'})
                 fac_ranges.remove(all_x_fac_range)
-                factors, single_factors, values, dummy = __create_x_y_values(us.plot_config.filter_args)
+                factors, single_factors, values, dummy, dummy = __create_x_y_values(us.plot_config.filter_args)
 
                 for val, s_fac, ds in zip(values, single_factors, data_sources):
                     val_dict = dict()

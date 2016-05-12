@@ -1,0 +1,39 @@
+function recalc_values() {
+setTimeout(recalc_progress, 1000);
+$.ajax({
+url: '{% url "recalculate_invalid" %}',
+{% if recalc_needed %}
+    data: {comb_filters: '{{ comb_filters|safe }}' },
+{% endif %}
+success: function (data, textStatus, XMLHttpRequest) {
+},
+type: 'POST',
+});
+
+}
+function recalc_progress() {
+$.ajax({
+url: '{% url "recalculate_progress" %}',
+success: function (data, textStatus, XMLHttpRequest) {
+
+$('#progress_value').text(data.progress + '%');
+$('.progress-bar').width(data.progress + '%');
+if (!data.finished) {
+setTimeout(recalc_progress, 1000);
+}
+else if (after_finished) {
+after_finished();
+}
+$('#invalid_header').text(data.remaining + '/{{ num_of_invalid }}')
+},
+type: 'POST',
+{% if recalc_needed %}
+    data: {comb_filters: '{{ comb_filters|safe }}',
+    start_num: {{ num_of_invalid }}},
+{% else %}
+    data: {start_num: {{ num_of_invalid }}},
+{% endif %}
+datatype: 'JSON',
+});
+
+}

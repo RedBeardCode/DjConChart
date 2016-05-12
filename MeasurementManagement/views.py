@@ -1,4 +1,5 @@
 # Create your views here.
+import json
 from datetime import datetime
 
 from django.contrib.admin.widgets import AdminSplitDateTime
@@ -7,9 +8,9 @@ from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
-from MeasurementManagement.plot_util import create_plot_code
+from MeasurementManagement.plot_util import create_plot_code, combine_filter_args
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
-from .models import CharacteristicValueDescription, PlotConfig
+from .models import CharacteristicValueDescription, PlotConfig, CalcValueQuerySet
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue, Product
 from .models import MeasurementItem, MeasurementOrderDefinition, MeasurementDevice
 from .multiform import MultiFormsView
@@ -390,7 +391,7 @@ def get_ajax_meas_item(request):
 
 def recalc_characteristic_values(request, type=''):
     context = {}
-    context['num_of_invalid'] = CharacteristicValue.objects.filter(_is_valid=False, _finished=True).count()
+    context['num_of_invalid'] = CharacteristicValue.objects.count_invalid()
     unfinished_values = CharacteristicValue.objects.filter(_finished=False)
     context['num_not_finished'] = unfinished_values.count()
     missing_keys = {}
@@ -402,15 +403,25 @@ def recalc_characteristic_values(request, type=''):
 
 def recalculate_invalid(request):
     if request.is_ajax() and request.method == 'POST':
-        invalid_values = CharacteristicValue.objects.filter(_is_valid=False, _finished=True)
+        invalid_values = __get_invalid_values(request)
         for val in invalid_values:
             dummy = val.value
     return JsonResponse({})
 
 
+def __get_invalid_values(request):
+    if 'comb_filters' in request.POST:
+        filter_args = json.loads(request.POST['comb_filters'])
+        comb_filters = combine_filter_args(filter_args)
+        invalid_values = CharacteristicValue.objects.filter(comb_filters, _finished=True)
+    else:
+        invalid_values = CharacteristicValue.objects.filter(_is_valid=False, _finished=True)
+    return invalid_values
+
+
 def recalculate_progress(request):
     if request.is_ajax() and request.method == 'POST' and request.POST['start_num']:
-        num_invalid_val = CharacteristicValue.objects.filter(_is_valid=False, _finished=True).count()
+        num_invalid_val = __get_invalid_values(request).count_invalid()
         start_num = int(request.POST['start_num'])
         progress = int((start_num - num_invalid_val) * 100.0 / start_num)
         return JsonResponse(
@@ -420,10 +431,14 @@ def recalculate_progress(request):
 
 
 def plot_given_configuration(request, configuration):
+    context = dict()
     try:
         plot_config = PlotConfig.objects.get(short_name=configuration)
+        script, num_invalid = create_plot_code(plot_config)
+        context['script'] = script
+        context['recalc_needed'] = num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION
+        context['comb_filters'] = json.dumps(plot_config.filter_args)
+        context['num_of_invalid'] = num_invalid
     except PlotConfig.DoesNotExist:
         raise Http404
-    script = create_plot_code(plot_config)
-    context = {'script': script}
     return render_to_response('single_plot.html', context=context)

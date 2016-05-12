@@ -5,7 +5,7 @@ from MeasurementManagement.models import PlotConfig
 from MeasurementManagement.plot_annotation import MeanAnnotation, UpperInterventionAnnotation, \
     LowerInterventionAnnotation
 from MeasurementManagement.tests.utilies import login_as_admin, create_correct_sample_data, \
-    create_sample_characteristic_values
+    create_sample_characteristic_values, create_plot_config
 
 
 @pytest.mark.django_db
@@ -72,9 +72,31 @@ def test_plot_url(admin_client, live_server, webdriver):
         try:
             selenium.get(live_server + '/plot/url/')
             pull_session()
-            assert selenium.find_element_by_class_name('bokeh-container')
+            assert selenium.find_element_by_class_name('bk-plot')
         except IOError:
             # no bokeh server running
             assert selenium.find_element_by_tag_name('body').text == 'Server Error (500)'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_histogram(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    selenium = webdriver()
+    selenium.implicitly_wait(10)
+    try:
+        selenium.get(live_server + '/plot/gt05/')
+        login_as_admin(selenium)
+        pull_session()
+        assert len(selenium.find_elements_by_class_name('bk-plot')) == 2
+        PlotConfig.objects.filter(short_name='gt05').update(histogram=False)
+        selenium.get(live_server + '/plot/gt05/')
+        assert len(selenium.find_elements_by_class_name('bk-plot')) == 1
+    except IOError:
+        # no bokeh server running
+        assert selenium.find_element_by_tag_name('body').text == 'Server Error (500)'
     finally:
         selenium.quit()
