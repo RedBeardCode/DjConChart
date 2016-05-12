@@ -24,6 +24,6 @@ def test_plot_recalc_section(admin_client, live_server, webdriver):
         button = selenium.find_element_by_tag_name('button')
         assert button
         button.click()
-        assert WebDriverWait(selenium, 10).until_not(EC.presence_of_element_located((By.ID, 'recalc')))
+        assert WebDriverWait(selenium, 20).until_not(EC.presence_of_element_located((By.ID, 'recalc')))
     finally:
         selenium.quit()
