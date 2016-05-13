@@ -3,7 +3,7 @@ setTimeout(recalc_progress, 1000);
 $.ajax({
 url: '{% url "recalculate_invalid" %}',
 {% if recalc_needed %}
-    data: {comb_filters: '{{ comb_filters|safe }}' },
+    data: {comb_filters: '{{ filter_args|safe }}' },
 {% endif %}
 success: function (data, textStatus, XMLHttpRequest) {
 },
@@ -30,7 +30,7 @@ $('#invalid_header').text(data.remaining + '/{{ num_of_invalid }}');
 },
 type: 'POST',
 {% if recalc_needed %}
-    data: {comb_filters: '{{ comb_filters|safe }}',
+    data: {comb_filters: '{{ filter_args|safe }}',
     start_num: {{ num_of_invalid }}},
 {% else %}
     data: {start_num: {{ num_of_invalid }}},

@@ -8,7 +8,7 @@ from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
-from MeasurementManagement.plot_util import create_plot_code, combine_filter_args
+from MeasurementManagement.plot_util import PlotGenerator
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
 from .models import CharacteristicValueDescription, PlotConfig, CalcValueQuerySet
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue, Product
@@ -410,10 +410,9 @@ def recalculate_invalid(request):
 
 
 def __get_invalid_values(request):
-    if 'comb_filters' in request.POST:
-        filter_args = json.loads(request.POST['comb_filters'])
-        comb_filters = combine_filter_args(filter_args)
-        invalid_values = CharacteristicValue.objects.filter(comb_filters, _finished=True)
+    if 'filter_args' in request.POST:
+        filter_args = json.loads(request.POST['filter_args'])
+        invalid_values = CharacteristicValue.objects.filter(filter_args, _finished=True)
     else:
         invalid_values = CharacteristicValue.objects.filter(_is_valid=False, _finished=True)
     return invalid_values
@@ -434,11 +433,11 @@ def plot_given_configuration(request, configuration):
     context = dict()
     try:
         plot_config = PlotConfig.objects.get(short_name=configuration)
-        script, num_invalid = create_plot_code(plot_config)
-        context['script'] = script
-        context['recalc_needed'] = num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION
-        context['comb_filters'] = json.dumps(plot_config.filter_args)
-        context['num_of_invalid'] = num_invalid
+        plot_generator = PlotGenerator(plot_config)
+        context['script'] = plot_generator.create_plot_code()
+        context['recalc_needed'] = plot_generator.num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION
+        context['filter_args'] = json.dumps(plot_config.filter_args)
+        context['num_of_invalid'] = plot_generator.num_invalid
     except PlotConfig.DoesNotExist:
         raise Http404
     return render_to_response('single_plot.html', context=context)
