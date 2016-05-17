@@ -41,20 +41,22 @@ def test_plot_args():
 @pytest.mark.django_db
 def test_plot_annotations():
     plot_config = PlotConfig.objects.create(description='annotation_test', short_name='annotation')
-    annotations = {'mean': MeanAnnotation(),
+    annotations = [{'mean': MeanAnnotation(),
                    'upper': UpperInterventionAnnotation(),
-                   'lower': LowerInterventionAnnotation()}
+                    'lower': LowerInterventionAnnotation()}]
     assert not plot_config._PlotConfig__last_annotations
     plot_config.annotations = annotations
     assert plot_config._PlotConfig__last_annotations == annotations
     plot_config.save()
     plot_config.refresh_from_db()
     assert not plot_config._PlotConfig__last_annotations
-    assert plot_config.annotations.keys() == annotations.keys()
+    dummy = plot_config.annotations
     assert plot_config._PlotConfig__last_annotations
-    for key in plot_config.annotations:
-        assert key in annotations
-        assert type(plot_config.annotations[key]) == type(annotations[key])
+    for pl_anno, anno in zip(plot_config.annotations, annotations):
+        assert pl_anno.keys() == anno.keys()
+        for key in pl_anno:
+            assert key in anno
+            assert type(pl_anno[key]) == type(anno[key])
 
 
 @pytest.mark.django_db

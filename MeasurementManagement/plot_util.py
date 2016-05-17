@@ -19,26 +19,12 @@ class PlotGenerator(object):
     def __init__(self, configuration, max_calc_points=MAX_CALC_POINTS):
         self.__conf = configuration
         self.__max_calc_points = MAX_CALC_POINTS
-        self.__factors, self.__values, self.__num_invalid = self.__create_x_y_values()
-        self.__document = Document()
-        self.__document.title = self.__conf.description
+        self.__factors, self.__values, self.__num_invalid = [], [], []
 
-    @property
-    def num_invalid(self):
-        return self.__num_invalid
-
-    @property
-    def factors(self):
-        return self.__factors
-
-    @property
-    def values(self):
-        return self.__values
-
-    def __fetch_plot_data(self):
+    def __fetch_plot_data(self, filter_args):
 
         values = MeasurementManagement.models.CharacteristicValue.objects.filter(_finished=True,
-                                                                                 **self.__conf.filter_args[0])
+                                                                                 **filter_args)
 
         dt = values[max(0, values.count() - self.__max_calc_points):].to_dataframe(
             fieldnames=['id', 'measurements__meas_item__sn', '_calc_value', 'date', 'order__order_type__name',
@@ -66,43 +52,61 @@ class PlotGenerator(object):
     def __create_x_labels(self, values):
         return ['{}-{}'.format(id, sn) for id, sn in zip(values['id'], values['measurements__meas_item__sn'])]
 
-    def __create_x_y_values(self):
-        values, num_invalid = self.__fetch_plot_data()
+    def create_x_y_values(self, index):
+        filter_args = self.__conf.filter_args[index]
+        values, num_invalid = self.__fetch_plot_data(filter_args)
         factors = self.__create_x_labels(values)
         return factors, values, num_invalid
 
-    def create_plot_code(self):
-        plot = self.__create_control_chart_hist()
-        self.__document.add_root(plot)
-
-        with closing(push_session(self.__document)) as session:
+    def __save_user_session(self, document, index):
+        with closing(push_session(document)) as session:
+            session_id = session.id
             us = MeasurementManagement.models.UserPlotSession.objects.create(bokeh_session_id=session.id,
-                                                                             plot_config=self.__conf)
-            script = autoload_server(None, session_id=session.id)
-        return script
+                                                                             plot_config=self.__conf,
+                                                                             index=index)
+        return session_id
+
+    def create_plot_code_iterator(self):
+
+        for index, dummy in enumerate(self.__conf.filter_args):
+            document = Document()
+            document.title = self.__conf.description
+            self.__factors, self.__values, num_invalid = self.create_x_y_values(index)
+            plot = self.__create_control_chart_hist(index)
+            document.add_root(plot)
+            session_id = self.__save_user_session(document, index)
+            script = autoload_server(None, session_id=session_id)
+            yield script, num_invalid
 
     def __plot_histogram(self):
         plot = Figure()
         plot.title = 'Histogram'
-        hist, edges = histogram(self.__values._calc_value)
+        hist_data = self.calc_histogram_data(self.__values)
         plot.logo = None
-        plot.quad(top=hist, bottom=0, left=edges[:-1], right=edges[1:],
+        plot.quad(top='hist', bottom=0, left='edges_left', right='edges_right', source=hist_data,
                   fill_color="#036564", line_color="#033649")
         return plot
 
-    def __create_control_chart_hist(self):
-        plot_args = self.__conf.plot_args
-        annotations = self.__conf.annotations
-        if not plot_args:
-            plot_args = [{}]
-        if not annotations:
-            annotations = PlotAnnotationContainer()
-        plots = [self.__plot_control_chart(annotations, plot_args)]
+    def calc_histogram_data(self, values):
+        hist, edges = histogram(values._calc_value)
+        hist_data = dict()
+        hist_data['hist'] = hist
+        hist_data['edges_left'] = edges[:-1]
+        hist_data['edges_right'] = edges[1:]
+        return ColumnDataSource(hist_data, name='hist_data')
+
+    def __create_control_chart_hist(self, index):
+
+        plots = [self.__plot_control_chart(index)]
         if self.__conf.histogram:
             plots.append(self.__plot_histogram())
         return HBox(*plots)
 
-    def __plot_control_chart(self, annotations, plot_args):
+    def __plot_control_chart(self, index):
+        plot_args = self.__conf.plot_args[index]
+        annotations = self.__conf.annotations[index]
+        if not annotations:
+            annotations = PlotAnnotationContainer()
         plot = Figure(x_range=FactorRange(factors=self.__factors, name='x_factors'))
         plot.logo = None
         plot.title = 'Control chart'
@@ -110,14 +114,13 @@ class PlotGenerator(object):
         plot.add_tools(hover_tool)
         plot.xaxis.major_label_orientation = pi / 4
         plot.xaxis.major_label_standoff = 10
-        plot_args = plot_args[0]
         if not self.__values['_calc_value'].empty:
             if 'color' not in plot_args:
                 plot_args['color'] = 'navy'
             if 'alpha' not in plot_args:
                 plot_args['alpha'] = 0.5
             self.__values['s_fac'] = self.__factors
-            col_ds = ColumnDataSource(self.__values)
+            col_ds = ColumnDataSource(self.__values, name='control_data')
             plot.circle('s_fac', '_calc_value', source=col_ds, name='circle', **plot_args)
             plot.line('s_fac', '_calc_value', source=col_ds, name='line', **plot_args)
         min_anno, max_anno = annotations.calc_min_max_annotation(self.__values['_calc_value'])
@@ -159,20 +162,23 @@ def update_plot_sessions():
                 # could just ask bokeh if session x is a session.
                 us.delete()
             else:
-                data_sources = list(session.document.select({'type': ColumnDataSource}))
+                control_sources = list(session.document.select({'name': 'control_data'}))
+                hist_sources = list(session.document.select({'name': 'hist_data'}))
                 fac_ranges = list(session.document.select({'type': FactorRange}))
                 all_x_fac_range = session.document.select_one({'name': 'x_factors'})
                 fac_ranges.remove(all_x_fac_range)
                 plot_generator = PlotGenerator(us.plot_config)
-                for val, s_fac, ds in zip(plot_generator.values,
-                                          plot_generator.factors,
-                                          data_sources):
-                    val_dict = dict()
-                    for key in val.keys():
-                        val_dict[key] = list(val[key])
-                    val_dict['s_fac'] = s_fac
-                    ds.data = val_dict
-                    for fac in fac_ranges:
-                        fac.factors = s_fac
+                factors, values, _ = plot_generator.create_x_y_values(us.index)
+                val_dict = dict()
+                for key in values.keys():
+                    val_dict[key] = list(values[key])
+                val_dict['s_fac'] = factors
+                for cs in control_sources:
+                    cs.data = val_dict
+                hist_data = plot_generator.calc_histogram_data(values)
+                for hs in hist_sources:
+                    hs.data = hist_data.data
+                for fac in fac_ranges:
+                    fac.factors = factors
 
-                all_x_fac_range.factors = plot_generator.factors
+                all_x_fac_range.factors = factors

@@ -12,7 +12,7 @@ def calculate(meas_dict):
 
 
 @pytest.mark.django_db
-def test_recalv_finished_div(admin_client, live_server, webdriver):
+def test_recalc_finished_div(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     create_sample_characteristic_values()
@@ -33,7 +33,7 @@ def test_recalv_finished_div(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_recalv_invalid(admin_client, live_server, webdriver):
+def test_recalc_invalid(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     create_sample_characteristic_values()
@@ -44,7 +44,7 @@ def test_recalv_invalid(admin_client, live_server, webdriver):
         selenium.get(live_server + '/recalc_characteristic_values/')
         login_as_admin(selenium)
         section_header = selenium.find_element_by_id('invalid_header')
-        assert selenium.find_element_by_id('progress_value').text == "0%"
+        assert selenium.find_element_by_id('progress_value_0').text == "0%"
         assert selenium.find_element_by_class_name('progress-bar').get_attribute('style') == 'width: 0%;'
         assert section_header.text == '16'
         recalc_button = selenium.find_element_by_id('recalc_values')
@@ -52,7 +52,7 @@ def test_recalv_invalid(admin_client, live_server, webdriver):
         section_header = WebDriverWait(selenium, 5).until(
             EC.text_to_be_present_in_element((By.ID, 'invalid_header'), '0/16'))
         assert section_header
-        assert selenium.find_element_by_id('progress_value').text == '100%'
+        assert selenium.find_element_by_id('progress_value_0').text == '100%'
         assert selenium.find_element_by_class_name('progress-bar').get_attribute('style') == 'width: 100%;'
     finally:
         selenium.quit()

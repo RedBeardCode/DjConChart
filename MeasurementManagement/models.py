@@ -395,6 +395,7 @@ class PlotConfig(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(PlotConfig, self).__init__(*args, **kwargs)
+
         self.__last_filter_args = None
         self.__last_plot_args = None
         self.__last_annotations = None
@@ -415,7 +416,7 @@ class PlotConfig(models.Model):
     @property
     def plot_args(self):
         if not self._plot_args:
-            return None
+            return []
         if not self.__last_plot_args:
             self.__last_plot_args = pickle.loads(self._plot_args)
         return self.__last_plot_args
@@ -428,7 +429,7 @@ class PlotConfig(models.Model):
     @property
     def annotations(self):
         if not self._annotations:
-            return None
+            return []
         if not self.__last_annotations:
             self.__last_annotations = pickle.loads(self._annotations)
         return self.__last_annotations
@@ -452,7 +453,22 @@ class PlotConfig(models.Model):
         self.__last_annotations = None
         super(PlotConfig, self).refresh_from_db(using, fields, **kwargs)
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if self.filter_args:
+            plot_args = self.plot_args
+            annotations = self.annotations
+            max_list = len(self.filter_args)
+            for i in range(max_list - len(plot_args)):
+                plot_args.append({})
+            for i in range(max_list - len(annotations)):
+                annotations.append({})
+            self.plot_args = plot_args
+            self.annotations = annotations
+        super(PlotConfig, self).save(force_insert, force_update, using, update_fields)
+
 
 class UserPlotSession(models.Model):
     bokeh_session_id = models.CharField(max_length=64)
     plot_config = models.ForeignKey(PlotConfig, verbose_name="Plot configuration")
+    index = models.IntegerField(verbose_name='Index of plot configuration', default=0)

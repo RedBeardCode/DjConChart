@@ -1,5 +1,6 @@
 # Create your views here.
 import json
+from collections import defaultdict
 from datetime import datetime
 
 from django.contrib.admin.widgets import AdminSplitDateTime
@@ -8,7 +9,7 @@ from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
-from MeasurementManagement.plot_util import PlotGenerator
+from MeasurementManagement.plot_util import PlotGenerator, update_plot_sessions
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
 from .models import CharacteristicValueDescription, PlotConfig, CalcValueQuerySet
 from .models import Measurement, MeasurementOrder, CalculationRule, MeasurementTag, CharacteristicValue, Product
@@ -412,7 +413,7 @@ def recalculate_invalid(request):
 def __get_invalid_values(request):
     if 'filter_args' in request.POST:
         filter_args = json.loads(request.POST['filter_args'])
-        invalid_values = CharacteristicValue.objects.filter(filter_args, _finished=True)
+        invalid_values = CharacteristicValue.objects.filter(_finished=True, **filter_args)
     else:
         invalid_values = CharacteristicValue.objects.filter(_is_valid=False, _finished=True)
     return invalid_values
@@ -423,21 +424,31 @@ def recalculate_progress(request):
         num_invalid_val = __get_invalid_values(request).count_invalid()
         start_num = int(request.POST['start_num'])
         progress = int((start_num - num_invalid_val) * 100.0 / start_num)
+        finished = num_invalid_val == 0
+        if finished:
+            update_plot_sessions()
         return JsonResponse(
-            {'progress': str(progress), 'remaining': str(num_invalid_val), 'finished': num_invalid_val == 0})
+            {'progress': str(progress), 'remaining': str(num_invalid_val), 'finished': finished})
     return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
 
 
 
 def plot_given_configuration(request, configuration):
-    context = dict()
+    context = defaultdict(list)
     try:
         plot_config = PlotConfig.objects.get(short_name=configuration)
         plot_generator = PlotGenerator(plot_config)
-        context['script'] = plot_generator.create_plot_code()
-        context['recalc_needed'] = plot_generator.num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION
-        context['filter_args'] = json.dumps(plot_config.filter_args)
-        context['num_of_invalid'] = plot_generator.num_invalid
+        index = 0
+        for script, num_invalid in plot_generator.create_plot_code_iterator():
+            context['script_list'].append(script)
+            context['recalc_needed_list'].append(num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION)
+            context['filter_args_list'].append(json.dumps(plot_config.filter_args[index]))
+            context['num_of_invalid_list'].append(num_invalid)
+            index += 1
+        context['content_values'] = zip(context['script_list'], context['recalc_needed_list'],
+                                        context['num_of_invalid_list'])
+        context['script_values'] = zip(context['recalc_needed_list'], context['filter_args_list'],
+                                       context['num_of_invalid_list'])
     except PlotConfig.DoesNotExist:
         raise Http404
     return render_to_response('single_plot.html', context=context)
