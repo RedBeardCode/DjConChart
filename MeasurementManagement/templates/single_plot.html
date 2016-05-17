@@ -44,11 +44,11 @@
                 init_ajax_csrf();
             });
             {% for recalc_needed, filter_args, num_of_invalid in script_values %}
-                function after_finished_ {{ forloop.counter0 }}() {
+                function after_finished_{{ forloop.counter0 }}() {
                     $("#recalc_{{ forloop.counter0 }}").remove();
                 }
 
-                {% include "recalc_js_snippet.js" %}
+                {% include "recalc_js_snippet.html" %}
             {% endfor %}
         </script>
     {% endblock %}

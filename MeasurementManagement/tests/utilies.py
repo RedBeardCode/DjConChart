@@ -127,3 +127,4 @@ def create_plot_config():
     multi = PlotConfig.objects.get_or_create(description='Multiine', short_name='multi')[0]
     multi.filter_args = [{'pk__gt': 10}, {'pk__lte': 10}]
     multi.save()
+
