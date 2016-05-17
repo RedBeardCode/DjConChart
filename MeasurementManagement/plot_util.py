@@ -2,7 +2,7 @@ import os
 from contextlib import closing
 from math import pi
 
-from bokeh.client import pull_session
+from bokeh.client import pull_session as bokeh_pull_session
 from bokeh.client import push_session as bokeh_push_session
 from bokeh.document import Document
 from bokeh.embed import autoload_server
@@ -20,6 +20,11 @@ def push_session(*args, **kwargs):
     if 'BOKEH_SERVER' in os.environ:
         kwargs['url'] = os.environ['BOKEH_SERVER']
     return bokeh_push_session(*args, **kwargs)
+
+def pull_session(*args, **kwargs):
+    if 'BOKEH_SERVER' in os.environ:
+        kwargs['url'] = os.environ['BOKEH_SERVER']
+    return bokeh_pull_session(*args, **kwargs)
 
 class PlotGenerator(object):
     def __init__(self, configuration, max_calc_points=MAX_CALC_POINTS):

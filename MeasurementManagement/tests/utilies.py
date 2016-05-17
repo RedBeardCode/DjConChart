@@ -125,6 +125,6 @@ def create_plot_config():
     le05.filter_args = [{'value__lte': 0.5}]
     le05.save()
     multi = PlotConfig.objects.get_or_create(description='Multiine', short_name='multi')[0]
-    multi.filter_args = [{'pk__gt': 10}, {'pk__lte': 10}]
+    multi.filter_args = [{'value_type__value_name': 'length'}, {'value_type__value_name': 'width'}]
     multi.save()
 

@@ -1,9 +1,9 @@
 import pytest
-from bokeh.client import pull_session
 
 from MeasurementManagement.models import PlotConfig
 from MeasurementManagement.plot_annotation import MeanAnnotation, UpperInterventionAnnotation, \
     LowerInterventionAnnotation
+from MeasurementManagement.plot_util import pull_session
 from MeasurementManagement.tests.utilies import login_as_admin, create_correct_sample_data, \
     create_sample_characteristic_values, create_plot_config
 
