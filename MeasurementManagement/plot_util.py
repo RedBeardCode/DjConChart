@@ -32,8 +32,11 @@ def autoload_server(*args, **kwargs):
     return bokeh_autoload_server(*args, **kwargs)
 
 class PlotGenerator(object):
-    def __init__(self, configuration, max_calc_points=MAX_CALC_POINTS):
+    def __init__(self, configuration, index=None, max_calc_points=MAX_CALC_POINTS):
         self.__conf = configuration
+        self.__index = None
+        if index:
+            self.__index = int(index)
         self.__max_calc_points = MAX_CALC_POINTS
         self.__factors, self.__values, self.__num_invalid = [], [], []
 
@@ -85,6 +88,8 @@ class PlotGenerator(object):
     def create_plot_code_iterator(self):
 
         for index, dummy in enumerate(self.__conf.filter_args):
+            if self.__index != None and self.__index != index:
+                continue
             document = Document()
             document.title = self.__conf.description
             self.__factors, self.__values, num_invalid = self.create_x_y_values(index)

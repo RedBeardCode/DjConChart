@@ -4,10 +4,13 @@
 {% block content %}
 
     {% for plot, recalc_needed, num_of_invalid in content_values %}
+        <div class="plot">
         {% autoescape off %}
             {{ plot }}
         {% endautoescape %}
-
+            <div class="detail_view">
+                <a href="{{ current_path }}{{ forloop.counter0 }}/" class="btn btn-default">Show details</a>
+            </div>
         {% if recalc_needed %}
             <div id="recalc_{{ forloop.counter0 }}">
                 <div class="alert alert-warning" role="alert">
@@ -34,7 +37,7 @@
                 </div>
             </div>
         {% endif %}
-
+        </div>
     {% endfor %}
 
 {% endblock %}

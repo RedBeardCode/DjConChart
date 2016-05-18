@@ -3,6 +3,7 @@ import pytest
 from MeasurementManagement.models import PlotConfig
 from MeasurementManagement.plot_annotation import MeanAnnotation, UpperInterventionAnnotation, \
     LowerInterventionAnnotation
+from MeasurementManagement.plot_util import PlotGenerator
 from MeasurementManagement.plot_util import pull_session
 from MeasurementManagement.tests.utilies import login_as_admin, create_correct_sample_data, \
     create_sample_characteristic_values, create_plot_config
@@ -102,3 +103,20 @@ def test_plot_histogram(admin_client, live_server, webdriver):
         assert selenium.find_element_by_tag_name('body').text == 'Server Error (500)'
     finally:
         selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_index(admin_client, live_server):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    multi = PlotConfig.objects.get(short_name='multi')
+    generator = PlotGenerator(multi)
+    plot_list = list(generator.create_plot_code_iterator())
+    assert len(plot_list) == 2
+    generator = PlotGenerator(multi, 0)
+    plot_list = list(generator.create_plot_code_iterator())
+    assert len(plot_list) == 1
+    generator = PlotGenerator(multi, 1)
+    plot_list = list(generator.create_plot_code_iterator())
+    assert len(plot_list) == 1

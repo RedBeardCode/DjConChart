@@ -432,23 +432,24 @@ def recalculate_progress(request):
     return JsonResponse({'progress': '0', 'remaining': '0', 'finished': True})
 
 
-
-def plot_given_configuration(request, configuration):
+def plot_given_configuration(request, configuration, index=None):
     context = defaultdict(list)
     try:
         plot_config = PlotConfig.objects.get(short_name=configuration)
-        plot_generator = PlotGenerator(plot_config)
-        index = 0
+        plot_generator = PlotGenerator(plot_config, index=index)
+
+        counter = 0
         for script, num_invalid in plot_generator.create_plot_code_iterator():
             context['script_list'].append(script)
             context['recalc_needed_list'].append(num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION)
-            context['filter_args_list'].append(json.dumps(plot_config.filter_args[index]))
+            context['filter_args_list'].append(json.dumps(plot_config.filter_args[counter]))
             context['num_of_invalid_list'].append(num_invalid)
-            index += 1
+            counter += 1
         context['content_values'] = zip(context['script_list'], context['recalc_needed_list'],
                                         context['num_of_invalid_list'])
         context['script_values'] = zip(context['recalc_needed_list'], context['filter_args_list'],
                                        context['num_of_invalid_list'])
+        context['current_path'] = request.path
     except PlotConfig.DoesNotExist:
         raise Http404
     return render_to_response('single_plot.html', context=context)

@@ -54,3 +54,20 @@ def test_plot_multi(admin_client, live_server, webdriver):
         assert WebDriverWait(selenium, 20).until_not(EC.presence_of_element_located((By.ID, 'recalc_1')))
     finally:
         selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_detail(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/plot/multi/')
+        login_as_admin(selenium)
+        links = selenium.find_elements_by_tag_name('a')
+        assert len(links) == 2
+        assert links[0].get_attribute('href') == live_server + '/plot/multi/0/'
+        assert links[1].get_attribute('href') == live_server + '/plot/multi/1/'
+    finally:
+        selenium.quit()
