@@ -5,7 +5,7 @@ from math import pi
 from bokeh.client import pull_session as bokeh_pull_session
 from bokeh.client import push_session as bokeh_push_session
 from bokeh.document import Document
-from bokeh.embed import autoload_server
+from bokeh.embed import autoload_server as bokeh_autoload_server
 from bokeh.models import FactorRange, ColumnDataSource, HoverTool
 from bokeh.models import HBox
 from bokeh.plotting import Figure
@@ -25,6 +25,11 @@ def pull_session(*args, **kwargs):
     if 'BOKEH_SERVER' in os.environ:
         kwargs['url'] = os.environ['BOKEH_SERVER']
     return bokeh_pull_session(*args, **kwargs)
+
+def autoload_server(*args, **kwargs):
+    if 'BOKEH_SERVER' in os.environ:
+        kwargs['url'] = os.environ['BOKEH_SERVER']
+    return bokeh_autoload_server(*args, **kwargs)
 
 class PlotGenerator(object):
     def __init__(self, configuration, max_calc_points=MAX_CALC_POINTS):
