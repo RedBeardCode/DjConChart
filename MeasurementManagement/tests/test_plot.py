@@ -57,7 +57,7 @@ def test_plot_multi(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_detail(admin_client, live_server, webdriver):
+def test_plot_detail_links(admin_client, live_server, webdriver):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -69,5 +69,34 @@ def test_plot_detail(admin_client, live_server, webdriver):
         assert len(links) == 2
         assert links[0].get_attribute('href') == live_server + '/plot/multi/0/'
         assert links[1].get_attribute('href') == live_server + '/plot/multi/1/'
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_detail_view(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/plot/multi/0/')
+        login_as_admin(selenium)
+        rows = selenium.find_elements_by_tag_name('tr')
+        assert len([r for r in rows if r.text not in ['', 'inspect']]) == 11  # Strange in webkit
+        columns = selenium.find_elements_by_tag_name('td')
+        assert len([c for c in columns if c.text not in ['', 'inspect']]) == 40
+        headers = selenium.find_elements_by_tag_name('th')
+        assert len([h for h in headers if h.text not in ['', 'inspect']]) == 4
+        assert [h.text for h in headers] == ['Date', 'Serial', 'Examiner', 'Value']
+        selenium.get(live_server + '/plot/multi/1/')
+        rows = selenium.find_elements_by_tag_name('tr')
+        assert len([r for r in rows if r.text not in ['', 'inspect']]) == 7
+        columns = selenium.find_elements_by_tag_name('td')
+        assert len([c for c in columns if c.text not in ['', 'inspect']]) == 24
+        headers = selenium.find_elements_by_tag_name('th')
+        assert len([h for h in headers if h.text not in ['', 'inspect']]) == 4
+        assert [h.text for h in headers] == ['Date', 'Serial', 'Examiner', 'Value']
+        assert [a.text for a in selenium.find_elements_by_tag_name('a')] == ['inspect']
     finally:
         selenium.quit()

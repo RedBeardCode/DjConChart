@@ -60,6 +60,10 @@
    display: flex;
 }
 
+.detail_table {
+   display: block;
+}
+
 
 
 

@@ -8,9 +8,12 @@
         {% autoescape off %}
             {{ plot }}
         {% endautoescape %}
-            <div class="detail_view">
-                <a href="{{ current_path }}{{ forloop.counter0 }}/" class="btn btn-default">Show details</a>
-            </div>
+            {% if not is_detail_view %}
+                <div class="detail_view">
+                    <a href="{{ current_path }}{{ forloop.counter0 }}/" class="btn btn-default">Show details</a>
+                </div>
+            {% endif %}
+
         {% if recalc_needed %}
             <div id="recalc_{{ forloop.counter0 }}">
                 <div class="alert alert-warning" role="alert">
@@ -38,6 +41,26 @@
             </div>
         {% endif %}
         </div>
+        {% if is_detail_view %}
+            <table class="table table-striped list_table">
+                <tr>
+                    <th>Date</th>
+                    <th>Serial</th>
+                    <th>Examiner</th>
+                    <th>Value</th>
+                </tr>
+
+
+                {% for val in values %}
+                    <tr>
+                        <td>{{ val.0 }}</td>
+                        <td>{{ val.1 }} </td>
+                        <td>{{ val.2 }}</td>
+                        <td>{{ val.3 }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
     {% endfor %}
 
 {% endblock %}

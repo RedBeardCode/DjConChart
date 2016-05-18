@@ -150,7 +150,7 @@ urlpatterns = patterns('MeasurementManagement.views',
                            name="plot_given_configuration"),
                        url(r'^plot/(?P<configuration>[a-zA-Z0-9_.-]+)/(?P<index>\d+)/$',
                            login_required(plot_given_configuration),
-                           name="plot_given_configuration"),
+                           name="plot_given_configuration_detail"),
                        # Ajax Views
                        url(r'^get_order_info/$', get_ajax_order_info, name='get_order_info'),
                        url(r'^get_meas_item/$', get_ajax_meas_item, name='get_meas_item'),

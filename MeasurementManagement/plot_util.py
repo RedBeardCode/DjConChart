@@ -35,7 +35,7 @@ class PlotGenerator(object):
     def __init__(self, configuration, index=None, max_calc_points=MAX_CALC_POINTS):
         self.__conf = configuration
         self.__index = None
-        if index:
+        if index != None:
             self.__index = int(index)
         self.__max_calc_points = MAX_CALC_POINTS
         self.__factors, self.__values, self.__num_invalid = [], [], []
@@ -169,6 +169,10 @@ class PlotGenerator(object):
         """
         hover_tool = HoverTool(tooltips=tooltips)
         return hover_tool
+
+    def values_for_last_plot(self):
+        return self.__values
+
 
 
 

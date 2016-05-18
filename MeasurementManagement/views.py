@@ -450,6 +450,11 @@ def plot_given_configuration(request, configuration, index=None):
         context['script_values'] = zip(context['recalc_needed_list'], context['filter_args_list'],
                                        context['num_of_invalid_list'])
         context['current_path'] = request.path
+        if index != None:
+            context['is_detail_view'] = True
+            context['values'] = plot_generator.values_for_last_plot()[['date', 'measurements__meas_item__sn',
+                                                                       'measurements__examiner', '_calc_value',
+                                                                       'id']].values
     except PlotConfig.DoesNotExist:
         raise Http404
     return render_to_response('single_plot.html', context=context)
