@@ -12,7 +12,7 @@ from bokeh.plotting import Figure
 from numpy import histogram
 
 import MeasurementManagement.models
-from .plot_annotation import PlotAnnotationContainer
+from .plot_annotation import PlotAnnotationContainer, PlotAnnotation
 
 MAX_CALC_POINTS = 100
 
@@ -100,7 +100,7 @@ class PlotGenerator(object):
             yield script, num_invalid
 
     def __plot_histogram(self):
-        plot = Figure()
+        plot = Figure(plot_height=600, plot_width=400)
         plot.title = 'Histogram'
         hist_data = self.calc_histogram_data(self.__values)
         plot.logo = None
@@ -128,7 +128,8 @@ class PlotGenerator(object):
         annotations = self.__conf.annotations[index]
         if not annotations:
             annotations = PlotAnnotationContainer()
-        plot = Figure(x_range=FactorRange(factors=self.__factors, name='x_factors'))
+        plot = Figure(plot_height=600, plot_width=800,
+                      x_range=FactorRange(factors=self.__factors, name='x_factors'))
         plot.logo = None
         plot.title = 'Control chart'
         hover_tool = self.__create_tooltips()
@@ -173,6 +174,10 @@ class PlotGenerator(object):
     def values_for_last_plot(self):
         return self.__values
 
+    def summary_for_last_plot(self):
+        return self.__values._calc_value.mean(), \
+               PlotAnnotation.LOWER_INTERVENTION_LEVEL * self.__values._calc_value.std(), \
+               PlotAnnotation.UPPER_INTERVENTION_LEVEL * self.__values._calc_value.std()
 
 
 

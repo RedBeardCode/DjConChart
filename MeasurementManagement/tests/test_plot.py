@@ -82,21 +82,47 @@ def test_plot_detail_view(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/plot/multi/0/')
         login_as_admin(selenium)
-        rows = selenium.find_elements_by_tag_name('tr')
+        rows = selenium.find_elements_by_css_selector('#wrapper .table tr')
         assert len([r for r in rows if r.text not in ['', 'inspect']]) == 11  # Strange in webkit
-        columns = selenium.find_elements_by_tag_name('td')
+        columns = selenium.find_elements_by_css_selector('#wrapper .table td')
         assert len([c for c in columns if c.text not in ['', 'inspect']]) == 40
-        headers = selenium.find_elements_by_tag_name('th')
+        headers = selenium.find_elements_by_css_selector('#wrapper .table th')
         assert len([h for h in headers if h.text not in ['', 'inspect']]) == 4
         assert [h.text for h in headers] == ['Date', 'Serial', 'Examiner', 'Value']
         selenium.get(live_server + '/plot/multi/1/')
-        rows = selenium.find_elements_by_tag_name('tr')
+        rows = selenium.find_elements_by_css_selector('#wrapper .table tr')
         assert len([r for r in rows if r.text not in ['', 'inspect']]) == 7
-        columns = selenium.find_elements_by_tag_name('td')
+        columns = selenium.find_elements_by_css_selector('#wrapper .table td')
         assert len([c for c in columns if c.text not in ['', 'inspect']]) == 24
-        headers = selenium.find_elements_by_tag_name('th')
+        headers = selenium.find_elements_by_css_selector('#wrapper .table th')
         assert len([h for h in headers if h.text not in ['', 'inspect']]) == 4
         assert [h.text for h in headers] == ['Date', 'Serial', 'Examiner', 'Value']
         assert [a.text for a in selenium.find_elements_by_tag_name('a')] == ['inspect']
+    finally:
+        selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_summary(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/plot/multi/')
+        login_as_admin(selenium)
+
+        for url, num_rows, num_columns in zip(['/plot/multi/', '/plot/multi/0/', '/plot/multi/1/'],
+                                              [6, 3, 3],
+                                              [12, 6, 6]):
+            selenium.get(live_server + url)
+            rows = selenium.find_elements_by_css_selector('.summary tr')
+            assert len(rows) == num_rows
+            columns = selenium.find_elements_by_css_selector('.summary td')
+            assert len(columns) == num_columns
+            for i in range(int(num_columns / 6)):
+                assert columns[1 + i * num_rows].text == '1.00'
+                assert columns[3 + i * num_rows].text == '0.00'
+                assert columns[5 + i * num_rows].text == '0.00'
     finally:
         selenium.quit()

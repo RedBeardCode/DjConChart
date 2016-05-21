@@ -444,9 +444,11 @@ def plot_given_configuration(request, configuration, index=None):
             context['recalc_needed_list'].append(num_invalid > CalcValueQuerySet.MAX_NUM_CALCULATION)
             context['filter_args_list'].append(json.dumps(plot_config.filter_args[counter]))
             context['num_of_invalid_list'].append(num_invalid)
+            context['summary_list'].append(plot_generator.summary_for_last_plot())
+
             counter += 1
         context['content_values'] = zip(context['script_list'], context['recalc_needed_list'],
-                                        context['num_of_invalid_list'])
+                                        context['num_of_invalid_list'], context['summary_list'])
         context['script_values'] = zip(context['recalc_needed_list'], context['filter_args_list'],
                                        context['num_of_invalid_list'])
         context['current_path'] = request.path
@@ -457,5 +459,4 @@ def plot_given_configuration(request, configuration, index=None):
                                                                        'id']].values
     except PlotConfig.DoesNotExist:
         raise Http404
-    return render_to_response('single_plot.html', context=context)
-
+    return render_to_response('plot_page.html', context=context)

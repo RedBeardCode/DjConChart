@@ -64,7 +64,20 @@
    display: block;
 }
 
+.detail_view {
+   display: flex;
+   justify-content: center;
+}
 
+.detail_view .summary {
+   align-self: center;
+   align-content: center;
+}
+
+.detail_view .summary table {
+   width: 200px;
+
+}
 
 
 

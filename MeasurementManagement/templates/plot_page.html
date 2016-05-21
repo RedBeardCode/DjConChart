@@ -2,17 +2,37 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-
-    {% for plot, recalc_needed, num_of_invalid in content_values %}
+    <div id="wrapper">
+        {% for plot, recalc_needed, num_of_invalid, summary in content_values %}
         <div class="plot">
         {% autoescape off %}
             {{ plot }}
         {% endautoescape %}
-            {% if not is_detail_view %}
                 <div class="detail_view">
-                    <a href="{{ current_path }}{{ forloop.counter0 }}/" class="btn btn-default">Show details</a>
+
+                    <div class="summary">
+                        <div class="alert alert-warning">
+                            <table>
+                                <tr>
+                                    <td>Process average:</td>
+                                    <td>{{ summary.0|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Lower control limit:</td>
+                                    <td>{{ summary.1|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Upper control limit:</td>
+                                    <td>{{ summary.2|floatformat:2 }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        {% if not is_detail_view %}
+                            <a href="{{ current_path }}{{ forloop.counter0 }}/" class="btn btn-default"
+                               style="width: 100%">Show details</a>
+                        {% endif %}
+                    </div>
                 </div>
-            {% endif %}
 
         {% if recalc_needed %}
             <div id="recalc_{{ forloop.counter0 }}">
@@ -56,13 +76,13 @@
                         <td>{{ val.0 }}</td>
                         <td>{{ val.1 }} </td>
                         <td>{{ val.2 }}</td>
-                        <td>{{ val.3 }}</td>
+                        <td>{{ val.3|floatformat:2 }}</td>
                     </tr>
                 {% endfor %}
             </table>
         {% endif %}
     {% endfor %}
-
+    </div>
 {% endblock %}
     {% block inlinescripts %}
         <script type="text/javascript">
