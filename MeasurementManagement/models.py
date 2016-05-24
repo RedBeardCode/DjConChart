@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
 from django.db.models import Q, QuerySet
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, m2m_changed
+from django.utils.html import urlize
 from django_pandas.io import read_frame
 from django_pandas.managers import DataFrameQuerySet
 
@@ -176,6 +177,22 @@ class MeasurementItem(models.Model):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
 
 
+def create_product_plotconfig(instance, **kwargs):
+    if kwargs['action'] in ['post_add', 'post_remove']:
+        cvds = instance.characteristic_values.all()
+        plot_config, created = PlotConfig.objects.get_or_create(short_name=urlize(instance.product.product_name))
+        if created:
+            plot_config.description = 'Product view for ' + instance.product.product_name
+        filter_list = []
+        titles = []
+        for cvd in cvds:
+            filter_entry = {'product__pk': instance.product.pk, 'value_type__pk': cvd.pk}
+            filter_list.append(filter_entry)
+            titles.append(cvd.value_name)
+        plot_config.filter_args = filter_list
+        plot_config.titles = titles
+        plot_config.save()
+
 class MeasurementOrderDefinition(models.Model):
     name = models.CharField(max_length=127, verbose_name='Name of the measurement order')
     product = models.ForeignKey(Product, verbose_name='Product to be measured')
@@ -190,6 +207,9 @@ class MeasurementOrderDefinition(models.Model):
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + ': ' + self.__unicode__() + '>'
+
+
+m2m_changed.connect(create_product_plotconfig, sender=MeasurementOrderDefinition.characteristic_values.through)
 
 
 class MeasurementOrder(models.Model):
@@ -253,6 +273,7 @@ def after_characteristic_value_saved(instance, update_fields, **kwargs):
 
 class CalcValueQuerySet(DataFrameQuerySet):
     value_re = compile('^value([_]{2})')
+    product_re = compile('^product([_]{2})')
     MAX_NUM_CALCULATION = 2
 
     def __init__(self, *args, **kwargs):
@@ -284,9 +305,14 @@ class CalcValueQuerySet(DataFrameQuerySet):
                 for index, exp in enumerate(query.children):
                     if isinstance(exp, tuple):
                         query.children[index] = (self.value_re.sub('_calc_value\g<1>', exp[0]), exp[1])
+                        query.children[index] = (self.product_re.sub('order__order_type__product\g<1>', exp[0]), exp[1])
+
         for key in kwargs:
             if key.startswith('value'):
                 new_key = self.value_re.sub('_calc_value\g<1>', key)
+                kwargs[new_key] = kwargs.pop(key)
+            if key.startswith('product'):
+                new_key = self.product_re.sub('order__order_type__product\g<1>', key)
                 kwargs[new_key] = kwargs.pop(key)
         return super(CalcValueQuerySet, self).filter(*args, **kwargs)
 
@@ -388,6 +414,7 @@ class PlotConfig(models.Model):
     description = models.CharField(max_length=100, verbose_name='Description of the plotted data')
     short_name = models.URLField(verbose_name='Short name of configuration. Also used for url', unique=True)
     histogram = models.BooleanField(verbose_name='Show histogram', default=True)
+    _titles = models.TextField(verbose_name='Title of the plots', default='')
     _filter_args = models.BinaryField(blank=True,
                                       verbose_name='Pickle of list of dictionaries with filter lookup strings')
     _plot_args = models.BinaryField(blank=True, verbose_name='Pickle of List of dictionaries with plot parameter')
@@ -399,6 +426,24 @@ class PlotConfig(models.Model):
         self.__last_filter_args = None
         self.__last_plot_args = None
         self.__last_annotations = None
+
+    @property
+    def titles(self):
+        num_filter = len(self.filter_args)
+        titles = self._titles.split('|')
+        [titles.append('') for _ in range(num_filter - len(titles))]
+        if len(titles) > num_filter:
+            titles = titles[:num_filter]
+        return titles
+
+    @titles.setter
+    def titles(self, value):
+        if isinstance(value, list):
+            num_filter = len(self.filter_args)
+            if len(value) > num_filter:
+                value = value[:num_filter]
+            value = '|'.join(value)
+        self._titles = value
 
     @property
     def filter_args(self):
@@ -466,6 +511,15 @@ class PlotConfig(models.Model):
             self.plot_args = plot_args
             self.annotations = annotations
         super(PlotConfig, self).save(force_insert, force_update, using, update_fields)
+
+    def __unicode__(self):
+        return str(self.short_name)
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __repr__(self):
+        return '<' + self.__class__.__name__ + ': ' + self.short_name + ' >'
 
 
 class UserPlotSession(models.Model):

@@ -6,7 +6,7 @@ from MeasurementManagement.plot_annotation import MeanAnnotation, UpperIntervent
 from MeasurementManagement.plot_util import PlotGenerator
 from MeasurementManagement.plot_util import pull_session
 from MeasurementManagement.tests.utilies import login_as_admin, create_correct_sample_data, \
-    create_sample_characteristic_values, create_plot_config
+    create_sample_characteristic_values, create_plot_config, create_limited_users
 
 
 @pytest.mark.django_db
@@ -106,7 +106,8 @@ def test_plot_histogram(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_index(admin_client, live_server):
+def test_plot_index():
+    create_limited_users()
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -120,3 +121,40 @@ def test_plot_index(admin_client, live_server):
     generator = PlotGenerator(multi, 1)
     plot_list = list(generator.create_plot_code_iterator())
     assert len(plot_list) == 1
+
+
+@pytest.mark.django_db
+def test_plot_titles():
+    plot_config = PlotConfig.objects.create(short_name='dummy')
+    plot_config.filter_args = []
+    assert plot_config.titles == []
+    plot_config.filter_args = [{}]
+    assert plot_config.titles == ['']
+    plot_config.titles = ['', '']
+    assert plot_config.titles == ['']
+    plot_config.titles = 'title'
+    assert plot_config.titles == ['title']
+    plot_config.titles = 'title|dummy'
+    assert plot_config.titles == ['title']
+    plot_config.filter_args = [{}, {}, {}]
+    assert plot_config.titles == ['title', 'dummy', '']
+    plot_config.titles = 'title|foo'
+    assert plot_config.titles == ['title', 'foo', '']
+    plot_config.titles = ['spam', 'egg']
+    assert plot_config.titles == ['spam', 'egg', '']
+    plot_config.titles = 'title|foo|bar'
+    assert plot_config.titles == ['title', 'foo', 'bar']
+
+
+@pytest.mark.django_db
+def test_plot_create_product_config():
+    create_correct_sample_data()
+    assert PlotConfig.objects.all().count() == 3
+    pcs = PlotConfig.objects.all()
+    products = ['product1', 'product2', 'product3']
+    titles = ['length', 'width', 'height']
+
+    for index, prod in enumerate(products):
+        assert pcs[index].short_name == prod
+        assert pcs[index].titles == titles[:index + 1]
+        assert len(pcs[index].filter_args) == index + 1

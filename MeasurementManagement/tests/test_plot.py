@@ -126,3 +126,21 @@ def test_plot_summary(admin_client, live_server, webdriver):
                 assert columns[5 + i * num_rows].text == '0.00'
     finally:
         selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_titles(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/plot/multi/')
+        login_as_admin(selenium)
+        titles = selenium.find_elements_by_class_name('plot_title')
+        assert len(titles) == 2
+        assert titles[0].text == 'length'
+        assert titles[1].text == 'width'
+
+    finally:
+        selenium.quit()

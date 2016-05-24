@@ -120,11 +120,14 @@ def create_sample_characteristic_values():
 def create_plot_config():
     gt05 = PlotConfig.objects.get_or_create(description='Greater 0.5', short_name='gt05')[0]
     gt05.filter_args = [{'value__gt': 0.5}]
+    gt05.titles = 'Greater than 0.5'
     gt05.save()
     le05 = PlotConfig.objects.get_or_create(description='Less equal 0.5', short_name='lte05')[0]
     le05.filter_args = [{'value__lte': 0.5}]
+    le05.titles = 'Lower equal than 0.5'
     le05.save()
     multi = PlotConfig.objects.get_or_create(description='Multline', short_name='multi')[0]
     multi.filter_args = [{'value_type__value_name': 'length'}, {'value_type__value_name': 'width'}]
+    multi.titles = ['length', 'width']
     multi.save()
 

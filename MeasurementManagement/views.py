@@ -448,7 +448,7 @@ def plot_given_configuration(request, configuration, index=None):
 
             counter += 1
         context['content_values'] = zip(context['script_list'], context['recalc_needed_list'],
-                                        context['num_of_invalid_list'], context['summary_list'])
+                                        context['num_of_invalid_list'], context['summary_list'], plot_config.titles)
         context['script_values'] = zip(context['recalc_needed_list'], context['filter_args_list'],
                                        context['num_of_invalid_list'])
         context['current_path'] = request.path
