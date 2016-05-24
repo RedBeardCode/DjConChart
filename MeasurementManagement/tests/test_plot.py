@@ -144,3 +144,18 @@ def test_plot_titles(admin_client, live_server, webdriver):
 
     finally:
         selenium.quit()
+
+
+@pytest.mark.django_db
+def test_plot_emtpy(admin_client, live_server, webdriver):
+    create_correct_sample_data()
+    create_sample_characteristic_values()
+    create_plot_config()
+    selenium = webdriver()
+    try:
+        selenium.get(live_server + '/plot/product3/')
+        login_as_admin(selenium)
+        plots = selenium.find_elements_by_class_name('bokeh-container')
+        assert len(plots) == 3
+    finally:
+        selenium.quit()

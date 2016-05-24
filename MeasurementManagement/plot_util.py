@@ -1,6 +1,6 @@
 import os
 from contextlib import closing
-from math import pi
+from math import pi, isnan
 
 from bokeh.client import pull_session as bokeh_pull_session
 from bokeh.client import push_session as bokeh_push_session
@@ -147,8 +147,9 @@ class PlotGenerator(object):
             plot.line('s_fac', '_calc_value', source=col_ds, name='line', **plot_args)
         min_anno, max_anno = annotations.calc_min_max_annotation(self.__values['_calc_value'])
         annotations.plot(plot, self.__values['_calc_value'])
+
         range = max_anno - min_anno
-        if range:
+        if range and not isnan(range):
             plot.y_range.start = min_anno - range
             plot.y_range.end = max_anno + range
         return plot

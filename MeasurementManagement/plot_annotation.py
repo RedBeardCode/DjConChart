@@ -86,6 +86,8 @@ class PlotAnnotationContainer(object):
         self.__annotations['lower_intervention'] = LowerInterventionAnnotation()
 
     def plot(self, plot, y_values):
+        if y_values.empty:
+            return
         for name in self.__annotations:
             plot.add_layout(BoxAnnotation(bottom=self.__annotations[name].bottom(y_values),
                                           top=self.__annotations[name].top(y_values),
