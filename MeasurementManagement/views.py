@@ -7,7 +7,8 @@ from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.urlresolvers import reverse_lazy
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import DeleteView, TemplateView
 
 from MeasurementManagement.plot_util import PlotGenerator, update_plot_sessions
 from .forms import NewMeasurementItemForm, NewMeasurementOrderForm
@@ -320,6 +321,19 @@ class DeleteMeasurement(DeleteView):
     success_url = reverse_lazy('list_measurement')
 
 
+class ListPlotConfig(TitledListView):
+    template_name = "list_plot_configuration.html"
+    model = PlotConfig
+    fields = ['description', 'short_name']
+
+
+class DeletePlotConfig(DeleteView):
+    template_name = "delete_base.html"
+    model = PlotConfig
+    success_url = reverse_lazy('list_plot_configuration')
+
+
+
 
 class NewMeasurementItemAndOrder(MultiFormsView):
     template_name = 'new_item_and_order.html'
@@ -460,3 +474,7 @@ def plot_given_configuration(request, configuration, index=None):
     except PlotConfig.DoesNotExist:
         raise Http404
     return render_to_response('plot_page.html', context=context)
+
+
+class Dashboard(TemplateView):
+    template_name = 'dashboard.html'

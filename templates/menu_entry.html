@@ -1,0 +1,57 @@
+<ul class="nav" id="side-menu">
+    {% comment %}<li class="sidebar-search">
+                            <div class="input-group custom-search-form">
+                                <input type="text" class="form-control" placeholder="Search...">
+                                <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                            </div>
+                            <!-- /input-group -->
+                        </li>{% endcomment %}
+    <li>
+        <a href="{% url 'dashboard' %}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+    </li>
+    <li>
+        <a href="{% url 'list_plot_configuration' %}"><i class="fa fa-bar-chart-o fa-fw"></i> Charts</a>
+    </li>
+    <li>
+        <a href="{% url 'list_measurement' %}"><i class="fa fa-table fa-fw"></i> Measurements</a>
+    </li>
+    <li>
+        <a href="{% url 'list_measurement_item' %}"><i class="fa fa-wrench fa-fw"></i> Measurement items</a>
+    </li>
+    <li>
+        <a href="{% url 'list_measurement_order' %}"><i class="fa fa-sitemap fa-fw"></i> Measurement orders</a>
+    </li>
+
+    <li>
+        <a href="{% url 'list_measurement_device' %}"><i class="fa fa-files-o fa-fw"></i> Measurement devices</a>
+    </li>
+
+
+    <li>
+        <a href="{% url 'list_product' %}"><i class="fa fa-files-o fa-fw"></i> Products</a>
+    </li>
+    <li>
+        <a href="#"><i class="fa fa-files-o fa-fw"></i> Value definitions<span class="fa arrow"></span></a>
+        <ul class="nav nav-second-level">
+            <li>
+                <a href="{% url 'list_measurement_tag' %}"><i class="fa fa-files-o fa-fw"></i> Measurement tags</a>
+            </li>
+            <li>
+                <a href="{% url 'list_characteristic_value_description' %}"><i class="fa fa-files-o fa-fw"></i>
+                    Characteristic value description</a>
+            </li>
+            <li>
+                <a href="{% url 'list_measurement_order_definition' %}"><i class="fa fa-files-o fa-fw"></i> Measurement
+                    order definitions</a>
+            </li>
+            <li>
+                <a href="{% url 'list_calculation_rule' %}"><i class="fa fa-edit fa-fw"></i> Calculation rules</a>
+            </li>
+        </ul>
+    </li>
+
+</ul>

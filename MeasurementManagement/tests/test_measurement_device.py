@@ -28,12 +28,12 @@ def test_list_measurement_device(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement_device/')
         login_as_admin(selenium)
-        title = selenium.find_element_by_tag_name('h1').text
+        title = selenium.find_element_by_css_selector('#page-wrapper h1').text
         assert title == 'List of measurement devices'
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 5
         all_meas_devices = MeasurementDevice.objects.all()
-        header = selenium.find_elements_by_tag_name('th')
+        header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 2
         for index, field_name in enumerate(['name', 'sn']):
             assert header[index].text == MeasurementDevice._meta.get_field_by_name(field_name)[0].verbose_name
@@ -41,7 +41,7 @@ def test_list_measurement_device(admin_client, live_server, webdriver):
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_device/{}/'.format(
                 all_meas_devices[index].pk)
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 2
             assert columns[0].text == all_meas_devices[index].name
             assert columns[1].text == all_meas_devices[index].sn
@@ -100,7 +100,7 @@ def test_measurement_device_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 5 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == live_server + '/measurement_device/{}/delete/'.format(
                 MeasurementDevice.objects.all().first().pk)
@@ -188,7 +188,7 @@ def test_measurement_device_list_new_button(admin_client, live_server, webdriver
     try:
         selenium.get(live_server + '/measurement_device/')
         login_as_admin(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 1
         assert buttons[0].text == 'Add new measurement devices'
         buttons[0].click()
@@ -205,7 +205,7 @@ def test_measurement_device_list_new_button_limit_user(live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement_device/')
         login_as_limited_user(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 0
     finally:
         selenium.quit()

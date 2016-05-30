@@ -147,19 +147,19 @@ def test_list_calculation_rule(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/calculation_rule/')
         login_as_admin(selenium)
-        title = selenium.find_element_by_tag_name('h1').text
+        title = selenium.find_element_by_css_selector('#page-wrapper h1').text
         assert title == 'List of calculation rules'
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 2
         all_calc_rules = CalculationRule.objects.all()
-        header = selenium.find_elements_by_tag_name('th')
+        header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 1
         assert header[0].text == CalculationRule._meta.get_field_by_name('rule_name')[0].verbose_name
 
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/calculation_rule/{}/'.format(
                 all_calc_rules[index].pk)
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 1
             assert columns[0].text == all_calc_rules[index].rule_name
     finally:
@@ -217,7 +217,7 @@ def test_calculation_rule_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 2 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == live_server + '/calculation_rule/{}/delete/'.format(
                 CalculationRule.objects.all().first().pk)
@@ -305,7 +305,7 @@ def test_calculation_rule_list_new_button(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/calculation_rule/')
         login_as_admin(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 1
         assert buttons[0].text == 'Add new calculation rules'
         buttons[0].click()
@@ -322,7 +322,7 @@ def test_calculation_rule_list_new_button_limit_user(live_server, webdriver):
     try:
         selenium.get(live_server + '/calculation_rule/')
         login_as_limited_user(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 0
     finally:
         selenium.quit()

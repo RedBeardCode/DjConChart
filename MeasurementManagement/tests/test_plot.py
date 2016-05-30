@@ -65,7 +65,7 @@ def test_plot_detail_links(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/plot/multi/')
         login_as_admin(selenium)
-        links = selenium.find_elements_by_tag_name('a')
+        links = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(links) == 2
         assert links[0].get_attribute('href') == live_server + '/plot/multi/0/'
         assert links[1].get_attribute('href') == live_server + '/plot/multi/1/'
@@ -97,7 +97,7 @@ def test_plot_detail_view(admin_client, live_server, webdriver):
         headers = selenium.find_elements_by_css_selector('#wrapper .table th')
         assert len([h for h in headers if h.text not in ['', 'inspect']]) == 4
         assert [h.text for h in headers] == ['Date', 'Serial', 'Examiner', 'Value']
-        assert [a.text for a in selenium.find_elements_by_tag_name('a')] == ['inspect']
+        assert [a.text for a in selenium.find_elements_by_css_selector('#page-wrapper a')] == ['inspect']
     finally:
         selenium.quit()
 

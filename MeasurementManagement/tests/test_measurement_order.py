@@ -66,12 +66,12 @@ def test_list_measurement_order(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement_order/')
         login_as_admin(selenium)
-        title = selenium.find_element_by_tag_name('h1').text
+        title = selenium.find_element_by_css_selector('#page-wrapper h1').text
         assert title == 'List of measurement orders'
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 10
         all_meas_order = MeasurementOrder.objects.all()
-        header = selenium.find_elements_by_tag_name('th')
+        header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 3
         for index, field_name in enumerate(['order_nr', 'order_type', 'measurement_items']):
             assert header[index].text == MeasurementOrder._meta.get_field_by_name(field_name)[0].verbose_name
@@ -79,7 +79,7 @@ def test_list_measurement_order(admin_client, live_server, webdriver):
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_order/{}/'.format(
                 all_meas_order[index].pk)
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 3
             assert columns[0].text == str(all_meas_order[index].order_nr)
             assert columns[1].text == all_meas_order[index].order_type.name
@@ -139,7 +139,7 @@ def test_measurement_order_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == num_values - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == live_server + '/measurement_order/{}/delete/'.format(
                 MeasurementOrder.objects.all().first().pk)
@@ -227,11 +227,11 @@ def test_measurement_order_list_new_button(admin_client, live_server, webdriver)
     try:
         selenium.get(live_server + '/measurement_order/')
         login_as_admin(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 1
         assert buttons[0].text == 'Add new measurement orders'
         buttons[0].click()
-        assert selenium.current_url == live_server + '/measurement_order/new/'
+        assert selenium.current_url == live_server + '/new_item_and_order/'
     finally:
         selenium.quit()
 
@@ -244,7 +244,7 @@ def test_measurement_order_list_new_button_limit_user(live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement_order/')
         login_as_limited_user(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 0
     finally:
         selenium.quit()
@@ -257,12 +257,12 @@ def test_list_measurement_order_definition(admin_client, live_server, webdriver)
     try:
         selenium.get(live_server + '/measurement_order_definition/')
         login_as_admin(selenium)
-        title = selenium.find_element_by_tag_name('h1').text
+        title = selenium.find_element_by_css_selector('#page-wrapper h1').text
         assert title == 'List of measurement order definitions'
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 3
         all_meas_order_defs = MeasurementOrderDefinition.objects.all()
-        header = selenium.find_elements_by_tag_name('th')
+        header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 3
         for index, field_name in enumerate(['name', 'characteristic_values', 'product']):
             assert header[index].text == MeasurementOrderDefinition._meta.get_field_by_name(field_name)[0].verbose_name
@@ -270,7 +270,7 @@ def test_list_measurement_order_definition(admin_client, live_server, webdriver)
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement_order_definition/{}/'.format(
                 all_meas_order_defs[index].pk)
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 3
             assert columns[0].text == all_meas_order_defs[index].name
             assert columns[1].text == all_meas_order_defs[index].product.product_name
@@ -331,7 +331,7 @@ def test_measurement_order_definition_delete(admin_client, live_server, webdrive
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == num_values - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == live_server + '/measurement_order_definition/{}/delete/'.format(
                 MeasurementOrderDefinition.objects.all().first().pk)
@@ -419,7 +419,7 @@ def test_measurement_order_definition_list_new_button(admin_client, live_server,
     try:
         selenium.get(live_server + '/measurement_order_definition/')
         login_as_admin(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 1
         assert buttons[0].text == 'Add new measurement order definitions'
         buttons[0].click()
@@ -436,7 +436,7 @@ def test_measurement_order_definition_list_new_button_limit_user(live_server, we
     try:
         selenium.get(live_server + '/measurement_order_definition/')
         login_as_limited_user(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 0
     finally:
         selenium.quit()

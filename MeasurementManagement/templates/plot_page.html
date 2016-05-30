@@ -2,7 +2,6 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div id="wrapper">
         {% for plot, recalc_needed, num_of_invalid, summary, title in content_values %}
             <div class="plot_title"><h2>{{ title }}</h2></div>
             <div class="plot">
@@ -59,7 +58,6 @@
                     </div>
 
                 </div>
-            </div>
         {% endif %}
         </div>
         {% if is_detail_view %}

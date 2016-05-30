@@ -22,7 +22,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('MeasurementManagement.urls')),
+    url(r'', include('MeasurementManagement.urls')),
 
 ]
 

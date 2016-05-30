@@ -5,6 +5,7 @@
     <h1>{{ title }}</h1>
 
     {% if add_class in perms %}
+        {% block add_button %}
         <div class="list_table">
         <span style="float: right; height: 3em;">
             <a type="button" class="btn btn-default " aria-label="Add new {{ model_name }}"
@@ -13,7 +14,9 @@
                 Add new {{ model_name }}
             </a>
         </span>
+
         </div>
+        {% endblock %}
     {% endif %}
     <table class="table table-striped list_table">
         {% block table_header %}

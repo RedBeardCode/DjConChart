@@ -127,12 +127,12 @@ def test_list_characteristic_value_desc(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/characteristic_value_description/')
         login_as_admin(selenium)
-        title = selenium.find_element_by_tag_name('h1').text
+        title = selenium.find_element_by_css_selector('#page-wrapper h1').text
         assert title == 'List of characteristic value descriptions'
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 3
         all_chara_val_des = CharacteristicValueDescription.objects.all()
-        header = selenium.find_elements_by_tag_name('th')
+        header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 2
         for index, field_name in enumerate(['value_name', 'description']):
             assert header[index].text == CharacteristicValueDescription._meta.get_field_by_name(field_name)[
@@ -140,7 +140,7 @@ def test_list_characteristic_value_desc(admin_client, live_server, webdriver):
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/characteristic_value_description/{}/'.format(
                 all_chara_val_des[index].pk)
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 2
             assert columns[0].text == columns[1].text
     finally:
@@ -198,7 +198,7 @@ def test_characteristic_value_desc_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 3 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == live_server + '/characteristic_value_description/{}/delete/'.format(
                 CharacteristicValueDescription.objects.all().first().pk)
@@ -286,7 +286,7 @@ def test_characteristic_value_desc_list_new_button(admin_client, live_server, we
     try:
         selenium.get(live_server + '/characteristic_value_description/')
         login_as_admin(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 1
         assert buttons[0].text == 'Add new characteristic value descriptions'
         buttons[0].click()
@@ -303,7 +303,7 @@ def test_characteristic_value_desc_list_new_button_limit_user(live_server, webdr
     try:
         selenium.get(live_server + '/characteristic_value_description/')
         login_as_limited_user(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 0
     finally:
         selenium.quit()

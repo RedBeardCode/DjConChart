@@ -149,7 +149,7 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
         meas_items.select_by_index(0)
         meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
         meas_devices.select_by_index(0)
-        button = selenium.find_element_by_tag_name('button')
+        button = selenium.find_element_by_css_selector('#page-wrapper button')
         button.click()
         assert selenium.current_url == live_server.url + '/measurement/new/'
         WebDriverWait(selenium, 10).until_not(EC.text_to_be_present_in_element((By.ID, 'id_meas_item'), '---------'))
@@ -174,7 +174,7 @@ def test_submit(admin_client, live_server, webdriver):
         selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         __fill_in_single_measurement(selenium)
-        button = selenium.find_elements_by_tag_name('button')
+        button = selenium.find_elements_by_css_selector('#page-wrapper button')
         button[0].click()
         wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
@@ -193,7 +193,7 @@ def test_update_dlg(admin_client, live_server, webdriver):
         selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         __fill_in_single_measurement(selenium)
-        button = selenium.find_elements_by_tag_name('button')
+        button = selenium.find_elements_by_css_selector('#page-wrapper button')
         dlg = selenium.find_element_by_id("dialog-text")
         assert dlg.get_attribute('style') == 'visibility: hidden;'
         button[0].click()
@@ -202,26 +202,26 @@ def test_update_dlg(admin_client, live_server, webdriver):
         assert Measurement.objects.count() == 1
         selenium.get(live_server + '/measurement/new/')
         __fill_in_single_measurement(selenium)
-        button = selenium.find_elements_by_tag_name('button')
+        button = selenium.find_elements_by_css_selector('#page-wrapper button')
         button[0].click()
         wait = WebDriverWait(selenium, 10)
         dlg = wait.until(EC.visibility_of_element_located((By.ID, 'dialog-text')))
         assert dlg.get_attribute('style') == 'visibility: visible;'
         assert selenium.find_element_by_class_name('ui-dialog')
-        button = selenium.find_elements_by_tag_name('button')
-        assert len(button) == 4
-        assert button[2].text == 'Update'
-        assert button[3].text == 'Edit'
-        button[3].click()
+        button = selenium.find_elements_by_css_selector('.ui-dialog button')
+        assert len(button) == 3
+        assert button[1].text == 'Update'
+        assert button[2].text == 'Edit'
+        button[2].click()
         dlg = selenium.find_element_by_id("dialog-text")
         assert dlg.get_attribute('style') == 'visibility: hidden;'
         assert selenium.current_url == live_server.url + '/measurement/new/'
         button = selenium.find_elements_by_tag_name('button')
-        button[0].click()
+        button[1].click()
         dlg = wait.until(EC.visibility_of_element_located((By.ID, 'dialog-text')))
-        button = selenium.find_elements_by_tag_name('button')
-        button[2].click()
-        button = selenium.find_elements_by_tag_name('button')
+        button = selenium.find_elements_by_css_selector('.ui-dialog button')
+        button[1].click()
+        button = selenium.find_elements_by_css_selector('.ui-dialog button')
         assert selenium.current_url == live_server.url + '/measurement/{}/'.format(Measurement.objects.all().first().pk)
         assert CharacteristicValue.objects.count() == 1
     finally:
@@ -259,7 +259,7 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
         meas_devices.select_by_index(0)
         file_name = selenium.find_element_by_id('id_raw_data_file')
         file_name.send_keys('/home/farmer/Dropbox/projects/MeasMan/samples_rsc/erste_messung.txt')
-        button = selenium.find_elements_by_tag_name('button')
+        button = selenium.find_elements_by_css_selector('#page-wrapper button')
         button[0].click()
         wait_for_root_page(selenium)
         assert selenium.current_url == live_server.url + '/'
@@ -276,12 +276,12 @@ def test_list_measurement(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement/')
         login_as_admin(selenium)
-        title = selenium.find_element_by_tag_name('h1').text
+        title = selenium.find_element_by_css_selector('#page-wrapper h1').text
         assert title == 'List of measurements'
         table_rows = selenium.find_elements_by_class_name('clickable-row')
         assert len(table_rows) == 19
         all_meas = Measurement.objects.all()
-        header = selenium.find_elements_by_tag_name('th')
+        header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 6
         for index, field_name in enumerate(['date', 'order', 'order_items',
                                             'examiner', 'meas_item', 'measurement_tag']):
@@ -289,7 +289,7 @@ def test_list_measurement(admin_client, live_server, webdriver):
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/measurement/{}/'.format(
                 all_meas[index].pk)
-            columns = row.find_elements_by_tag_name('td')
+            columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 6
             assert columns[0].text == DateFormat(all_meas[index].date).format(settings.DATETIME_FORMAT)
             assert columns[1].text == str(all_meas[index].order).strip()
@@ -338,7 +338,7 @@ def test_measurement_back(admin_client, live_server, webdriver):
             assert back_button.text == 'Go back'
             back_button.click()
             selenium.implicitly_wait(3)
-            selenium.find_element_by_tag_name('h1')  #wait for not found page
+            selenium.find_element_by_css_selector('#page-wrapper h1')  # wait for not found page
             assert selenium.current_url == start_url
     finally:
         selenium.quit()
@@ -356,7 +356,7 @@ def test_measurement_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 2 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_tag_name('a')
+            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == live_server + '/measurement/{}/delete/'.format(
                 Measurement.objects.all().first().pk)
@@ -448,7 +448,7 @@ def test_measurement_list_new_button(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement/')
         login_as_admin(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 1
         assert buttons[0].text == 'Add new measurements'
         buttons[0].click()
@@ -465,7 +465,7 @@ def test_measurement_list_new_button_limit_user(live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement/')
         login_as_limited_user(selenium)
-        buttons = selenium.find_elements_by_tag_name('a')
+        buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
         assert len(buttons) == 0
     finally:
         selenium.quit()

@@ -18,14 +18,14 @@ def test_list_paginator(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/characteristic_value_description/')
         login_as_admin(selenium)
-        assert len(selenium.find_elements_by_tag_name('tr')) == 4
+        assert len(selenium.find_elements_by_css_selector('#page-wrapper tr')) == 4
         assert not selenium.find_elements_by_class_name('paginator')
         create_many_entries()
         selenium.get(live_server + '/characteristic_value_description/')
-        assert len(selenium.find_elements_by_tag_name('tr')) == 21
+        assert len(selenium.find_elements_by_css_selector('#page-wrapper tr')) == 21
         paginator = selenium.find_elements_by_class_name('paginator')
         assert paginator
-        page_button = paginator[0].find_elements_by_tag_name('li')
+        page_button = paginator[0].find_elements_by_css_selector('#page-wrapper li')
         assert len(page_button) == 7
         assert page_button[0].text == '«'
         assert page_button[1].text == '1'
@@ -48,18 +48,18 @@ def test_list_paginator_click_num(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         paginator = selenium.find_elements_by_class_name('paginator')
 
-        page_button = paginator[0].find_elements_by_tag_name('li')
-        assert page_button[1] == selenium.find_element_by_class_name('active')
+        page_button = paginator[0].find_elements_by_css_selector('#page-wrapper li')
+        assert page_button[1] == selenium.find_element_by_css_selector('#page-wrapper .active')
         for i in range(5, 0, -1):
-            page_button[i].find_element_by_tag_name('a').click()
+            page_button[i].find_element_by_css_selector('#page-wrapper a').click()
             assert selenium.current_url == live_server.url + '/characteristic_value_description/?page={}'.format(i)
             paginator = selenium.find_element_by_class_name('paginator')
-            page_button = paginator.find_elements_by_tag_name('li')
-            assert page_button[i] == selenium.find_element_by_class_name('active')
+            page_button = paginator.find_elements_by_css_selector('#page-wrapper li')
+            assert page_button[i] == selenium.find_element_by_css_selector('#page-wrapper .active')
             if i == 5:
-                assert len(selenium.find_elements_by_tag_name('tr')) == 20
+                assert len(selenium.find_elements_by_css_selector('#page-wrapper tr')) == 20
             else:
-                assert len(selenium.find_elements_by_tag_name('tr')) == 21
+                assert len(selenium.find_elements_by_css_selector('#page-wrapper tr')) == 21
     finally:
         selenium.quit()
 
@@ -74,15 +74,15 @@ def test_list_paginator_click_arrow(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         paginator = selenium.find_elements_by_class_name('paginator')
 
-        page_button = paginator[0].find_elements_by_tag_name('li')
-        assert page_button[0] == selenium.find_element_by_class_name('disabled')
-        assert page_button[1] == selenium.find_element_by_class_name('active')
+        page_button = paginator[0].find_elements_by_css_selector('#page-wrapper li')
+        assert page_button[0] == selenium.find_element_by_css_selector('#page-wrapper .disabled')
+        assert page_button[1] == selenium.find_element_by_css_selector('#page-wrapper .active')
         for i in range(2, 6):
-            page_button[-1].find_element_by_tag_name('a').click()
+            page_button[-1].find_element_by_css_selector('#page-wrapper a').click()
             assert selenium.current_url == live_server.url + '/characteristic_value_description/?page={}'.format(i)
             paginator = selenium.find_element_by_class_name('paginator')
             page_button = paginator.find_elements_by_tag_name('li')
-            assert page_button[i] == selenium.find_element_by_class_name('active')
-        assert page_button[6] == selenium.find_element_by_class_name('disabled')
+            assert page_button[i] == selenium.find_element_by_css_selector('#page-wrapper .active')
+        assert page_button[6] == selenium.find_element_by_css_selector('#page-wrapper .disabled')
     finally:
         selenium.quit()

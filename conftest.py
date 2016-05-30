@@ -1,5 +1,9 @@
+import pytest
 from selenium.webdriver import DesiredCapabilities, Chrome
 from selenium.webdriver import Firefox, PhantomJS, Remote
+
+from MeasurementManagement.tests.utilies import create_limited_users, create_correct_sample_data, login_as_admin
+from MeasurementManagement.tests.utilies import create_sample_characteristic_values
 
 
 def pytest_addoption(parser):
@@ -22,3 +26,30 @@ def pytest_generate_tests(metafunc):
             metafunc.parametrize(['webdriver'], ((Chrome,),))
         else:
             metafunc.parametrize(['webdriver'], ((Firefox,),))
+
+
+@pytest.fixture
+def fix_webdriver(request):
+    webdriver = Firefox
+    if request.config.getoption('phantomjs'):
+        webdriver = PhantomJS
+    elif request.config.getoption('chrome'):
+        webdriver = Chrome
+    elif request.config.getoption('htmlunit'):
+        webdriver = HtmlUnit
+    return webdriver
+
+
+@pytest.fixture
+def working_instance(request, live_server, fix_webdriver, transactional_db):
+    def fin(selenium):
+        selenium.quit()
+
+    create_correct_sample_data()
+    create_limited_users()
+    create_sample_characteristic_values()
+    selenium = fix_webdriver()
+    selenium.get(live_server.url)
+    login_as_admin(selenium)
+    request.addfinalizer(lambda: fin(selenium))
+    return selenium

@@ -29,6 +29,10 @@ def create_limited_users():
     delete_permissions = Permission.objects.filter(codename__contains='delete')
     delete_user.user_permissions = delete_permissions
     delete_user.save()
+    super_user = User.objects.create(username='admin')
+    super_user.set_password('password')
+    super_user.is_superuser = True
+    super_user.save()
 
 
 def login_as_limited_user(selenium, user='limited_user'):
@@ -61,7 +65,7 @@ def calculate(meas_dict):
 
 def wait_for_root_page(selenium):
     selenium.implicitly_wait(3)
-    selenium.find_element_by_tag_name('h1')
+    selenium.find_element_by_css_selector('#page-wrapper h1')
 
 def create_correct_sample_data():
     dummy = MeasurementTag.objects.create(name='width')

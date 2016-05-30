@@ -2,7 +2,8 @@ from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
-from .views import NewCalculationRule, ListCalculationRule, UpdateCalculationRule, DeleteCalculationRule
+from .views import NewCalculationRule, ListCalculationRule, UpdateCalculationRule, DeleteCalculationRule, Dashboard, \
+    ListPlotConfig, DeletePlotConfig
 from .views import NewCharacteristicValueDescription, ListCharacteristicValueDescription, \
     UpdateCharacteristicValueDescription, DeleteCharacteristicValueDescription
 from .views import NewMeasurement, ListMeasurement, UpdateMeasurement, DeleteMeasurement
@@ -22,6 +23,7 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('MeasurementManagement.views',
+
                        url(r'^measurement/new/$',
                            login_required(NewMeasurement.as_view()),
                            name="new_measurement"),
@@ -138,6 +140,14 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^product/(?P<pk>\d+)/delete/$',
                            login_required(DeleteProduct.as_view()),
                            name="delete_product"),
+
+                       url(r'^plot_configuration/$',
+                           login_required(ListPlotConfig.as_view()),
+                           name="list_plot_configuration"),
+                       url(r'^plot_configuration/(?P<pk>\d+)/delete/$',
+                           login_required(DeletePlotConfig.as_view()),
+                           name="delete_plot_configuration"),
+
                        # Diverse Views
                        url(r'^new_item_and_order/$',
                            login_required(NewMeasurementItemAndOrder.as_view()),
@@ -151,10 +161,15 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^plot/(?P<configuration>[a-zA-Z0-9_.-]+)/(?P<index>\d+)/$',
                            login_required(plot_given_configuration),
                            name="plot_given_configuration_detail"),
+
                        # Ajax Views
                        url(r'^get_order_info/$', get_ajax_order_info, name='get_order_info'),
                        url(r'^get_meas_item/$', get_ajax_meas_item, name='get_meas_item'),
                        url(r'^recalculate_invalid/$', recalculate_invalid, name='recalculate_invalid'),
                        url(r'^recalculate_progress/$', recalculate_progress, name='recalculate_progress'),
+
+                       url(r'^$',
+                           login_required(Dashboard.as_view()),
+                           name="dashboard"),
 
                        )

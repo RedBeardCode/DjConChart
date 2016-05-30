@@ -2,15 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block adminscripts %}
-    <script type="text/javascript">window.__admin_media_prefix__ = "{% static "admin/" %}";</script>
-    <script type="text/javascript">window.__admin_utc_offset__ = "0";</script>
-
-
-    <script type="text/javascript" src="/admin/jsi18n/"></script>
-    <script type="text/javascript" src="{% static "admin/js/core.js" %}"></script>
-    <script type="text/javascript" src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
-    <script type="text/javascript" src="{% static "admin/js/actions.js" %}"></script>
-    <script type="text/javascript" src="{% static "admin/js/related-widget-wrapper.js" %}"></script>
+    {% include "admin_include.html" %}
     <script type="text/javascript" src="{% static "js/vendor/jquery.autocomplete.js" %}"></script>
 {% endblock %}
 
