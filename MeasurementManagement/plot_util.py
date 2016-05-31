@@ -100,7 +100,7 @@ class PlotGenerator(object):
             yield script, num_invalid
 
     def __plot_histogram(self):
-        plot = Figure(plot_height=600, plot_width=400)
+        plot = Figure(plot_height=500, plot_width=300)
         plot.title = 'Histogram'
         hist_data = self.calc_histogram_data(self.__values)
         plot.logo = None
@@ -128,7 +128,7 @@ class PlotGenerator(object):
         annotations = self.__conf.annotations[index]
         if not annotations:
             annotations = PlotAnnotationContainer()
-        plot = Figure(plot_height=600, plot_width=800,
+        plot = Figure(plot_height=500, plot_width=600,
                       x_range=FactorRange(factors=self.__factors, name='x_factors'))
         plot.logo = None
         plot.title = 'Control chart'

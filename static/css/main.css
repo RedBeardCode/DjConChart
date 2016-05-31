@@ -100,7 +100,9 @@
     color: #fff;
 }
 
-
+.list_table tbody tr td {
+    vertical-align: middle;
+}
 
 
 

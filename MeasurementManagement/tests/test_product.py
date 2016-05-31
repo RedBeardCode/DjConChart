@@ -47,15 +47,16 @@ def test_list_product(admin_client, live_server, webdriver):
         assert len(table_rows) == 3
         all_products = Product.objects.all()
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
-        assert len(header) == 1
+        assert len(header) == 2
         assert header[0].text == Product._meta.get_field_by_name('product_name')[0].verbose_name
 
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == '/product/{}/'.format(
                 all_products[index].pk)
             columns = row.find_elements_by_css_selector('#page-wrapper td')
-            assert len(columns) == 1
+            assert len(columns) == 2
             assert columns[0].text == all_products[index].product_name
+            assert columns[1].text == 'Show product site'
     finally:
         selenium.quit()
 
@@ -200,7 +201,7 @@ def test_product_list_new_button(admin_client, live_server, webdriver):
         selenium.get(live_server + '/product/')
         login_as_admin(selenium)
         buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
-        assert len(buttons) == 1
+        assert len(buttons) == 4
         assert buttons[0].text == 'Add new products'
         buttons[0].click()
         assert selenium.current_url == live_server + '/product/new/'
@@ -217,7 +218,7 @@ def test_product_list_new_button_limit_user(live_server, webdriver):
         selenium.get(live_server + '/product/')
         login_as_limited_user(selenium)
         buttons = selenium.find_elements_by_css_selector('#page-wrapper a')
-        assert len(buttons) == 0
+        assert len(buttons) == 3
     finally:
         selenium.quit()
 
