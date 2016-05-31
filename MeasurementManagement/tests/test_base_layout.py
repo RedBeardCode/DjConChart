@@ -40,18 +40,18 @@ class TestBaseLayout:
         list_elements = working_instance.find_elements_by_css_selector('.sidebar li')
         assert [l.is_displayed() for l in list_elements] == [True] * 12
 
-    def test_side_navbar_links(self, working_instance):
+    def test_side_navbar_links(self, live_server, working_instance):
         links = working_instance.find_elements_by_css_selector('.sidebar a')
-        for link, href in zip(links, ['http://localhost:8081/',
-                                      'http://localhost:8081/plot_configuration/',
-                                      'http://localhost:8081/measurement/',
-                                      'http://localhost:8081/measurement_item/',
-                                      'http://localhost:8081/measurement_order/',
-                                      'http://localhost:8081/measurement_device/',
-                                      'http://localhost:8081/product/',
-                                      'http://localhost:8081/#',
-                                      'http://localhost:8081/measurement_tag/',
-                                      'http://localhost:8081/characteristic_value_description/',
-                                      'http://localhost:8081/measurement_order_definition/',
-                                      'http://localhost:8081/calculation_rule/']):
+        for link, href in zip(links, [live_server + '/',
+                                      live_server + '/plot_configuration/',
+                                      live_server + '/measurement/',
+                                      live_server + '/measurement_item/',
+                                      live_server + '/measurement_order/',
+                                      live_server + '/measurement_device/',
+                                      live_server + '/product/',
+                                      live_server + '/#',
+                                      live_server + '/measurement_tag/',
+                                      live_server + '/characteristic_value_description/',
+                                      live_server + '/measurement_order_definition/',
+                                      live_server + '/calculation_rule/']):
             assert link.get_attribute('href') == href
