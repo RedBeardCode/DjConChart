@@ -364,6 +364,10 @@ class CharacteristicValue(models.Model):
 
 
     @property
+    def product(self):
+        return self.order.order_type.product
+
+    @property
     def value(self):
         if self.is_valid and self._finished:
             return self._calc_value

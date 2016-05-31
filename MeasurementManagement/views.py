@@ -478,3 +478,12 @@ def plot_given_configuration(request, configuration, index=None):
 
 class Dashboard(TemplateView):
     template_name = 'dashboard.html'
+
+    def get(self, request, *args, **kwargs):
+        self.last_changed_products = list()
+        for cv in CharacteristicValue.objects.all().order_by('-date'):
+            if cv.product not in self.last_changed_products:
+                self.last_changed_products.append(cv.product)
+                if len(self.last_changed_products) > 3:
+                    break
+        return super(Dashboard, self).get(request, *args, **kwargs)
