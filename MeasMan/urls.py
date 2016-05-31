@@ -17,17 +17,17 @@ Including another URLconf
 from django.conf.urls import include, url, patterns
 from django.contrib import admin
 
+from MeasMan.views import login
 
 admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('MeasurementManagement.urls')),
+    url(r'^login/$', login, name='mysite_login'),
 
 ]
 
 urlpatterns += patterns('django.contrib.auth.views',
-    url(r'^login/$', 'login', {'template_name': 'login.html'},
-        name='mysite_login'),
     url(r'^logout/$', 'logout', {'next_page': '/'}, name='mysite_logout'),
 )
