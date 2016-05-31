@@ -161,15 +161,14 @@ urlpatterns = patterns('MeasurementManagement.views',
                        url(r'^plot/(?P<configuration>[a-zA-Z0-9_.-]+)/(?P<index>\d+)/$',
                            login_required(plot_given_configuration),
                            name="plot_given_configuration_detail"),
+                       url(r'^$',
+                           login_required(Dashboard.as_view()),
+                           name="dashboard"),
 
                        # Ajax Views
                        url(r'^get_order_info/$', get_ajax_order_info, name='get_order_info'),
                        url(r'^get_meas_item/$', get_ajax_meas_item, name='get_meas_item'),
                        url(r'^recalculate_invalid/$', recalculate_invalid, name='recalculate_invalid'),
                        url(r'^recalculate_progress/$', recalculate_progress, name='recalculate_progress'),
-
-                       url(r'^$',
-                           login_required(Dashboard.as_view()),
-                           name="dashboard"),
 
                        )
