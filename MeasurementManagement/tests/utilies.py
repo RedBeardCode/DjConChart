@@ -2,6 +2,9 @@ import datetime
 
 from django.contrib.auth.models import User, Permission
 from django.core.files.base import ContentFile
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from MeasurementManagement.models import MeasurementDevice, MeasurementItem, CalculationRule, PlotConfig
 from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefinition, CharacteristicValueDescription, \
@@ -43,8 +46,8 @@ def login_as_limited_user(selenium, user='limited_user'):
     selenium.find_element_by_tag_name('form').submit()
 
 def login_as_admin(selenium):
-    username = selenium.find_element_by_id('id_username')
-    pwd = selenium.find_element_by_id('id_password')
+    username = WebDriverWait(selenium, 5).until(EC.presence_of_element_located((By.ID, 'id_username')))
+    pwd = WebDriverWait(selenium, 5).until(EC.presence_of_element_located((By.ID, 'id_password')))
     username.send_keys('admin')
     pwd.send_keys('password')
     selenium.find_element_by_tag_name('form').submit()
