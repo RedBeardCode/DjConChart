@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from .utilies import login_as_admin, create_correct_sample_data, create_limited_users, login_as_limited_user, \
-    create_sample_characteristic_values, wait_for_root_page
+    create_sample_characteristic_values, wait_for_root_page, create_grouped_users
 from ..models import Measurement, MeasurementOrder, CharacteristicValue
 
 
@@ -165,14 +165,18 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
         selenium.quit()
 
 
-@pytest.mark.django_db
-def test_submit(admin_client, live_server, webdriver):
-    create_correct_sample_data()
-    selenium = webdriver()
+@pytest.fixture(params=['Administrator', 'Examiner', 'Manager'])
+def username(request):
+    return request.param
 
+@pytest.mark.django_db
+def test_submit(username, live_server, webdriver):
+    create_correct_sample_data()
+    create_grouped_users()
+    selenium = webdriver()
     try:
         selenium.get(live_server + '/measurement/new/')
-        login_as_admin(selenium)
+        login_as_limited_user(selenium, user=username)
         __fill_in_single_measurement(selenium)
         button = selenium.find_elements_by_css_selector('#page-wrapper button')
         button[0].click()

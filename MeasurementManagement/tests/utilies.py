@@ -1,6 +1,6 @@
 import datetime
 
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User, Permission, Group
 from django.core.files.base import ContentFile
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,6 +11,25 @@ from MeasurementManagement.models import MeasurementOrder, MeasurementOrderDefin
     MeasurementTag, Measurement, Product
 
 FAKE_TIME = datetime.datetime(2020, 12, 5, 17, 5, 55)
+
+
+def create_grouped_users():
+    viewer = User.objects.create(username='Viewer')
+    viewer.groups.add(Group.objects.get(name='Viewer'))
+    viewer.set_password('test')
+    viewer.save()
+    examiner = User.objects.create(username='Examiner')
+    examiner.groups.add(Group.objects.get(name='Examiner'))
+    examiner.set_password('test')
+    examiner.save()
+    manager = User.objects.create(username='Manager')
+    manager.groups.add(Group.objects.get(name='Manager'))
+    manager.set_password('test')
+    manager.save()
+    admin = User.objects.create(username='Administrator')
+    admin.groups.add(Group.objects.get(name='Administrator'))
+    admin.set_password('test')
+    admin.save()
 
 
 def create_limited_users():
