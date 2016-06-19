@@ -1,63 +1,69 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import pytest
 
 from MeasurementManagement.models import PlotConfig
-from MeasurementManagement.plot_annotation import MeanAnnotation, UpperInterventionAnnotation, \
-    LowerInterventionAnnotation
-from MeasurementManagement.plot_util import PlotGenerator
-from MeasurementManagement.plot_util import pull_session
-from MeasurementManagement.tests.utilies import login_as_admin, create_correct_sample_data, \
-    create_sample_characteristic_values, create_plot_config, create_limited_users
+from .utilies import create_correct_sample_data, create_limited_users
+from .utilies import create_sample_characteristic_values, create_plot_config
+from .utilies import login_as_admin
+from ..plot_annotation import LowerControlLimitAnnotation
+from ..plot_annotation import MeanAnnotation, UpperControlLimitAnnotation
+from ..plot_util import PlotGenerator, pull_session
 
 
 @pytest.mark.django_db
 def test_filter_args():
-    plot_config = PlotConfig.objects.create(description='filter args test', short_name='filter_args')
+    plot_config = PlotConfig.objects.create(description='filter args test',
+                                            short_name='filter_args')
     filter_args = [{'product__id': 1, 'finished': True}]
-    assert not plot_config._PlotConfig__last_filter_args
+    assert not plot_config._PlotConfig__last_filter_args  # pylint: disable=W0212
     plot_config.filter_args = filter_args
-    assert plot_config._PlotConfig__last_filter_args == filter_args
+    assert plot_config._PlotConfig__last_filter_args == filter_args  # pylint: disable=W0212
     assert plot_config.filter_args == filter_args
     plot_config.save()
     plot_config.refresh_from_db()
-    assert not plot_config._PlotConfig__last_filter_args
+    assert not plot_config._PlotConfig__last_filter_args  # pylint: disable=W0212
     assert plot_config.filter_args == filter_args
-    assert plot_config._PlotConfig__last_filter_args == filter_args
+    assert plot_config._PlotConfig__last_filter_args == filter_args  # pylint: disable=W0212
 
 
 @pytest.mark.django_db
 def test_plot_args():
-    plot_config = PlotConfig.objects.create(description='plot_args_test', short_name='plot_args')
+    plot_config = PlotConfig.objects.create(description='plot_args_test',
+                                            short_name='plot_args')
     plot_args = [{'linecolor': 'blue', 'title': 'testival'}]
-    assert not plot_config._PlotConfig__last_plot_args
+    assert not plot_config._PlotConfig__last_plot_args  # pylint: disable=W0212
     plot_config.plot_args = plot_args
-    assert plot_config._PlotConfig__last_plot_args == plot_args
+    assert plot_config._PlotConfig__last_plot_args == plot_args  # pylint: disable=W0212
     assert plot_config.plot_args == plot_args
     plot_config.save()
     plot_config.refresh_from_db()
-    assert not plot_config._PlotConfig__last_plot_args
+    assert not plot_config._PlotConfig__last_plot_args  # pylint: disable=W0212
     assert plot_config.plot_args == plot_args
-    assert plot_config._PlotConfig__last_plot_args == plot_args
+    assert plot_config._PlotConfig__last_plot_args == plot_args  # pylint: disable=W0212
 
 
 @pytest.mark.django_db
 def test_plot_annotations():
-    plot_config = PlotConfig.objects.create(description='annotation_test', short_name='annotation')
+    plot_config = PlotConfig.objects.create(description='annotation_test',
+                                            short_name='annotation')
     annotations = [{'mean': MeanAnnotation(),
-                   'upper': UpperInterventionAnnotation(),
-                    'lower': LowerInterventionAnnotation()}]
-    assert not plot_config._PlotConfig__last_annotations
+                    'upper': UpperControlLimitAnnotation(),
+                    'lower': LowerControlLimitAnnotation()}]
+    assert not plot_config._PlotConfig__last_annotations  # pylint: disable=W0212
     plot_config.annotations = annotations
-    assert plot_config._PlotConfig__last_annotations == annotations
+    assert plot_config._PlotConfig__last_annotations == annotations  # pylint: disable=W0212
     plot_config.save()
     plot_config.refresh_from_db()
-    assert not plot_config._PlotConfig__last_annotations
+    assert not plot_config._PlotConfig__last_annotations  # pylint: disable=W0212
     dummy = plot_config.annotations
-    assert plot_config._PlotConfig__last_annotations
+    assert plot_config._PlotConfig__last_annotations  # pylint: disable=W0212
     for pl_anno, anno in zip(plot_config.annotations, annotations):
         assert pl_anno.keys() == anno.keys()
         for key in pl_anno:
             assert key in anno
-            assert type(pl_anno[key]) == type(anno[key])
+            assert isinstance(pl_anno[key], type(anno[key]))
 
 
 @pytest.mark.django_db
@@ -69,7 +75,8 @@ def test_plot_url(admin_client, live_server, webdriver):
         selenium.get(live_server + '/plot/url/')
         login_as_admin(selenium)
         assert selenium.title == 'Page Not Found :('
-        plot_config = PlotConfig.objects.create(description='url_test', short_name='url')
+        plot_config = PlotConfig.objects.create(description='url_test',
+                                                short_name='url')
         plot_config.filter_args = [{'value__gt': 0.0}]
         plot_config.save()
         try:
@@ -78,7 +85,8 @@ def test_plot_url(admin_client, live_server, webdriver):
             assert selenium.find_element_by_class_name('bk-plot')
         except IOError:
             # no bokeh server running
-            assert selenium.find_element_by_tag_name('body').text == 'Server Error (500)'
+            body_text = selenium.find_element_by_tag_name('body').text
+            assert body_text == 'Server Error (500)'
     finally:
         selenium.quit()
 
@@ -100,7 +108,8 @@ def test_plot_histogram(admin_client, live_server, webdriver):
         assert len(selenium.find_elements_by_class_name('bk-plot')) == 1
     except IOError:
         # no bokeh server running
-        assert selenium.find_element_by_tag_name('body').text == 'Server Error (500)'
+        body_text = selenium.find_element_by_tag_name('body').text
+        assert body_text == 'Server Error (500)'
     finally:
         selenium.quit()
 
@@ -113,13 +122,13 @@ def test_plot_index():
     create_plot_config()
     multi = PlotConfig.objects.get(short_name='multi')
     generator = PlotGenerator(multi)
-    plot_list = list(generator.create_plot_code_iterator())
+    plot_list = list(generator.plot_code_iterator())
     assert len(plot_list) == 2
     generator = PlotGenerator(multi, 0)
-    plot_list = list(generator.create_plot_code_iterator())
+    plot_list = list(generator.plot_code_iterator())
     assert len(plot_list) == 1
     generator = PlotGenerator(multi, 1)
-    plot_list = list(generator.create_plot_code_iterator())
+    plot_list = list(generator.plot_code_iterator())
     assert len(plot_list) == 1
 
 
@@ -132,7 +141,7 @@ def test_plot_titles():
     assert plot_config.titles == ['']
     plot_config.titles = ['', '']
     assert plot_config.titles == ['']
-    plot_config.titles = 'title'
+    plot_config.titles = 'title'  # pylint: disable=R0204
     assert plot_config.titles == ['title']
     plot_config.titles = 'title|dummy'
     assert plot_config.titles == ['title']

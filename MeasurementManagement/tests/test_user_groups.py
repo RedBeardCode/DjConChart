@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import pytest
 
 from django.contrib.auth.models import Group
 
 
-class TestGroupCreation:
+class TestGroupCreation:  # pylint: disable=R0903
     @pytest.mark.django_db
     def test_init_groups(self):
         groups = Group.objects.all()

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """MeasMan URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -29,5 +32,6 @@ urlpatterns = [
 ]
 
 urlpatterns += patterns('django.contrib.auth.views',
-    url(r'^logout/$', 'logout', {'next_page': '/'}, name='mysite_logout'),
-)
+                        url(r'^logout/$', 'logout', {'next_page': '/'},
+                            name='mysite_logout'),
+                        )

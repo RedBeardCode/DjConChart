@@ -1,7 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import pytest
 
-from .utilies import login_as_admin, create_correct_sample_data, login_as_limited_user, create_limited_users, \
-    create_sample_characteristic_values
+from .utilies import create_sample_characteristic_values
+from .utilies import login_as_admin, create_correct_sample_data
+from .utilies import login_as_limited_user, create_limited_users
 from ..models import Product
 
 
@@ -26,7 +30,6 @@ def test_create_product_view_noname(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/product/new/')
         login_as_admin(selenium)
-        name = selenium.find_element_by_id('id_product_name')
         selenium.find_element_by_tag_name('form').submit()
         assert selenium.current_url == live_server + '/product/new/'
         assert len(Product.objects.all()) == 0
@@ -48,11 +51,12 @@ def test_list_product(admin_client, live_server, webdriver):
         all_products = Product.objects.all()
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 2
-        assert header[0].text == Product._meta.get_field_by_name('product_name')[0].verbose_name
-
+        field = Product._meta.get_field_by_name('product_name')[
+            0]  # pylint: disable=W0212
+        assert header[0].text == field.verbose_name
         for index, row in enumerate(table_rows):
-            assert row.get_attribute('data-href') == '/product/{}/'.format(
-                all_products[index].pk)
+            url = '/product/{}/'.format(all_products[index].pk)
+            assert row.get_attribute('data-href') == url
             columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 2
             assert columns[0].text == all_products[index].product_name
@@ -73,9 +77,8 @@ def test_list_product_click(admin_client, live_server, webdriver):
             selenium.get(live_server + '/product/')
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             table_rows[index].click()
-            assert selenium.current_url == live_server + '/product/{}/'.format(
-                all_products[index].pk)
-
+            url = '/product/{}/'.format(all_products[index].pk)
+            assert selenium.current_url == live_server + url
     finally:
         selenium.quit()
 
@@ -112,10 +115,10 @@ def test_product_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 3 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
-            delete_button.click()
-            assert selenium.current_url == live_server + '/product/{}/delete/'.format(
-                Product.objects.all().first().pk)
+            d_button = selenium.find_element_by_css_selector('#page-wrapper a')
+            d_button.click()
+            url = '/product/{}/delete/'.format(Product.objects.all().first().pk)
+            assert selenium.current_url == live_server + url
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/product/'
     finally:
@@ -227,7 +230,10 @@ def test_product_list_new_button_limit_user(live_server, webdriver):
 def test_product_get_characteristic_value_descriptions(admin_client):
     create_correct_sample_data()
     create_sample_characteristic_values()
-    assert len(Product.objects.all().get_characteristic_value_descriptions()) == 3
-    assert len(Product.objects.filter(product_name='product1').get_characteristic_value_descriptions()) == 1
-    assert len(Product.objects.filter(product_name='product2').get_characteristic_value_descriptions()) == 2
-    assert len(Product.objects.filter(product_name='product3').get_characteristic_value_descriptions()) == 3
+    assert len(Product.objects.all().get_charac_value_definitions()) == 3
+    product1 = Product.objects.filter(product_name='product1')
+    assert len(product1.get_charac_value_definitions()) == 1
+    product2 = Product.objects.filter(product_name='product2')
+    assert len(product2.get_charac_value_definitions()) == 2
+    product3 = Product.objects.filter(product_name='product3')
+    assert len(product3.get_charac_value_definitions()) == 3

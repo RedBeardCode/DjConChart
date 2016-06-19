@@ -9,9 +9,11 @@
 {% block inlinescripts %}
     <script type="text/javascript">
         var last_search=null;
-        function setItemName(sn_element, name){
+        function setItem(sn_element, data) {
             var name_element = sn_element.parent().parent().siblings().find('#id_name');
-            name_element.val(name);
+            var product_element = sn_element.parent().parent().siblings().find('#id_product');
+            name_element.val(data[0]);
+            product_element.val(data[1])
         }
         function snOnBlur(){
             var value = $(this).val();
@@ -30,13 +32,13 @@
 
         function init_autocomplete() {
             $('.sn_autocomplete').autocomplete({
-                        paramName: 'sn',
+                paramName: 'serial_nr',
                         serviceUrl: '{% url "get_meas_item" %}',
                         type: 'POST',
                         dataType: 'JSON',
-                        triggerSelectOnValidInput: false,
+                triggerSelectOnValidInput: true,
                         onSelect: function (suggestion) {
-                            setItemName($(this), suggestion.data);
+                            setItem($(this), suggestion.data);
                         },
                         onSearchComplete: function(query, suggestions) {
                             last_search = suggestions;
@@ -56,22 +58,22 @@
         $(document).ready(function () {
             init_ajax_csrf();
 
-            {% if forms.sns|length > 1 %}
+            {% if forms.serial_nrs|length > 1 %}
                 {%  autoescape off %}
-                    var sns = {{ forms.sns }};
+                    var serial_nrs = {{ forms.serial_nrs }};
                     var names = {{ forms.names }};
                     var products = {{ forms.products }};
                 {% endautoescape %}
-                for (i = 0; i < {{ forms.sns|length }}-1; i++) {
+                for (i = 0; i < {{ forms.serial_nrs|length }}-1; i++) {
                     add_item();
                 }
-                for (i = {{ forms.sns|length }}-1; i >= 0; i--) {
-                    $('.meas-item-group #id_sn')[i].value = sns[i];
+                for (i = {{ forms.serial_nrs|length }}-1; i >= 0; i--) {
+                    $('.meas-item-group #id_serial_nr')[i].value = serial_nrs[i];
                     $('.meas-item-group #id_name')[i].value = names[i];
                     $('.meas-item-group #id_product')[i].value = products[i];
-                    if (sns[i] != '') {
-                        $('[id*="error_1_id_sn"]').eq(i).remove();
-                        $('.form-group#div_id_sn').eq(i).removeClass('has-error');
+                    if (serial_nrs[i] != '') {
+                        $('[id*="error_1_id_serial_nr"]').eq(i).remove();
+                        $('.form-group#div_id_serial_nr').eq(i).removeClass('has-error');
                     }
                     if (products[i] != '') {
                         $('[id*="error_1_id_product"]').eq(i).remove();

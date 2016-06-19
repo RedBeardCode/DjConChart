@@ -1,11 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 
 import pytest
 import reversion as revisions
 from django.contrib.auth.models import User
 
-from .utilies import login_as_admin, create_correct_sample_data, create_limited_users, login_as_limited_user
-from ..models import CalculationRule, MeasurementOrder, Measurement, MeasurementTag
+from .utilies import create_limited_users, login_as_limited_user
+from .utilies import login_as_admin, create_correct_sample_data
+from ..models import CalculationRule, MeasurementOrder, Measurement
+from ..models import MeasurementTag
 
 
 @pytest.mark.django_db
@@ -16,7 +21,8 @@ def test_create_rule_view(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         name = selenium.find_element_by_id('id_rule_name')
         name.send_keys('test_name')
-        selenium.execute_script('editor.getSession().setValue("def calculate():</br>    pass");')
+        selenium.execute_script(
+            'editor.getSession().setValue("def calculate():</br>    pass");')
         selenium.find_element_by_tag_name('form').submit()
         assert selenium.current_url == live_server + '/'
         assert len(CalculationRule.objects.all()) == 1
@@ -54,11 +60,13 @@ def test_create_rule_view_noname(admin_client, live_server, webdriver):
 
 @pytest.mark.django_db
 def test_rule_changed():
-    class MockRelationManager(object):
+    class MockRelationManager(object):  # pylint: disable=R0903
         def all(self):
             return []
 
-    rule = CalculationRule.objects.create(rule_name='HistTest', rule_code='def calculate(meas_dict):\n    return 1.0\n')
+    rule = CalculationRule.objects.create(
+        rule_name='HistTest',
+        rule_code='def calculate(meas_dict):\n    return 1.0\n')
     assert rule.is_changed()
     rule.save()
     assert rule.is_changed()
@@ -71,7 +79,9 @@ def test_rule_changed():
 
 @pytest.mark.django_db
 def test_rule_history():
-    rule = CalculationRule.objects.create(rule_name='HistTest', rule_code='def calculate(measurements):\n    pass\n')
+    rule = CalculationRule.objects.create(
+        rule_name='HistTest',
+        rule_code='def calculate(measurements):\n    pass\n')
     versions = revisions.get_for_object(rule)
     assert len(versions) == 1
     rule.rule_code = ""
@@ -96,7 +106,8 @@ def test_rule_history_new_view(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         name = selenium.find_element_by_id('id_rule_name')
         name.send_keys('test_name')
-        selenium.execute_script('editor.getSession().setValue("def calculate():</br>    pass");')
+        selenium.execute_script(
+            'editor.getSession().setValue("def calculate():</br>    pass");')
         selenium.find_element_by_tag_name('form').submit()
         rule = CalculationRule.objects.get(rule_name='test_name')
         assert rule
@@ -114,7 +125,7 @@ def test_rule_history_new_view(admin_client, live_server, webdriver):
 
 @pytest.mark.django_db
 def test_rule_missing_key(admin_client):
-    class MockRelationManager(object):
+    class MockRelationManager(object):  # pylint: disable=R0903
         def __init__(self, measurements):
             self.__measurements = measurements
 
@@ -123,11 +134,12 @@ def test_rule_missing_key(admin_client):
 
     create_correct_sample_data()
     calc_rule = CalculationRule.objects.get(rule_name='calc_multi_rule')
-    order = MeasurementOrder.objects.filter(order_type__name='OrderDefinition3')[0]
+    order = MeasurementOrder.objects.filter(
+        order_type__name='OrderDefinition3')[0]
     user = User.objects.get(username='admin')
     item = order.measurement_items.all()[0]
     m_width = Measurement.objects.create(date=datetime.now(), order=order,
-                                          meas_item=item, examiner=user)
+                                         meas_item=item, examiner=user)
     m_width.measurement_tag = MeasurementTag.objects.get(name='width')
     m_height = Measurement.objects.create(date=datetime.now(), order=order,
                                           meas_item=item, examiner=user)
@@ -154,11 +166,13 @@ def test_list_calculation_rule(admin_client, live_server, webdriver):
         all_calc_rules = CalculationRule.objects.all()
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 1
-        assert header[0].text == CalculationRule._meta.get_field_by_name('rule_name')[0].verbose_name
+        assert header[0].text == \
+               CalculationRule._meta.get_field_by_name(  # pylint: disable=W0212
+                   'rule_name')[0].verbose_name
 
         for index, row in enumerate(table_rows):
-            assert row.get_attribute('data-href') == '/calculation_rule/{}/'.format(
-                all_calc_rules[index].pk)
+            assert row.get_attribute('data-href') == \
+                   '/calculation_rule/{}/'.format(all_calc_rules[index].pk)
             columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 1
             assert columns[0].text == all_calc_rules[index].rule_name
@@ -178,8 +192,9 @@ def test_list_calculation_rule_click(admin_client, live_server, webdriver):
             selenium.get(live_server + '/calculation_rule/')
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             table_rows[index].click()
-            assert selenium.current_url == live_server + '/calculation_rule/{}/'.format(
-                all_calc_rules[index].pk)
+            assert selenium.current_url == \
+                   live_server + '/calculation_rule/{}/'.format(
+                       all_calc_rules[index].pk)
 
     finally:
         selenium.quit()
@@ -194,9 +209,11 @@ def test_calculation_rule_back(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         first_value = CalculationRule.objects.all().first()
         selenium.get(live_server + '/recalc_characteristic_values/')
-        for start_url in [live_server + '/calculation_rule/', live_server + '/']:
+        for start_url in [live_server + '/calculation_rule/',
+                          live_server + '/']:
             selenium.get(start_url)
-            selenium.get(live_server + '/calculation_rule/{}/'.format(first_value.pk))
+            selenium.get(live_server + '/calculation_rule/{}/'.format(
+                first_value.pk))
             back_button = selenium.find_elements_by_class_name('btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
@@ -217,10 +234,12 @@ def test_calculation_rule_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 2 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
+            delete_button = selenium.find_element_by_css_selector(
+                '#page-wrapper a')
             delete_button.click()
-            assert selenium.current_url == live_server + '/calculation_rule/{}/delete/'.format(
-                CalculationRule.objects.all().first().pk)
+            assert selenium.current_url == \
+                   live_server + '/calculation_rule/{}/delete/'.format(
+                       CalculationRule.objects.all().first().pk)
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/calculation_rule/'
     finally:
@@ -234,7 +253,8 @@ def test_calculation_rule_buttons_limited_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = CalculationRule.objects.all().first()
-        selenium.get(live_server + '/calculation_rule/{}/'.format(first_value.pk))
+        selenium.get(live_server + '/calculation_rule/{}/'.format(
+            first_value.pk))
         login_as_limited_user(selenium)
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 1
@@ -250,7 +270,8 @@ def test_calculation_rule_buttons_change_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = CalculationRule.objects.all().first()
-        selenium.get(live_server + '/calculation_rule/{}/'.format(first_value.pk))
+        selenium.get(live_server + '/calculation_rule/{}/'.format(
+            first_value.pk))
         login_as_limited_user(selenium, 'change_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
@@ -267,7 +288,8 @@ def test_calculation_rule_buttons_del_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = CalculationRule.objects.all().first()
-        selenium.get(live_server + '/calculation_rule/{}/'.format(first_value.pk))
+        selenium.get(live_server + '/calculation_rule/{}/'.format(
+            first_value.pk))
         login_as_limited_user(selenium, 'delete_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
@@ -284,7 +306,8 @@ def test_calculation_rule_buttons_add_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = CalculationRule.objects.all().first()
-        selenium.get(live_server + '/calculation_rule/{}/'.format(first_value.pk))
+        selenium.get(live_server + '/calculation_rule/{}/'.format(
+            first_value.pk))
         login_as_limited_user(selenium, 'add_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 1

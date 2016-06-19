@@ -1,10 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from MeasurementManagement.models import CalculationRule
-from .utilies import login_as_admin, create_correct_sample_data, create_sample_characteristic_values
+from .utilies import create_sample_characteristic_values
+from .utilies import login_as_admin, create_correct_sample_data
 
 CALC_RULE_CODE = '''
 def calculate(meas_dict):
@@ -21,7 +25,8 @@ def test_recalc_finished_div(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         unfinished_section = selenium.find_element_by_id('unfinished_values')
         assert not unfinished_section.is_displayed()
-        unfinished_list = selenium.find_elements_by_css_selector('#unfinished_values ul li')
+        unfinished_list = selenium.find_elements_by_css_selector(
+            '#unfinished_values ul li')
         assert len(unfinished_list) == 3
         collapse_button = selenium.find_element_by_id('collapse_unfinished')
         collapse_button.click()
@@ -45,7 +50,8 @@ def test_recalc_invalid(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         section_header = selenium.find_element_by_id('invalid_header')
         assert selenium.find_element_by_id('progress_value_0').text == "0%"
-        assert selenium.find_element_by_class_name('progress-bar').get_attribute('style') == 'width: 0%;'
+        progress_bar = selenium.find_element_by_class_name('progress-bar')
+        assert progress_bar.get_attribute('style') == 'width: 0%;'
         assert section_header.text == '16'
         recalc_button = selenium.find_element_by_id('recalc_values')
         recalc_button.click()
@@ -53,6 +59,7 @@ def test_recalc_invalid(admin_client, live_server, webdriver):
             EC.text_to_be_present_in_element((By.ID, 'invalid_header'), '0/16'))
         assert section_header
         assert selenium.find_element_by_id('progress_value_0').text == '100%'
-        assert selenium.find_element_by_class_name('progress-bar').get_attribute('style') == 'width: 100%;'
+        progress_bar = selenium.find_element_by_class_name('progress-bar')
+        assert progress_bar.get_attribute('style') == 'width: 100%;'
     finally:
         selenium.quit()

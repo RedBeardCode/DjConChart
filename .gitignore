@@ -7,3 +7,4 @@
 *.orig
 db.sqlite3
 /*.txt
+imports.dot

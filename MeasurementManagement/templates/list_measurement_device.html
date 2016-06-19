@@ -3,6 +3,6 @@
 {% block table_line %}
     <tr class="clickable-row" data-href="{% url 'list_measurement_device' %}{{ object.pk }}/">
         <td>{{ object.name }}</td>
-        <td>{{ object.sn }}</td>
+        <td>{{ object.serial_nr }}</td>
     </tr>
 {% endblock %}

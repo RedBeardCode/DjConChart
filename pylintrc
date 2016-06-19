@@ -1,0 +1,25 @@
+[REPORTS]
+msg-template='{abspath} {line} {column}: {msg_id}: {obj}: {msg}'
+
+
+
+[MESSAGES CONTROL]
+disable=I0011, I0012
+
+[MASTER]
+load-plugins=pylint_django
+
+[TYPECHECK]
+generated-members=GroupManager, ModelManager
+
+[IMPORTS]
+
+
+# Create a graph of every (i.e. internal and external) dependencies in the
+# given file (report RP0402 must not be disabled)
+#import-graph=imports.dot
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=80

@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import pytest
 
-from .utilies import login_as_admin, create_correct_sample_data, create_limited_users, login_as_limited_user
+from .utilies import create_limited_users, login_as_limited_user
+from .utilies import login_as_admin, create_correct_sample_data
 from ..models import MeasurementTag
 
 
@@ -25,7 +29,7 @@ def test_create_meas_tag_view_noname(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement_tag/new/')
         login_as_admin(selenium)
-        name = selenium.find_element_by_id('id_name')
+        _ = selenium.find_element_by_id('id_name')
         selenium.find_element_by_tag_name('form').submit()
         assert selenium.current_url == live_server + '/measurement_tag/new/'
         assert len(MeasurementTag.objects.all()) == 0
@@ -47,11 +51,12 @@ def test_list_measurement_tag(admin_client, live_server, webdriver):
         all_meas_tags = MeasurementTag.objects.all()
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 1
-        assert header[0].text == MeasurementTag._meta.get_field_by_name('name')[0].verbose_name
-
+        field = MeasurementTag._meta.get_field_by_name('name')[
+            0]  # pylint: disable=W0212
+        assert header[0].text == field.verbose_name
         for index, row in enumerate(table_rows):
-            assert row.get_attribute('data-href') == '/measurement_tag/{}/'.format(
-                all_meas_tags[index].pk)
+            url = '/measurement_tag/{}/'.format(all_meas_tags[index].pk)
+            assert row.get_attribute('data-href') == url
             columns = row.find_elements_by_css_selector('#page-wrapper td')
             assert len(columns) == 1
             assert columns[0].text == all_meas_tags[index].name
@@ -71,8 +76,8 @@ def test_list_measurement_tag_click(admin_client, live_server, webdriver):
             selenium.get(live_server + '/measurement_tag/')
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             table_rows[index].click()
-            assert selenium.current_url == live_server + '/measurement_tag/{}/'.format(
-                all_meas_tags[index].pk)
+            url = '/measurement_tag/{}/'.format(all_meas_tags[index].pk)
+            assert selenium.current_url == live_server + url
 
     finally:
         selenium.quit()
@@ -89,7 +94,8 @@ def test_measurement_tag_back(admin_client, live_server, webdriver):
         selenium.get(live_server + '/recalc_characteristic_values/')
         for start_url in [live_server + '/measurement_tag/', live_server + '/']:
             selenium.get(start_url)
-            selenium.get(live_server + '/measurement_tag/{}/'.format(first_value.pk))
+            url = '/measurement_tag/{}/'.format(first_value.pk)
+            selenium.get(live_server + url)
             back_button = selenium.find_elements_by_class_name('btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
@@ -110,10 +116,11 @@ def test_measurement_tag_delete(admin_client, live_server, webdriver):
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             assert len(table_rows) == 2 - index
             table_rows[0].click()
-            delete_button = selenium.find_element_by_css_selector('#page-wrapper a')
-            delete_button.click()
-            assert selenium.current_url == live_server + '/measurement_tag/{}/delete/'.format(
+            d_button = selenium.find_element_by_css_selector('#page-wrapper a')
+            d_button.click()
+            url = '/measurement_tag/{}/delete/'.format(
                 MeasurementTag.objects.all().first().pk)
+            assert selenium.current_url == live_server + url
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/measurement_tag/'
     finally:
@@ -127,7 +134,8 @@ def test_measurement_tag_buttons_limited_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = MeasurementTag.objects.all().first()
-        selenium.get(live_server + '/measurement_tag/{}/'.format(first_value.pk))
+        url = '/measurement_tag/{}/'.format(first_value.pk)
+        selenium.get(live_server + url)
         login_as_limited_user(selenium)
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 1
@@ -143,7 +151,8 @@ def test_measurement_tag_buttons_change_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = MeasurementTag.objects.all().first()
-        selenium.get(live_server + '/measurement_tag/{}/'.format(first_value.pk))
+        url = '/measurement_tag/{}/'.format(first_value.pk)
+        selenium.get(live_server + url)
         login_as_limited_user(selenium, 'change_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
@@ -160,7 +169,8 @@ def test_measurement_tag_buttons_del_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = MeasurementTag.objects.all().first()
-        selenium.get(live_server + '/measurement_tag/{}/'.format(first_value.pk))
+        url = '/measurement_tag/{}/'.format(first_value.pk)
+        selenium.get(live_server + url)
         login_as_limited_user(selenium, 'delete_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 2
@@ -177,7 +187,8 @@ def test_measurement_tag_buttons_add_user(live_server, webdriver):
     selenium = webdriver()
     try:
         first_value = MeasurementTag.objects.all().first()
-        selenium.get(live_server + '/measurement_tag/{}/'.format(first_value.pk))
+        url = '/measurement_tag/{}/'.format(first_value.pk)
+        selenium.get(live_server + url)
         login_as_limited_user(selenium, 'add_user')
         buttons = selenium.find_elements_by_class_name('btn')
         assert len(buttons) == 1
