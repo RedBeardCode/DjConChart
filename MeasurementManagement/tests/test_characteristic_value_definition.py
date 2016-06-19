@@ -162,7 +162,7 @@ def test_list_characteristic_value_def(admin_client, live_server, webdriver):
                        # pylint: disable=W0212
                        field_name)[0].verbose_name
         for index, row in enumerate(table_rows):
-            assert row.get_attribute('data-href') == \
+            assert row.get_attribute('data-href').strip() == \
                    '/characteristic_value_definition/{}/'.format(
                        all_chara_val_des[index].pk)
             columns = row.find_elements_by_css_selector('#page-wrapper td')
