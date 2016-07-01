@@ -67,7 +67,7 @@ def test_plot_annotations():
 
 
 @pytest.mark.django_db
-def test_plot_url(admin_client, live_server, webdriver):
+def test_plot_url(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     selenium = webdriver()
@@ -79,20 +79,15 @@ def test_plot_url(admin_client, live_server, webdriver):
                                                 short_name='url')
         plot_config.filter_args = [{'value__gt': 0.0}]
         plot_config.save()
-        try:
-            selenium.get(live_server + '/plot/url/')
-            pull_session()
-            assert selenium.find_element_by_class_name('bk-plot')
-        except IOError:
-            # no bokeh server running
-            body_text = selenium.find_element_by_tag_name('body').text
-            assert body_text == 'Server Error (500)'
+        selenium.get(live_server + '/plot/url/')
+        pull_session()
+        assert selenium.find_element_by_class_name('bk-plot')
     finally:
         selenium.quit()
 
 
 @pytest.mark.django_db
-def test_plot_histogram(admin_client, live_server, webdriver):
+def test_plot_histogram(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -106,10 +101,6 @@ def test_plot_histogram(admin_client, live_server, webdriver):
         PlotConfig.objects.filter(short_name='gt05').update(histogram=False)
         selenium.get(live_server + '/plot/gt05/')
         assert len(selenium.find_elements_by_class_name('bk-plot')) == 1
-    except IOError:
-        # no bokeh server running
-        body_text = selenium.find_element_by_tag_name('body').text
-        assert body_text == 'Server Error (500)'
     finally:
         selenium.quit()
 

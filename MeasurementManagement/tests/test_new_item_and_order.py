@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
 from .utilies import login_as_admin, create_correct_sample_data
 from .utilies import wait_for_root_page
@@ -226,10 +229,11 @@ def test_ac_single_item_type(admin_client, live_server, webdriver):
         selenium.implicitly_wait(1)
         sugg = selenium.find_elements_by_class_name('autocomplete-suggestion')
         assert len(sugg) == 10
-        serial_nr.send_keys('000001')
+        serial_nr.send_keys('000001\t')
         selenium.find_element_by_id('id_name').send_keys("")
-        name = selenium.find_element_by_id('id_name').get_attribute('value')
-        assert name == 'Item 1'
+        wait = WebDriverWait(selenium, 5)
+        assert wait.until(EC.text_to_be_present_in_element_value(
+            (By.ID, 'id_name'), 'Item 1'))
     finally:
         selenium.quit()
 

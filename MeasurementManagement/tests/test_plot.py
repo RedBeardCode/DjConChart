@@ -12,7 +12,8 @@ from ..models import CharacteristicValue
 
 
 @pytest.mark.django_db
-def test_plot_recalc_section(admin_client, live_server, webdriver):
+def test_plot_recalc_section(admin_client, live_server,
+                             webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -34,7 +35,7 @@ def test_plot_recalc_section(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_multi(admin_client, live_server, webdriver):
+def test_plot_multi(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -63,7 +64,7 @@ def test_plot_multi(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_detail_links(admin_client, live_server, webdriver):
+def test_plot_detail_links(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -80,7 +81,7 @@ def test_plot_detail_links(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_detail_view(admin_client, live_server, webdriver):
+def test_plot_detail_view(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -113,7 +114,7 @@ def test_plot_detail_view(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_summary(admin_client, live_server, webdriver):
+def test_plot_summary(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -141,7 +142,7 @@ def test_plot_summary(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_titles(admin_client, live_server, webdriver):
+def test_plot_titles(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
@@ -159,7 +160,7 @@ def test_plot_titles(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_plot_emtpy(admin_client, live_server, webdriver):
+def test_plot_emtpy(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()

@@ -53,3 +53,20 @@ def working_instance(request, live_server, fix_webdriver, transactional_db):
     login_as_admin(selenium)
     request.addfinalizer(lambda: fin(selenium))
     return selenium
+
+
+@pytest.fixture(scope='session')
+def bokeh_server(request):
+    from subprocess import Popen
+    import os
+    os.environ['BOKEH_SERVER'] = 'http://localhost:6008/'
+    server = Popen(['bokeh', 'serve',
+                    '--port=6008',
+                    '--allow-websocket-origin=localhost:8081',
+                    '--allow-websocket-origin=127.0.0.1:8081'])
+
+    def fin(server):
+        server.terminate()
+
+    request.addfinalizer(lambda: fin(server))
+    return None
