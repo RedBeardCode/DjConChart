@@ -1,0 +1,2 @@
+source activate MeasMan
+pylint --report=n $1 $2 $3 $4 $5
