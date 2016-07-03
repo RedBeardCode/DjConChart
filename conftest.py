@@ -2,8 +2,8 @@ import pytest
 from selenium.webdriver import DesiredCapabilities, Chrome
 from selenium.webdriver import Firefox, PhantomJS, Remote
 
-from MeasurementManagement.tests.utilies import create_limited_users, create_correct_sample_data, login_as_admin
-from MeasurementManagement.tests.utilies import create_sample_characteristic_values
+from ControlChart.tests.utilies import create_limited_users, create_correct_sample_data, login_as_admin
+from ControlChart.tests.utilies import create_sample_characteristic_values
 
 
 def pytest_addoption(parser):

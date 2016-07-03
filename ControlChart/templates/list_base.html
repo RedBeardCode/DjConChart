@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>DjConChart {{ title }}</title>
+{% endblock %}
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    {% if add_class in perms %}
+        {% block add_button %}
+        <div class="list_table">
+        <span style="float: right; height: 3em;">
+            <a type="button" class="btn btn-default " aria-label="Add new {{ model_name }}"
+               href="/{{ list_link_name }}/new/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add new {{ model_name }}
+            </a>
+        </span>
+
+        </div>
+        {% endblock %}
+    {% endif %}
+    <table class="table table-striped list_table">
+        {% block table_header %}
+            {% for field_name in verbose_field_names %}
+                <th>{{ field_name }}</th>
+            {% endfor %}
+        {% endblock %}
+        {% for object in object_list %}
+            {% block table_line %}
+                <tr class="clickable-row" data-href="/">
+                    <td>{{ object }}</td>
+                </tr>
+            {% endblock %}
+        {% empty %}
+            <tr>
+                <td>No {{ model_name }} yet.</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {% block page-navigation %}
+        {% if is_paginated %}
+            <div class="paginator">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li>
+                            <a href="?page={{ page_obj.previous_page_number }}" aria-label="Back">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <a href="#" aria-label="Back">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for page in paginator.page_range %}
+                        {% if page_obj.number == page %}
+                            <li class="active"><a href="?page={{ page }}">{{ page }}</a></li>
+                        {% else %}
+                            <li><a href="?page={{ page }}">{{ page }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li>
+                            <a href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="disabled">
+                            <a href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endblock %}
+
+{% endblock %}
+
+{% block inlinescripts %}
+    <script type="text/javascript">
+
+        $(document).ready(function ($) {
+            $('.clickable-row').click(function () {
+                window.document.location = $(this).data("href");
+            });
+        });
+    </script>
+{% endblock %}
