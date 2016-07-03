@@ -5,7 +5,6 @@ Contains the configuration of the MeasurementManagement App
 """
 
 from django.apps import AppConfig
-from django.contrib.auth.models import Group, Permission
 from django.db.models.signals import post_migrate
 
 
@@ -28,27 +27,32 @@ class MeasurementManagementConfig(AppConfig):
         """
         Generation of the MeasurementManagement default user groups
         """
-        _ = Group.objects.create(name='Viewer')
+        from django.contrib.auth.models import Group, Permission
+        _ = Group.objects.get_or_create(name='Viewer')
 
-        examiner = Group.objects.create(name='Examiner')
-        examiner.permissions.add(Permission.objects.get(
-            codename='add_measurement'))
-        examiner.permissions.add(Permission.objects.get(
-            codename='add_characteristicvalue'))
-        examiner.save()
+        examiner, created = Group.objects.get_or_create(name='Examiner')
+        if created:
+            examiner.permissions.add(Permission.objects.get(
+                codename='add_measurement'))
+            examiner.permissions.add(Permission.objects.get(
+                codename='add_characteristicvalue'))
+            examiner.save()
 
-        manager = Group.objects.create(name='Manager')
-        _ = [manager.permissions.add(p) for p in
-             Permission.objects.filter(codename__contains='add')]
-        _ = [manager.permissions.add(p) for p in
-             Permission.objects.filter(codename__contains='change')]
-        manager.save()
+        manager, created = Group.objects.get_or_create(name='Manager')
+        if created:
+            _ = [manager.permissions.add(p) for p in
+                 Permission.objects.filter(codename__contains='add')]
+            _ = [manager.permissions.add(p) for p in
+                 Permission.objects.filter(codename__contains='change')]
+            manager.save()
 
-        administrators = Group.objects.create(name='Administrator')
-        _ = [administrators.permissions.add(p) for p in
-             Permission.objects.filter(codename__contains='add')]
-        _ = [administrators.permissions.add(p) for p in
-             Permission.objects.filter(codename__contains='change')]
-        _ = [administrators.permissions.add(p) for p in
-             Permission.objects.filter(codename__contains='delete')]
-        administrators.save()
+        administrators, created = Group.objects.get_or_create(
+            name='Administrator')
+        if created:
+            _ = [administrators.permissions.add(p) for p in
+                 Permission.objects.filter(codename__contains='add')]
+            _ = [administrators.permissions.add(p) for p in
+                 Permission.objects.filter(codename__contains='change')]
+            _ = [administrators.permissions.add(p) for p in
+                 Permission.objects.filter(codename__contains='delete')]
+            administrators.save()

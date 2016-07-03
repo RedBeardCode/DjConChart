@@ -1,3 +1,4 @@
+/*global DateTimeShortcuts, SelectFilter*/
 /**
  * Django admin inlines
  *
@@ -15,6 +16,7 @@
  * See: http://www.opensource.org/licenses/bsd-license.php
  */
 (function ($) {
+    'use strict';
     $.fn.formset = function (opts) {
         var options = $.extend({}, $.fn.formset.defaults, opts);
         var $this = $(this);
@@ -43,7 +45,7 @@
         });
         if ($this.length && showAddButton) {
             var addButton;
-            if ($this.prop("tagName") == "TR") {
+            if ($this.prop("tagName") === "TR") {
                 // If forms are laid out as table rows, insert the
                 // "add" button in a new table row:
                 var numCols = this.eq(-1).children().length;
@@ -56,7 +58,6 @@
             }
             addButton.click(function (e) {
                 e.preventDefault();
-                var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
                 var template = $("#" + options.prefix + "-empty");
                 var row = template.clone(true);
                 row.removeClass(options.emptyCssClass)
@@ -88,16 +89,16 @@
                     addButton.parent().hide();
                 }
                 // The delete button of each row triggers a bunch of other things
-                row.find("a." + options.deleteCssClass).click(function (e) {
-                    e.preventDefault();
+                row.find("a." + options.deleteCssClass).click(function (e1) {
+                    e1.preventDefault();
                     // Remove the parent form containing this button:
-                    var row = $(this).parents("." + options.formCssClass);
                     row.remove();
                     nextIndex -= 1;
                     // If a post-delete callback was provided, call it with the deleted form:
                     if (options.removed) {
                         options.removed(row);
                     }
+                    $(document).trigger('formset:removed', [row, options.prefix]);
                     // Update the TOTAL_FORMS form count.
                     var forms = $("." + options.formCssClass);
                     $("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
@@ -107,17 +108,20 @@
                     }
                     // Also, update names and ids for all remaining form controls
                     // so they remain in sequence:
-                    for (var i = 0, formCount = forms.length; i < formCount; i++) {
+                    var i, formCount;
+                    var updateElementCallback = function () {
+                        updateElementIndex(this, options.prefix, i);
+                    };
+                    for (i = 0, formCount = forms.length; i < formCount; i++) {
                         updateElementIndex($(forms).get(i), options.prefix, i);
-                        $(forms.get(i)).find("*").each(function () {
-                            updateElementIndex(this, options.prefix, i);
-                        });
+                        $(forms.get(i)).find("*").each(updateElementCallback);
                     }
                 });
                 // If a post-add callback was supplied, call it with the added form:
                 if (options.added) {
                     options.added(row);
                 }
+                $(document).trigger('formset:added', [row, options.prefix]);
             });
         }
         return this;
@@ -148,7 +152,7 @@
 
         var reinitDateTimeShortCuts = function () {
             // Reinitialize the calendar and clock widgets by force
-            if (typeof DateTimeShortcuts != "undefined") {
+            if (typeof DateTimeShortcuts !== "undefined") {
                 $(".datetimeshortcuts").remove();
                 DateTimeShortcuts.init();
             }
@@ -157,14 +161,14 @@
         var updateSelectFilter = function () {
             // If any SelectFilter widgets are a part of the new form,
             // instantiate a new SelectFilter instance for it.
-            if (typeof SelectFilter != 'undefined') {
+            if (typeof SelectFilter !== 'undefined') {
                 $('.selectfilter').each(function (index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], false, options.adminStaticPrefix);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
                 });
                 $('.selectfilterstacked').each(function (index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], true, options.adminStaticPrefix);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
                 });
             }
         };
@@ -215,7 +219,7 @@
 
         var reinitDateTimeShortCuts = function () {
             // Reinitialize the calendar and clock widgets by force, yuck.
-            if (typeof DateTimeShortcuts != "undefined") {
+            if (typeof DateTimeShortcuts !== "undefined") {
                 $(".datetimeshortcuts").remove();
                 DateTimeShortcuts.init();
             }
@@ -223,14 +227,14 @@
 
         var updateSelectFilter = function () {
             // If any SelectFilter widgets were added, instantiate a new instance.
-            if (typeof SelectFilter != "undefined") {
+            if (typeof SelectFilter !== "undefined") {
                 $(".selectfilter").each(function (index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], false, options.adminStaticPrefix);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
                 });
                 $(".selectfilterstacked").each(function (index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length - 1], true, options.adminStaticPrefix);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
                 });
             }
         };
@@ -258,12 +262,12 @@
             deleteText: options.deleteText,
             emptyCssClass: "empty-form",
             removed: updateInlineLabel,
-            added: (function (row) {
+            added: function (row) {
                 initPrepopulatedFields(row);
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
                 updateInlineLabel(row);
-            })
+            }
         });
 
         return $rows;

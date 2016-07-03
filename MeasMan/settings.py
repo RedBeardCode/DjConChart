@@ -33,8 +33,6 @@ INSTALLED_APPS = (
     'reversion',
     'crispy_forms',
     'MeasurementManagement',
-    'debug_toolbar',
-    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (

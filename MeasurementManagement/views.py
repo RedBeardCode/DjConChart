@@ -5,12 +5,13 @@ Views for the  MeasurementManagement app
 """
 import json
 from collections import defaultdict
-from datetime import datetime
 
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.urlresolvers import reverse_lazy
+from django.forms import ModelForm, Select, SplitDateTimeField
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
+from django.utils.timezone import now
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic import DeleteView, TemplateView
 
@@ -67,8 +68,8 @@ class TitledListView(AddContextInfoMixIn, ListView):  # pylint: disable=R0901
     list_link_name = None
     paginate_by = 20
 
-    def __init__(self, *args, title=None, model_name=None, list_link_name=None,
-                 **kwargs):
+    def __init__(self, title=None, model_name=None, list_link_name=None,
+                 *args, **kwargs):
         self.title = title
         self.model_name = model_name
         self.list_link_name = list_link_name
@@ -94,8 +95,7 @@ class TitledListView(AddContextInfoMixIn, ListView):  # pylint: disable=R0901
         return context
 
 
-class NewCharacteristicValueDefinition(AddContextInfoMixIn,
-                                       CreateView):  # pylint: disable=R0901
+class NewCharacteristicValueDefinition(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create new CharacteristicValueDefinitions
     """
@@ -106,8 +106,7 @@ class NewCharacteristicValueDefinition(AddContextInfoMixIn,
     success_url = '/'
 
 
-class ListCharacteristicValueDefinition(
-    TitledListView):  # pylint: disable=R0901
+class ListCharacteristicValueDefinition(TitledListView):  # pylint: disable=R0901
     """
     View to list all CharacteristicValueDefinitions
     """
@@ -116,8 +115,7 @@ class ListCharacteristicValueDefinition(
     fields = ['value_name', 'description']
 
 
-class UpdateCharacteristicValueDefinition(AddContextInfoMixIn,
-                                          UpdateView):  # pylint: disable=R0901
+class UpdateCharacteristicValueDefinition(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a CharacteristicValueDefinition
     """
@@ -137,8 +135,7 @@ class DeleteCharacteristicValueDefinition(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_characteristic_value_definition')
 
 
-class NewMeasurementDevice(AddContextInfoMixIn,
-                           CreateView):  # pylint: disable=R0901
+class NewMeasurementDevice(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new MeasurementDevice
     """
@@ -157,8 +154,7 @@ class ListMeasurementDevice(TitledListView):  # pylint: disable=R0901
     fields = ['name', 'serial_nr']
 
 
-class UpdateMeasurementDevice(AddContextInfoMixIn,
-                              UpdateView):  # pylint: disable=R0901
+class UpdateMeasurementDevice(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a MeasurementDevice
     """
@@ -177,8 +173,7 @@ class DeleteMeasurementDevice(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_measurement_device')
 
 
-class NewMeasurementOrder(AddContextInfoMixIn,
-                          CreateView):  # pylint: disable=R0901
+class NewMeasurementOrder(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new MeasuremetOrder
     """
@@ -197,8 +192,7 @@ class ListMeasurementOrder(TitledListView):  # pylint: disable=R0901
     fields = ['order_nr', 'order_type', 'measurement_items']
 
 
-class UpdateMeasurementOrder(AddContextInfoMixIn,
-                             UpdateView):  # pylint: disable=R0901
+class UpdateMeasurementOrder(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a MeasurementOrder
     """
@@ -217,8 +211,7 @@ class DeleteMeasurementOrder(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_measurement_order')
 
 
-class NewMeasurementOrderDefinition(AddContextInfoMixIn,
-                                    CreateView):  # pylint: disable=R0901
+class NewMeasurementOrderDefinition(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new MeasurementOrderDefinition
     """
@@ -237,8 +230,7 @@ class ListMeasurementOrderDefinition(TitledListView):  # pylint: disable=R0901
     fields = ['name', 'characteristic_values', 'product']
 
 
-class UpdateMeasurementOrderDefinition(AddContextInfoMixIn,
-                                       UpdateView):  # pylint: disable=R0901
+class UpdateMeasurementOrderDefinition(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a MeasurementOrderDefinition
     """
@@ -257,8 +249,7 @@ class DeleteMeasurementOrderDefinition(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_measurement_order_definition')
 
 
-class NewMeasurementItem(AddContextInfoMixIn,
-                         CreateView):  # pylint: disable=R0901
+class NewMeasurementItem(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new MeasurementItem
     """
@@ -277,8 +268,7 @@ class ListMeasurementItem(TitledListView):  # pylint: disable=R0901
     fields = ['serial_nr', 'name', 'product']
 
 
-class UpdateMeasurementItem(AddContextInfoMixIn,
-                            UpdateView):  # pylint: disable=R0901
+class UpdateMeasurementItem(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a MeasurementItem
     """
@@ -297,8 +287,7 @@ class DeleteMeasurementItem(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_measurement_item')
 
 
-class NewCalculationRule(AddContextInfoMixIn,
-                         CreateView):  # pylint: disable=R0901
+class NewCalculationRule(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new CalculationRule
     """
@@ -317,8 +306,7 @@ class ListCalculationRule(TitledListView):  # pylint: disable=R0901
     fields = ['rule_name']
 
 
-class UpdateCalculationRule(AddContextInfoMixIn,
-                            UpdateView):  # pylint: disable=R0901
+class UpdateCalculationRule(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a CalculationRule
     """
@@ -337,8 +325,7 @@ class DeleteCalculationRule(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_calculation_rule')
 
 
-class NewMeasurementTag(AddContextInfoMixIn,
-                        CreateView):  # pylint: disable=R0901
+class NewMeasurementTag(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new MeasurementTag
     """
@@ -357,8 +344,7 @@ class ListMeasurementTag(TitledListView):  # pylint: disable=R0901
     fields = ['name']
 
 
-class UpdateMeasurementTag(AddContextInfoMixIn,
-                           UpdateView):  # pylint: disable=R0901
+class UpdateMeasurementTag(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a MeasurementTag
     """
@@ -415,36 +401,37 @@ class DeleteProduct(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_product')
 
 
-class MeasurementFormMixin(object):  # pylint: disable=R0903
+class MeasurementFrom(ModelForm):
     """
-    Mixin to add dynamic widgets to the MeasurementForm
+    Form class for creating an editing a measurement model instance.
+    Uses the AdminSplitDateTime widget for the DateTimeField
     """
-    def get_form(self, form_class=None):
-        """
-        Adds dynamic widgets (date, order-autocomplete) to the form
-        """
-        form = super(MeasurementFormMixin, self).get_form(form_class)
-        field = form.fields['date']
-        field.initial = datetime.now()
-        field.widget = AdminSplitDateTime()
-        form.fields['date'] = field
-        form.fields['order'].widget.attrs.update(
-            {'onchange': 'get_order_items();'})
-        form.fields['examiner'].initial = self.request.user
-        return form
+
+    class Meta:
+        model = Measurement
+        fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
+                  'meas_item', 'measurement_devices', 'raw_data_file',
+                  'measurement_tag']
+        field_classes = {
+            'date': SplitDateTimeField
+        }
+        widgets = {
+            'date': AdminSplitDateTime(),
+            'order': Select(attrs={'onchange': 'get_order_items();'})
+        }
 
 
-class NewMeasurement(MeasurementFormMixin, AddContextInfoMixIn,
-                     CreateView):  # pylint: disable=R0901
+class NewMeasurement(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     """
     View to create a new Measurement
     """
     template_name = "new_measurement.html"
+    form_class = MeasurementFrom
     model = Measurement
-    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
-              'meas_item', 'measurement_devices', 'raw_data_file',
-              'measurement_tag']
     success_url = "/"
+
+    def get_initial(self):
+        return {'date': now(), 'examiner': self.request.user}
 
     def post(self, request, *args, **kwargs):
         if request.is_ajax and 'check' in request.POST:
@@ -455,7 +442,8 @@ class NewMeasurement(MeasurementFormMixin, AddContextInfoMixIn,
                     order=request.POST['order'], value_type=val_type)
                 if cvs.exists():
                     cv_exits = True
-                    update_url = cvs.first().measurements.first().get_absolute_url()
+                    first_measurement = cvs.first().measurements.first()
+                    update_url = first_measurement.get_absolute_url()
             return JsonResponse({'exists': cv_exits, 'update_url': update_url})
 
         response = super(NewMeasurement, self).post(request, *args, **kwargs)
@@ -474,16 +462,13 @@ class ListMeasurement(TitledListView):  # pylint: disable=R0901
               'measurement_tag']
 
 
-class UpdateMeasurement(MeasurementFormMixin, AddContextInfoMixIn,
-                        UpdateView):  # pylint: disable=R0901
+class UpdateMeasurement(AddContextInfoMixIn, UpdateView):  # pylint: disable=R0901
     """
     View to update a Measurement
     """
     template_name = "new_measurement.html"
     model = Measurement
-    fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
-              'meas_item', 'measurement_devices', 'raw_data_file',
-              'measurement_tag']
+    form_class = MeasurementFrom
     success_url = '/'
 
 

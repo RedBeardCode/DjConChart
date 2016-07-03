@@ -17,8 +17,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 
-from django.conf.urls import include, url, patterns
+from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.views import logout
 
 from MeasMan.views import login
 
@@ -28,10 +29,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('MeasurementManagement.urls')),
     url(r'^login/$', login, name='mysite_login'),
-
+    url(r'^logout/$', logout, {'next_page': '/'},
+        name='mysite_logout')
 ]
 
-urlpatterns += patterns('django.contrib.auth.views',
-                        url(r'^logout/$', 'logout', {'next_page': '/'},
-                            name='mysite_logout'),
-                        )

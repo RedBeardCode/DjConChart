@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import datetime
+
 
 from django.contrib.auth.models import User, Permission, Group
 from django.core.files.base import ContentFile
+from django.utils import timezone
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,7 +15,7 @@ from ..models import MeasurementDevice, MeasurementItem, CalculationRule
 from ..models import MeasurementOrder, MeasurementOrderDefinition, Product
 from ..models import PlotConfig, MeasurementTag, CharacteristicValueDefinition
 
-FAKE_TIME = datetime.datetime(2020, 12, 5, 17, 5, 55)
+FAKE_TIME = timezone.datetime(2020, 12, 5, 17, 5, 55)
 
 
 def create_grouped_users():
@@ -149,7 +150,7 @@ def create_sample_characteristic_values():
         user = User.objects.all()[0]
         item = order.measurement_items.all()[0]
         for cv_type in cv_types:
-            meas = Measurement.objects.create(date=datetime.datetime.now(),
+            meas = Measurement.objects.create(date=timezone.now(),
                                               order=order,
                                               meas_item=item,
                                               examiner=user)

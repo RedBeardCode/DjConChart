@@ -95,6 +95,7 @@ def test_default_values(admin_client, live_server, webdriver):
 def test_all_elements(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
+    selenium.implicitly_wait(3)
     try:
         selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
@@ -239,8 +240,7 @@ def test_update_dlg(admin_client, live_server, webdriver):
         wait = WebDriverWait(selenium, 10)
         dlg = wait.until(EC.visibility_of_element_located(
             (By.ID, 'dialog-text')))
-        assert dlg.get_attribute(
-            'style') == 'visibility: visible;'  # pylint: disable=E1101
+        assert dlg.get_attribute('style') == 'visibility: visible;'  # pylint: disable=E1101
         assert selenium.find_element_by_class_name('ui-dialog')
         button = selenium.find_elements_by_css_selector('.ui-dialog button')
         assert len(button) == 3
@@ -309,8 +309,8 @@ def test_submit_no_remark(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement(admin_client, live_server,
-                          webdriver):  # pylint: disable=R0914
+def test_list_measurement(admin_client, live_server,  # pylint: disable=R0914
+                          webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     create_sample_characteristic_values()
@@ -327,8 +327,7 @@ def test_list_measurement(admin_client, live_server,
         for index, field_name in enumerate(['date', 'order', 'order_items',
                                             'examiner', 'meas_item',
                                             'measurement_tag']):
-            field = Measurement._meta.get_field_by_name(field_name)[
-                0]  # pylint: disable=W0212
+            field = Measurement._meta.get_field_by_name(field_name)[0]  # pylint: disable=W0212
             assert header[index].text == field.verbose_name
         for index, row in enumerate(table_rows):
             url = '/measurement/{}/'.format(all_meas[index].pk)

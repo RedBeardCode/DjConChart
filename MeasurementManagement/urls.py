@@ -4,7 +4,7 @@
 Url-mapping for the  MeasurementManagement app
 """
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
@@ -31,13 +31,12 @@ from .views import UpdateMeasurementOrder, DeleteMeasurementOrder
 from .views import UpdateMeasurementOrderDefinition
 from .views import UpdateMeasurementTag, DeleteMeasurementTag
 from .views import get_ajax_order_info, get_ajax_meas_item
-from .views import recalc_characteristic_values, \
-    recalculate_invalid, recalculate_progress, plot_given_configuration
+from .views import recalc_characteristic_values, recalculate_invalid
+from .views import recalculate_progress, plot_given_configuration
 
 admin.autodiscover()
 
-urlpatterns = patterns(
-    'MeasurementManagement.views',
+urlpatterns = [
 
     url(r'^measurement/new/$',
         login_required(NewMeasurement.as_view()),
@@ -190,4 +189,4 @@ urlpatterns = patterns(
     url(r'^recalculate_progress/$', recalculate_progress,
         name='recalculate_progress'),
 
-)
+]

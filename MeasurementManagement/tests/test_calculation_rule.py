@@ -4,8 +4,8 @@
 from datetime import datetime
 
 import pytest
-import reversion as revisions
 from django.contrib.auth.models import User
+from reversion.models import Version
 
 from .utilies import create_limited_users, login_as_limited_user
 from .utilies import login_as_admin, create_correct_sample_data
@@ -82,19 +82,19 @@ def test_rule_history():
     rule = CalculationRule.objects.create(
         rule_name='HistTest',
         rule_code='def calculate(measurements):\n    pass\n')
-    versions = revisions.get_for_object(rule)
+    versions = Version.objects.get_for_object(rule)
     assert len(versions) == 1
     rule.rule_code = ""
-    versions = revisions.get_for_object(rule)
+    versions = Version.objects.get_for_object(rule)
     assert len(versions) == 1
     rule.save()
-    versions = revisions.get_for_object(rule)
+    versions = Version.objects.get_for_object(rule)
     assert len(versions) == 2
     rule.rule_name = ""
-    versions = revisions.get_for_object(rule)
+    versions = Version.objects.get_for_object(rule)
     assert len(versions) == 2
     rule.save()
-    versions = revisions.get_for_object(rule)
+    versions = Version.objects.get_for_object(rule)
     assert len(versions) == 3
 
 
@@ -111,13 +111,13 @@ def test_rule_history_new_view(admin_client, live_server, webdriver):
         selenium.find_element_by_tag_name('form').submit()
         rule = CalculationRule.objects.get(rule_name='test_name')
         assert rule
-        versions = revisions.get_for_object(rule)
+        versions = Version.objects.get_for_object(rule)
         assert len(versions) == 1
         rule.rule_code = ''
-        versions = revisions.get_for_object(rule)
+        versions = Version.objects.get_for_object(rule)
         assert len(versions) == 1
         rule.save()
-        versions = revisions.get_for_object(rule)
+        versions = Version.objects.get_for_object(rule)
         assert len(versions) == 2
     finally:
         selenium.quit()
