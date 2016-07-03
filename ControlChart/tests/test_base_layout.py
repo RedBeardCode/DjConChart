@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 
-class TestBaseLayout:
+class TestBaseLayout(object):
     def test_top_navbar(self, working_instance):
         if isinstance(working_instance, PhantomJS):
             return  # is_displayed doesn't works correct in PhantomJS
@@ -69,5 +69,7 @@ class TestBaseLayout:
                  live_server + '/measurement_tag/',
                  live_server + '/characteristic_value_definition/',
                  live_server + '/measurement_order_definition/',
-                 live_server + '/calculation_rule/']):
+                 live_server + '/calculation_rule/',
+                 live_server + '/#',
+                 live_server + '/recalc_characteristic_values/']):
             assert link.get_attribute('href') == href
