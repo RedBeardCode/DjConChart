@@ -63,7 +63,9 @@ def bokeh_server(request):
     server = Popen(['bokeh', 'serve',
                     '--port=6008',
                     '--allow-websocket-origin=localhost:8081',
-                    '--allow-websocket-origin=127.0.0.1:8081'])
+                    '--allow-websocket-origin=127.0.0.1:8081',
+                    '--allow-websocket-origin=localhost:8082',
+                    '--allow-websocket-origin=127.0.0.1:8082'])
 
     def fin(server):
         server.terminate()
