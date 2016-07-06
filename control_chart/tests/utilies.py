@@ -157,7 +157,8 @@ def create_sample_characteristic_values():
             meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
-            raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+            raw_filename = os.path.join(settings.BASE_DIR,
+                                        'samples_rsc/erste_messung.txt')
             meas.raw_data_file = File(open(raw_filename, 'r'))
             meas.save()
             count += 1

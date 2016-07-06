@@ -32,7 +32,8 @@ def test_cv_single_creation(admin_client):
             meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
-            raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+            raw_filename = os.path.join(settings.BASE_DIR,
+                                        'samples_rsc/erste_messung.txt')
             meas.raw_data_file = File(open(raw_filename, 'r'))
             meas.save()
             count += 1
@@ -63,7 +64,8 @@ def test_cv_multi_creation(admin_client):
             remarks += str(cv_type) + '\n'
             count += 1
         meas.remarks = remarks
-        raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+        raw_filename = os.path.join(settings.BASE_DIR,
+                                    'samples_rsc/erste_messung.txt')
         meas.raw_data_file = File(open(raw_filename, 'r'))
         meas.save()
     assert len(CharacteristicValue.objects.all()) == count
@@ -94,7 +96,7 @@ def test_cv_multi_meas_creation(admin_client):
                 count += 1
                 meas.remarks = str(cv_type)
                 raw_filename = os.path.join(settings.BASE_DIR,
-                                            'erste_messung.txt')
+                                            'samples_rsc/erste_messung.txt')
                 meas.raw_data_file = File(open(raw_filename, 'r'))
                 meas.measurement_tag = tag
                 meas.save()
@@ -125,7 +127,8 @@ def test_cv_rule_change(admin_client):
             meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
-            raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+            raw_filename = os.path.join(settings.BASE_DIR,
+                                        'samples_rsc/erste_messung.txt')
             meas.raw_data_file = File(open(raw_filename, 'r'))
             meas.save()
             cvalue = CharacteristicValue.objects.get(order=order,
@@ -167,7 +170,8 @@ def test_cv_wrong_value_type(admin_client):
         meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
         meas.order_items.add(cv_type)
         meas.remarks = str(cv_type)
-        raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+        raw_filename = os.path.join(settings.BASE_DIR,
+                                    'samples_rsc/erste_messung.txt')
         meas.raw_data_file = File(open(raw_filename, 'r'))
         with pytest.raises(ValidationError):
             meas.save()
