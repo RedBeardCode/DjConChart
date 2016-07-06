@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
+from django.core.files.base import File
 from django.utils import timezone
 
 from .utilies import create_correct_sample_data
@@ -29,7 +32,8 @@ def test_cv_single_creation(admin_client):
             meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
-            meas.raw_data_file = ContentFile('erste_messung.txt')
+            raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+            meas.raw_data_file = File(open(raw_filename, 'r'))
             meas.save()
             count += 1
             cvalue = CharacteristicValue.objects.get(order=order,
@@ -59,7 +63,8 @@ def test_cv_multi_creation(admin_client):
             remarks += str(cv_type) + '\n'
             count += 1
         meas.remarks = remarks
-        meas.raw_data_file = ContentFile('erste_messung.txt')
+        raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+        meas.raw_data_file = File(open(raw_filename, 'r'))
         meas.save()
     assert len(CharacteristicValue.objects.all()) == count
     for cvalue in CharacteristicValue.objects.all():
@@ -88,7 +93,9 @@ def test_cv_multi_meas_creation(admin_client):
                     cv_type.possible_meas_devices.all()[0])
                 count += 1
                 meas.remarks = str(cv_type)
-                meas.raw_data_file = ContentFile('erste_messung.txt')
+                raw_filename = os.path.join(settings.BASE_DIR,
+                                            'erste_messung.txt')
+                meas.raw_data_file = File(open(raw_filename, 'r'))
                 meas.measurement_tag = tag
                 meas.save()
     assert len(CharacteristicValue.objects.all()) == count / 2
@@ -118,7 +125,8 @@ def test_cv_rule_change(admin_client):
             meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
-            meas.raw_data_file = ContentFile('erste_messung.txt')
+            raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+            meas.raw_data_file = File(open(raw_filename, 'r'))
             meas.save()
             cvalue = CharacteristicValue.objects.get(order=order,
                                                      value_type=cv_type)
@@ -159,7 +167,8 @@ def test_cv_wrong_value_type(admin_client):
         meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
         meas.order_items.add(cv_type)
         meas.remarks = str(cv_type)
-        meas.raw_data_file = ContentFile('erste_messung.txt')
+        raw_filename = os.path.join(settings.BASE_DIR, 'erste_messung.txt')
+        meas.raw_data_file = File(open(raw_filename, 'r'))
         with pytest.raises(ValidationError):
             meas.save()
 
