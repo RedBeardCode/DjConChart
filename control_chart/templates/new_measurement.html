@@ -1,0 +1,111 @@
+{% extends "new_base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block adminscripts %}
+    {% include "admin_include.html" %}
+{% endblock %}
+{% block form_content %}
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+
+        {{ form|crispy }}
+
+{% endblock %}
+
+
+{% block inlinescripts %}
+    <div id="dialog-confirm" title="Measurement already exists!">
+        <p id="dialog-text" style="visibility: hidden">
+            Selected measurement already exists.</br>
+            Chose "Update" for updating the existing measurement.</br>
+            Or press "Edit" to change your input.
+        </p>
+    </div>
+    <script type="text/javascript">
+
+        function init_select(select_id, itemlist) {
+            var sel_items = $(select_id).val();
+            $(select_id).children().remove();
+            for (var item in itemlist) {
+                var value = itemlist[item][0];
+                if (sel_items != null && sel_items.indexOf(value.toString()) >= 0) {
+                    $(select_id).append("<option value='" + value + "' selected='selected'>" + itemlist[item][1] + "</option>");
+
+                }
+                else {
+                    $(select_id).append("<option value='" + value + "'>" + itemlist[item][1] + "</option>");
+                }
+            }
+            $(select_id).select(sel_items)
+        }
+        function get_order_items() {
+            var order_pk = $('#id_order').val();
+            $.ajax({
+                url: '{% url "get_order_info" %}',
+                success: function (data, textStatus, XMLHttpRequest) {
+                    init_select("#id_order_items", data.order_items);
+                    init_select("#id_measurement_devices", data.meas_devices);
+                    init_select("#id_meas_item", data.meas_items);
+                },
+                type: 'POST',
+                data: {order: order_pk},
+                datatype: 'JSON',
+            });
+        }
+        $("form").submit(function (e) {
+            e.preventDefault();
+            var form = this;
+            $.ajax({
+                type: "POST",
+                url: "{% url 'new_measurement' %}",
+                data: {order_items: $("#id_order_items").val(), order: $("#id_order").val(), check: true},
+                cache: false
+            }).done(function (result) {
+{#                var is_create = $('.btn-default').size()==2;#}
+                if (result.exists) {
+                    $(function () {
+                        $('#dialog-text')[0].style.visibility = "visible";
+                        $("#dialog-confirm").dialog({
+                            resizable: false,
+                            modal: true,
+                            buttons: {
+                                "Update": function () {
+                                    window.location.href = result.update_url;
+                                },
+                                "Edit": function () {
+                                    $(this).dialog("close");
+                                    $('#dialog-text')[0].style.visibility = "hidden";
+
+                                }
+                            }
+                        });
+                    });
+                } else {
+                    form.submit();
+                }
+
+
+            });
+        });
+
+        $(document).ready(function () {
+            var order_pk = $("#id_order").val();
+
+
+            init_ajax_csrf();
+            if (order_pk) {
+                get_order_items();
+
+            }
+            else {
+                $("#id_order_items").children().remove();
+                $("#id_meas_item").children().remove();
+                $("#id_measurement_devices").children().remove();
+
+                $("#id_order_items").append("<option value='-1'> Please select first the order</option>");
+                $("#id_meas_item").append("<option value='-1'> Please select first the order</option>");
+                $("#id_measurement_devices").append("<option value='-1'> Please select first the order</option>");
+            }
+        });
+    </script>
+{% endblock %}

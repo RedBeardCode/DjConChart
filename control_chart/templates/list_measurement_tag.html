@@ -1,0 +1,7 @@
+{% extends "list_base.html" %}
+
+{% block table_line %}
+    <tr class="clickable-row" data-href="{% url 'list_measurement_tag' %}{{ object.pk }}/">
+        <td>{{ object.name }}</td>
+    </tr>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "list_base.html" %}
+
+{% block add_button %}{% endblock %}
+
+{% block table_line %}
+    <tr class="clickable-row" data-href="/plot/{{ object.short_name }}/">
+        <td>{{ object.description }}</td>
+        <td>{{ object.short_name }}</td>
+    </tr>
+{% endblock %}

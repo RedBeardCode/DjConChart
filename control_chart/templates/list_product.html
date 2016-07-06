@@ -1,0 +1,15 @@
+{% extends "list_base.html" %}
+
+{% block table_header %}
+    {% for field_name in verbose_field_names %}
+        <th>{{ field_name }}</th>
+    {% endfor %}
+    <th></th>
+{% endblock %}
+
+{% block table_line %}
+    <tr class="clickable-row" data-href="{% url 'list_product' %}{{ object.pk }}/">
+        <td>{{ object.product_name }}</td>
+        <td><a href="/plot/{{ object.product_name|urlize }}/" class="btn btn-default">Show product site</a></td>
+    </tr>
+{% endblock %}
