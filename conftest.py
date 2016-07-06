@@ -119,6 +119,7 @@ def pytest_runtest_teardown(item):
     """
     Teardown function to delete all create measurement raw data files
     """
-    if item.get_marker('django_db'):
+    if item.get_marker('django_db') and \
+            os.path.exists(settings.MEASUREMENT_FILE_DIR):
         for file in os.listdir(settings.MEASUREMENT_FILE_DIR):
             os.remove(os.path.join(settings.MEASUREMENT_FILE_DIR, file))
