@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Django settings for DjConChart project.
+Django settings for djcon_chart project.
 
 """
 
@@ -32,7 +32,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'reversion',
     'crispy_forms',
-    'ControlChart',
+    'control_chart',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -46,7 +46,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'DjConChart.urls'
+ROOT_URLCONF = 'djcon_chart.urls'
 
 TEMPLATES = [
     {
@@ -64,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'DjConChart.wsgi.application'
+WSGI_APPLICATION = 'djcon_chart.wsgi.application'
 
 
 # Database
@@ -115,3 +115,5 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # One Week
+
+MEASUREMENT_FILE_DIR = os.path.join(BASE_DIR, 'data')

@@ -1,9 +1,0 @@
-{% extends "list_base.html" %}
-
-{% block table_line %}
-    <tr class="clickable-row" data-href="{% url 'list_measurement_item' %}{{ object.pk }}/">
-        <td>{{ object.serial_nr }}</td>
-        <td>{{ object.name }}</td>
-        <td>{{ object.product.product_name }}</td>
-    </tr>
-{% endblock %}

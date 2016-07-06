@@ -1,7 +1,0 @@
-{% extends "list_base.html" %}
-
-{% block table_line %}
-    <tr class="clickable-row" data-href="{% url 'list_calculation_rule' %}{{ object.pk }}/">
-        <td>{{ object.rule_name }}</td>
-    </tr>
-{% endblock %}

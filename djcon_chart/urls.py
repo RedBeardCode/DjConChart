@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""DjConChart URL Configuration
+"""djcon_chart URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -21,13 +21,13 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import logout
 
-from DjConChart.views import login
+from djcon_chart.views import login
 
 admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'', include('ControlChart.urls')),
+    url(r'', include('control_chart.urls')),
     url(r'^login/$', login, name='mysite_login'),
     url(r'^logout/$', logout, {'next_page': '/'},
         name='mysite_logout')

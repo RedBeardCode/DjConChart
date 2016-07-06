@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Views for the DjConChart project
+Views for the djcon_chart project
 """
 import django.contrib.auth.views as auth_views
 
