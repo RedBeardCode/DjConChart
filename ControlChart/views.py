@@ -428,7 +428,7 @@ class NewMeasurement(AddContextInfoMixIn, CreateView):  # pylint: disable=R0901
     template_name = "new_measurement.html"
     form_class = MeasurementFrom
     model = Measurement
-    success_url = "/"
+    success_url = reverse_lazy('list_measurement')
 
     def get_initial(self):
         return {'date': now(), 'examiner': self.request.user}
@@ -469,7 +469,7 @@ class UpdateMeasurement(AddContextInfoMixIn, UpdateView):  # pylint: disable=R09
     template_name = "new_measurement.html"
     model = Measurement
     form_class = MeasurementFrom
-    success_url = '/'
+    success_url = reverse_lazy('list_measurement')
 
 
 class DeleteMeasurement(DeleteView):  # pylint: disable=R0901
