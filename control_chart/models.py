@@ -351,7 +351,8 @@ class Measurement(models.Model):
     measurement_devices = models.ManyToManyField(
         MeasurementDevice, verbose_name='Used measurement devices')
     raw_data_file = models.FileField(verbose_name='Raw data file',
-                                     upload_to=get_file_directory)
+                                     upload_to=get_file_directory,
+                                     max_length=500)
     measurement_tag = models.ForeignKey(
         MeasurementTag, blank=True, null=True,
         verbose_name="Tag to distinguish the Measurements")
