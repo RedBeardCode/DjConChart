@@ -2,6 +2,9 @@
 DjConChart
 ##########
 
+.. image:: https://travis-ci.org/RedBeardCode/DjConChart.svg?branch=master
+    :target: https://travis-ci.org/RedBeardCode/DjConChart
+
 .. image:: https://readthedocs.org/projects/djconchart/badge/?version=latest
     :target: http://djconchart.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
