@@ -6,7 +6,6 @@
 .idea/*
 *.orig
 db.sqlite3
-/*.txt
 imports.dot
 data/*
 doc/build/*
