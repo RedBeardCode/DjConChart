@@ -49,7 +49,7 @@ class MultiFormMixin(ContextMixin):
         :param form_name: Name of the form
         :param bind_form: Set True to read the POST data
         :return: Dictionary with the following keys ['initial', 'prefix' and
-                 'data', files (only if bind_form)]
+        'data', files (only if bind_form)]
         """
         kwargs = {}
         kwargs.update({'initial': self.get_initial(form_name)})
@@ -66,7 +66,7 @@ class MultiFormMixin(ContextMixin):
         :param forms: Dictonary of all Form classes
         :param form_name: Form name which should check
         :return: Returns the result of the from_valid method or redirects to the
-                 success_url if the form has no valid method
+        success_url if the form has no valid method
         """
         form_valid_method = '%s_form_valid' % form_name
         if hasattr(self, form_valid_method):

@@ -397,9 +397,8 @@ class CalcValueQuerySet(DataFrameQuerySet):
 
     def count_unfinished(self):
         """
-
         :return: Returns the number of unfinished(not all necessary
-        Measurements are available) CharacteristicValues
+         Measurements are available) CharacteristicValues
         """
         return self.filter(_finished=False).count()
 
@@ -476,13 +475,13 @@ class CalcValueQuerySet(DataFrameQuerySet):
                      in a related model.
 
 
-        .param index:  specify the field to use  for the index. If the index
+        :param index:  specify the field to use  for the index. If the index
                 field is not in fieldnames it will be appended. This
                 is mandatory for timeseries.
 
         :param verbose: If  this is ``True`` then populate the DataFrame with
                 the human readable versions for foreign key fields else
-                 use the actual values set in the model
+                use the actual values set in the model
         """
         if self.count_invalid() < self.MAX_NUM_CALCULATION:
             outdated_values = self.filter(_is_valid=False)
