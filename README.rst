@@ -2,6 +2,11 @@
 DjConChart
 ##########
 
+.. image:: https://readthedocs.org/projects/djconchart/badge/?version=latest
+    :target: http://djconchart.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+
 DjConChart is a `Django <https://www.djangoproject.com/>`_ statistic process
 control (SPC) server for small and middlesized companys.It allows you to create
 interactive control charts for the browser and to manage your measurement data.
