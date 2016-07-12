@@ -7,10 +7,17 @@ python:
   - "3.4"
   - "3.5"
 
+services: postgresql
+
+env:
+  - DJANGO=1.9
+
+
 install:
   - pip install -r requirements.txt
   - pip install -r requirements_dev.txt
-# command to run tests
+  - pip install psycopg2
+
 script:
   - python manage.py makemigrations
   - python manage.py migrate
