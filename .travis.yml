@@ -11,6 +11,7 @@ services: postgresql
 
 env:
   - DJANGO=1.9
+  - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
 
 
 install:
