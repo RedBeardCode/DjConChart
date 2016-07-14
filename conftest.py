@@ -27,6 +27,8 @@ def pytest_addoption(parser):
                      help='Use HtmlUnit Webdriver instead of FireFox')
     parser.addoption('--chrome', action="store_true",
                      help='Use Google Chrome Webdriver instead of FireFox')
+    parser.addoption('--ci', action="store_true",
+                     help='Using the chrome on sauce lab')
 
 
 class HtmlUnit(Remote):
@@ -36,6 +38,24 @@ class HtmlUnit(Remote):
     def __init__(self):
         super(HtmlUnit, self).__init__('http://127.0.0.1:4444/wd/hub',
                                        DesiredCapabilities.HTMLUNITWITHJS)
+
+class SauceLab(Remote):
+    """
+    Wrapper class for the Remote Webdriver for using SauceLab
+    """
+    def __init__(self):
+        tunnel_id = os.environ['TRAVIS_JOB_NUMBER']
+        browser = os.environ['SAUCE_BROWSER']
+        desired_cap = {
+            'platform': "Windows 10",
+            'browserName': browser,
+            "tunnelIdentifier": tunnel_id
+        }
+        user = os.environ['SAUCE_USERNAME']
+        key = os.environ['SAUCE_ACCESS_KEY']
+        url = 'http://{0}:{1}@ondemand.saucelabs.com/wd/hub'.format(user, key)
+        super(SauceLab, self).__init__(url, desired_cap)
+
 
 def pytest_generate_tests(metafunc):
     """
@@ -48,6 +68,8 @@ def pytest_generate_tests(metafunc):
             metafunc.parametrize(['webdriver'], ((HtmlUnit,),))
         elif metafunc.config.option.chrome:
             metafunc.parametrize(['webdriver'], ((Chrome,),))
+        elif metafunc.config.option.ci:
+            metafunc.parameterize(['webdriver'], ((SauceLab,),))
         else:
             metafunc.parametrize(['webdriver'], ((Firefox,),))
 

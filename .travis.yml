@@ -6,7 +6,9 @@ services: postgresql
 
 env:
   - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
-
+  - SAUCE_USERNAME=RedBeardCode
+  - SAUCE_ACCESS_KEY=7a21a467-c36b-4469-9a5b-46dec9959dbb
+  - SAUCE_BROWSER=chrome
 
 install:
   - pip install -r requirements.txt
@@ -25,5 +27,6 @@ script:
   - python manage.py createtestdata
   - py.test --timeout=60 --force-flaky --max-run=5 --phantomjs 
 
-
+addons:
+  sauce_connect: true
 
