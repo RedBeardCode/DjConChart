@@ -12,6 +12,8 @@ install:
   - pip install -r requirements.txt
   - pip install -r requirements_dev.txt
   - pip install python-coveralls
+  - pip install flaky
+  - pip install pytest-timeout
   - pip install psycopg2
 
 before_script:
@@ -21,6 +23,7 @@ script:
   - python manage.py makemigrations control_chart
   - python manage.py migrate
   - python manage.py createtestdata
-  - py.test --cov coveralls --cov-report term-missing
+  - py.test --timeout=60 --force-flaky --max-run=5 --phantomjs --cov coveralls --cov-report term-missing
+
 after_success:
   - coveralls
