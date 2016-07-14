@@ -69,7 +69,7 @@ def pytest_generate_tests(metafunc):
         elif metafunc.config.option.chrome:
             metafunc.parametrize(['webdriver'], ((Chrome,),))
         elif metafunc.config.option.ci:
-            metafunc.parameterize(['webdriver'], ((SauceLab,),))
+            metafunc.parametrize(['webdriver'], ((SauceLab,),))
         else:
             metafunc.parametrize(['webdriver'], ((Firefox,),))
 

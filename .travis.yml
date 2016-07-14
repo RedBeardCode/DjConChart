@@ -7,8 +7,6 @@ services: postgresql
 env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
-    - SAUCE_USERNAME=RedBeardCode
-    - SAUCE_ACCESS_KEY=7a21a467-c36b-4469-9a5b-46dec9959dbb
     - SAUCE_BROWSER=chrome
 
 install:
@@ -26,7 +24,7 @@ script:
   - python manage.py makemigrations control_chart
   - python manage.py migrate
   - python manage.py createtestdata
-  - py.test --timeout=60 --force-flaky --max-run=5 --phantomjs 
+  - py.test --timeout=60 --force-flaky --max-run=5 --ci
 
 addons:
   sauce_connect: true
