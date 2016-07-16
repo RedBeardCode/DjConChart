@@ -75,8 +75,8 @@ def test_list_product_click(admin_client, live_server, webdriver):
         all_products = Product.objects.all()
         for index in range(3):
             selenium.get(live_server + '/product/')
-            table_rows = selenium.find_elements_by_class_name('clickable-row')
-            table_rows[index].click()
+            table_rows = selenium.find_elements_by_css_selector('.clickable-row td')
+            table_rows[2*index].click()
             url = '/product/{}/'.format(all_products[index].pk)
             assert selenium.current_url == live_server + url
     finally:
@@ -112,9 +112,10 @@ def test_product_delete(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         num_values = Product.objects.all().count()
         for index in range(num_values):
-            table_rows = selenium.find_elements_by_class_name('clickable-row')
-            assert len(table_rows) == 3 - index
-            table_rows[0].click()
+            table_cells = selenium.find_elements_by_css_selector(
+                '.clickable-row td')
+            assert len(table_cells) == 6 - 2 * index
+            table_cells[0].click()
             d_button = selenium.find_element_by_css_selector('#page-wrapper a')
             d_button.click()
             url = '/product/{}/delete/'.format(Product.objects.all().first().pk)
