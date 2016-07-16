@@ -24,7 +24,7 @@ script:
   - python manage.py makemigrations control_chart
   - python manage.py migrate
   - python manage.py createtestdata
-  - py.test --timeout=60 --force-flaky --max-run=5 --ci
+  - py.test -s --timeout=60 --force-flaky --max-run=5 --ci
 
 addons:
   sauce_connect: true
