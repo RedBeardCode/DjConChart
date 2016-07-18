@@ -70,10 +70,8 @@ def test_default_values(admin_client, live_server, webdriver):
         selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
         time_delta = datetime.datetime.now() - start_create_data
-        date_widget = selenium.find_element_by_id('id_date_0')
-        date1_widget = selenium.find_element_by_id('id_date_1')
-        date_str = date_widget.get_attribute('value') + ' '
-        date_str += date1_widget.get_attribute('value')
+        date_widget = selenium.find_element_by_id('id_date')
+        date_str = date_widget.get_attribute('value')
         form_date = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
         assert form_date - start_create_data < time_delta
         order_select = Select(selenium.find_element_by_id('id_order'))
@@ -100,12 +98,7 @@ def test_all_elements(admin_client, live_server, webdriver):
     try:
         selenium.get(live_server + '/measurement/new/')
         login_as_admin(selenium)
-        assert selenium.find_element_by_id('id_date_0')
-        assert selenium.find_element_by_id('calendarlink0')
-        assert selenium.find_element_by_link_text('Today')
-        assert selenium.find_element_by_id('id_date_1')
-        assert selenium.find_element_by_id('clocklink0')
-        assert selenium.find_element_by_link_text('Now')
+        assert selenium.find_element_by_id('id_date')
         assert selenium.find_element_by_id('id_order')
         assert selenium.find_element_by_id('id_order_items')
         assert selenium.find_element_by_id('id_examiner')

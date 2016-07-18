@@ -52,6 +52,7 @@
                 datatype: 'JSON',
             });
         }
+        {% if not object.pk %}
         $("form").submit(function (e) {
             e.preventDefault();
             var form = this;
@@ -87,7 +88,7 @@
 
             });
         });
-
+        {% endif %}
         $(document).ready(function () {
             var order_pk = $("#id_order").val();
 
@@ -106,6 +107,13 @@
                 $("#id_meas_item").append("<option value='-1'> Please select first the order</option>");
                 $("#id_measurement_devices").append("<option value='-1'> Please select first the order</option>");
             }
+        });
+
+
+        $('#id_date').datetimepicker({
+          format:'Y-m-d H:i:s',
+          formatTime:'H:i',
+          formatDate:'Y-m-d'
         });
     </script>
 {% endblock %}

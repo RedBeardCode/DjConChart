@@ -8,7 +8,8 @@ from collections import defaultdict
 
 from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.urlresolvers import reverse_lazy
-from django.forms import ModelForm, Select, SplitDateTimeField
+from django.forms import ModelForm, Select, SplitDateTimeField, \
+    SplitDateTimeWidget, DateInput, TimeInput, DateTimeInput
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.utils.timezone import now
@@ -412,11 +413,7 @@ class MeasurementFrom(ModelForm):
         fields = ['date', 'order', 'order_items', 'examiner', 'remarks',
                   'meas_item', 'measurement_devices', 'raw_data_file',
                   'measurement_tag']
-        field_classes = {
-            'date': SplitDateTimeField
-        }
         widgets = {
-            'date': AdminSplitDateTime(),
             'order': Select(attrs={'onchange': 'get_order_items();'})
         }
 
