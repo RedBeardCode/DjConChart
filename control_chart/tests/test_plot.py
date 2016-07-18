@@ -107,8 +107,6 @@ def test_plot_detail_view(admin_client, live_server, webdriver, bokeh_server):
         assert len([h for h in headers if h.text not in ['', 'inspect']]) == 4
         assert [h.text for h in headers] == ['Date', 'Serial',
                                              'Examiner', 'Value']
-        links = selenium.find_elements_by_css_selector('#page-wrapper a')
-        assert [a.text for a in links] == ['inspect']
     finally:
         selenium.quit()
 
