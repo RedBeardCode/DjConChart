@@ -8,6 +8,7 @@ env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
     - SAUCE_BROWSER=chrome
+    - SAUCE_PLATFORM="Windows 10"
 
 install:
   - pip install -r requirements.txt
