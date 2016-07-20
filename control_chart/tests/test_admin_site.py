@@ -25,6 +25,7 @@ def test_admin_start(admin_client, live_server, webdriver):
         assert selenium.find_elements_by_link_text('Measurement orders')
         assert selenium.find_elements_by_link_text('Measurements')
         assert selenium.find_elements_by_link_text('Measurement tags')
+        assert selenium.find_elements_by_link_text('Plot configs')
         assert selenium.find_elements_by_link_text('Products')
     finally:
         selenium.quit()
