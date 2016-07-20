@@ -3,6 +3,7 @@
 
 import pytest
 
+from conftest import SauceLab
 from control_chart.models import PlotConfig
 from .utilies import create_correct_sample_data, create_limited_users
 from .utilies import create_sample_characteristic_values, create_plot_config
@@ -71,7 +72,10 @@ def test_plot_url(admin_client, live_server, fix_webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     selenium = fix_webdriver()
+    selenium.implicitly_wait(10)
     try:
+        if isinstance(selenium, SauceLab):
+            pytest.xfail('Outworld connection not support without server')
         selenium.get(live_server + '/plot/url/')
         login_as_admin(selenium)
         assert selenium.title == 'Page Not Found :('
@@ -92,8 +96,10 @@ def test_plot_histogram(admin_client, live_server, fix_webdriver, bokeh_server):
     create_sample_characteristic_values()
     create_plot_config()
     selenium = fix_webdriver()
-    selenium.implicitly_wait(20)
+    selenium.implicitly_wait(10)
     try:
+        if isinstance(selenium, SauceLab):
+            pytest.xfail('Outworld connection not support without server')
         selenium.get(live_server + '/plot/gt05/')
         login_as_admin(selenium)
         pull_session()
