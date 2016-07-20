@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import pytest
 from selenium.webdriver import PhantomJS
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 class TestBaseLayout(object):
     def test_top_navbar(self, working_instance):
         if isinstance(working_instance, PhantomJS):
-            return  # is_displayed doesn't works correct in PhantomJS
+            pytest.xfail("is_displayed doesn't works correct in PhantomJS")
         list_elements = working_instance.find_elements_by_css_selector(
             '.navbar-top-links li')
         assert len(list_elements) == 2
@@ -27,16 +28,16 @@ class TestBaseLayout(object):
 
     def test_side_navbar(self, working_instance):
         if isinstance(working_instance, PhantomJS):
-            return  # is_displayed doesn't works correct in PhantomJS
+            pytest.xfail("is_displayed doesn't works correct in PhantomJS")
         list_elements = working_instance.find_elements_by_css_selector(
             '.sidebar li')
-        assert len(list_elements) == 12
+        assert len(list_elements) == 14
         assert [l.is_displayed() for l in list_elements] == \
-               [True] * 8 + [False] * 4
+               [True] * 8 + [False] * 4 + [True, False]
         working_instance.set_window_size(600, 1000)
         list_elements = working_instance.find_elements_by_css_selector(
             '.sidebar li')
-        assert [l.is_displayed() for l in list_elements] == [False] * 12
+        assert [l.is_displayed() for l in list_elements] == [False] * 14
         button = working_instance.find_element_by_css_selector(
             '.navbar-header button')
         button.click()
@@ -46,13 +47,24 @@ class TestBaseLayout(object):
         list_elements = working_instance.find_elements_by_css_selector(
             '.sidebar li')
         assert [l.is_displayed() for l in list_elements] == \
-               [True] * 8 + [False] * 4
+               [True] * 8 + [False] * 4 + [True, False]
         list_elements[7].click()
-        for element in list_elements[8:]:
+        for element in list_elements[8:12]:
             wait.until(EC.visibility_of(element))
         list_elements = working_instance.find_elements_by_css_selector(
             '.sidebar li')
-        assert [l.is_displayed() for l in list_elements] == [True] * 12
+        assert [l.is_displayed() for l in list_elements] == [True] * 12 + \
+                                                            [True, False]
+        list_elements[12].click()
+        for element in list_elements[8:12]:
+            wait.until_not(EC.visibility_of(element))
+
+        wait.until(EC.visibility_of(list_elements[13]))
+        list_elements = working_instance.find_elements_by_css_selector(
+             '.sidebar li')
+        assert [l.is_displayed() for l in list_elements] == [True] * 8 +\
+                                                            [False] * 4 + \
+                                                            [True] * 2
 
     def test_side_navbar_links(self, live_server, working_instance):
         links = working_instance.find_elements_by_css_selector('.sidebar a')
