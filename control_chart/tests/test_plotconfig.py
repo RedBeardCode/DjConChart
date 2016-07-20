@@ -67,10 +67,10 @@ def test_plot_annotations():
 
 
 @pytest.mark.django_db
-def test_plot_url(admin_client, live_server, webdriver, bokeh_server):
+def test_plot_url(admin_client, live_server, fix_webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
-    selenium = webdriver()
+    selenium = fix_webdriver()
     try:
         selenium.get(live_server + '/plot/url/')
         login_as_admin(selenium)
@@ -87,12 +87,12 @@ def test_plot_url(admin_client, live_server, webdriver, bokeh_server):
 
 
 @pytest.mark.django_db
-def test_plot_histogram(admin_client, live_server, webdriver, bokeh_server):
+def test_plot_histogram(admin_client, live_server, fix_webdriver, bokeh_server):
     create_correct_sample_data()
     create_sample_characteristic_values()
     create_plot_config()
-    selenium = webdriver()
-    selenium.implicitly_wait(10)
+    selenium = fix_webdriver()
+    selenium.implicitly_wait(20)
     try:
         selenium.get(live_server + '/plot/gt05/')
         login_as_admin(selenium)

@@ -43,14 +43,17 @@ class SauceLab(Remote):
     """
     Wrapper class for the Remote Webdriver for using SauceLab
     """
-    def __init__(self):
+    def __init__(self, request=None):
         tunnel_id = os.environ['TRAVIS_JOB_NUMBER']
         browser = os.environ['SAUCE_BROWSER']
+        platform = os.environ['SAUCE_PLATFORM']
         desired_cap = {
-            'platform': "Windows 10",
+            'platform': platform,
             'browserName': browser,
-            "tunnelIdentifier": tunnel_id
+            'tunnelIdentifier': tunnel_id
         }
+        if request:
+            desired_cap['name'] = request.node.nodeid
         user = os.environ['SAUCE_USERNAME']
         key = os.environ['SAUCE_ACCESS_KEY']
         url = 'http://{0}:{1}@ondemand.saucelabs.com/wd/hub'.format(user, key)
@@ -86,6 +89,8 @@ def fix_webdriver(request):
         webdriver = Chrome
     elif request.config.getoption('htmlunit'):
         webdriver = HtmlUnit
+    elif request.config.getoption('ci'):
+        webdriver = lambda : SauceLab(request)
     return webdriver
 
 
