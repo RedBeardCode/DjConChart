@@ -31,7 +31,7 @@ script:
   - python manage.py makemigrations control_chart
   - python manage.py migrate
   - python manage.py createtestdata
-  - py.test --timeout=60 --force-flaky --max-run=5 --ci -cov coveralls
+  - py.test --timeout=60 --force-flaky --max-run=5 --ci --cov coveralls
 
 addons:
   sauce_connect: true
