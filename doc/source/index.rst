@@ -40,8 +40,8 @@ Overview
 .. toctree::
    :maxdepth: 2
 
-
    gettingstarted
+   overview
    deployment
    api
 

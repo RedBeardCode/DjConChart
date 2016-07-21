@@ -1,5 +1,7 @@
 language: python
 python:
+  - "2.7"
+  - "3.4"
   - "3.5"
 
 services: postgresql
@@ -7,8 +9,12 @@ services: postgresql
 env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
-    - SAUCE_BROWSER=chrome
-    - SAUCE_PLATFORM="Windows 10"
+  matirx:
+    - SAUCE_BROWSER=chrome SAUCE_PLATFORM="Windows 10"
+    - SAUCE_BROWSER=firefox SAUCE_PLATFORM="Windows 10"
+    - SAUCE_BROWSER=chrome SAUCE_PLATFORM="linux"
+    - SAUCE_BROWSER=firefox SAUCE_PLATFORM="linux"
+
 
 install:
   - pip install -r requirements.txt
@@ -25,8 +31,11 @@ script:
   - python manage.py makemigrations control_chart
   - python manage.py migrate
   - python manage.py createtestdata
-  - py.test --timeout=60 --force-flaky --max-run=5 --ci
+  - py.test --timeout=60 --force-flaky --max-run=5 --ci -cov coveralls
 
 addons:
   sauce_connect: true
+
+after_success:
+  - coveralls
 
