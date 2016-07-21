@@ -9,8 +9,7 @@ services: postgresql
 env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
-  matirx:
-    - SAUCE_BROWSER="chrome" 
+    - SAUCE_BROWSER="chrome"
     - SAUCE_PLATFORM="Windows 10"
 
 
