@@ -36,13 +36,13 @@ def test_list_paginator(admin_client, live_server, webdriver):
         assert paginator
         button = paginator[0].find_elements_by_css_selector('#page-wrapper li')
         assert len(button) == 7
-        assert button[0].text == '«'
+        assert button[0].text == u'«'
         assert button[1].text == '1'
         assert button[2].text == '2'
         assert button[3].text == '3'
         assert button[4].text == '4'
         assert button[5].text == '5'
-        assert button[6].text == '»'
+        assert button[6].text == u'»'
     finally:
         selenium.quit()
 

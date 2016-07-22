@@ -6,10 +6,8 @@ Views for the  control_chart app
 import json
 from collections import defaultdict
 
-from django.contrib.admin.widgets import AdminSplitDateTime
 from django.core.urlresolvers import reverse_lazy
-from django.forms import ModelForm, Select, SplitDateTimeField, \
-    SplitDateTimeWidget, DateInput, TimeInput, DateTimeInput
+from django.forms import ModelForm, Select
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.utils.timezone import now
@@ -525,9 +523,12 @@ class NewMeasurementItemAndOrder(MultiFormsView):
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_invalid(self, forms):
-        forms['serial_nrs'] = forms['item'].data.getlist('serial_nr')
-        forms['names'] = forms['item'].data.getlist('name')
-        forms['products'] = forms['item'].data.getlist('product')
+        forms['serial_nrs'] = \
+            [str(nr) for nr in forms['item'].data.getlist('serial_nr')]
+        forms['names'] = \
+            [str(name) for name in forms['item'].data.getlist('name')]
+        forms['products'] = \
+            [str(pro) for pro in forms['item'].data.getlist('product')]
         return self.render_to_response(self.get_context_data(forms=forms))
 
 

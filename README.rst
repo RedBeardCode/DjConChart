@@ -9,6 +9,8 @@ DjConChart
     :target: http://djconchart.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://coveralls.io/repos/github/RedBeardCode/DjConChart/badge.svg?branch=master
+    :target: https://coveralls.io/github/RedBeardCode/DjConChart?branch=master
 
 DjConChart is a `Django <https://www.djangoproject.com/>`_ statistic process
 control (SPC) server for small and middlesized companys.It allows you to create
