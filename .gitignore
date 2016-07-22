@@ -11,3 +11,4 @@ data/*
 doc/build/*
 test_data/*
 .cache/*
+.coverage

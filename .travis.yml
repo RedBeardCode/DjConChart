@@ -9,8 +9,12 @@ services: postgresql
 env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
-    - SAUCE_BROWSER="chrome"
-    - SAUCE_PLATFORM="Windows 10"
+  matrix:
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10"
+    - SAUCE_BROWSER="firefox" SAUCE_PLATFORM="Windows 10"
+    - SAUCE_BROWSER="internetExplorer" SAUCE_PLATFORM="Windows 10"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="linux"
+    - SAUCE_BROWSER="firefox" SAUCE_PLATFORM="linux"
 
 
 install:
