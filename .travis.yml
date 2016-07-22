@@ -12,7 +12,6 @@ env:
   matrix:
     - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10"
     - SAUCE_BROWSER="firefox" SAUCE_PLATFORM="Windows 10"
-    - SAUCE_BROWSER="internetExplorer" SAUCE_PLATFORM="Windows 10"
     - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="linux"
     - SAUCE_BROWSER="firefox" SAUCE_PLATFORM="linux"
 
