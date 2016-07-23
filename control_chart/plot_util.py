@@ -114,7 +114,7 @@ class PlotGenerator(object):
         Create the lists for the x and y values for the plot out of the raw_data
         :param index: Index of the filter argument set of the PlotConfig
         :return: Tuple of list of x label, list of values and the number of
-                 invalid values
+        invalid values
         """
         filter_args = self.__conf.filter_args[index]
         values, num_invalid = self.__fetch_plot_data(filter_args)
@@ -134,7 +134,7 @@ class PlotGenerator(object):
         """
         Iterator over the single bokeh plot
         :return: Tuple of js-script code for the plot and number of invalid
-                 values
+        values
         """
         for index, dummy in enumerate(self.__conf.filter_args):
             if self.__index is not None and self.__index != index:
