@@ -9,13 +9,22 @@ Getting started
     $ virtualenv env
     $ source env/bin/activate
 * Create the the database and admin user
-    $ python manage.py makemigrations
-    $ python manage.py migrate
-    $ python manage.py createsuperuser
+    .. code:: bash
+
+        $ python manage.py makemigrations
+        $ python manage.py migrate
+        $ python manage.py createsuperuser
+
 * Create test data
-    $ python manage.py createtestdata
+    .. code:: bash
+
+        $ python manage.py createtestdata
+
 * Start the django development server
-    $ python manage.py runserver
+    .. code:: bash
+
+        $ python manage.py runserver
+
 * Goto `Dashboard <http://127.0.0.1:8000/>`_ and login as one of the following
   users
 
