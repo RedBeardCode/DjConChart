@@ -4,10 +4,14 @@ Getting started
 ---------------
 
 * First download the source code and unzip to your test dir
+
 * Install and create a virual enviroment with the following commands
-    $ pip install --upgrade virtualenv
-    $ virtualenv env
-    $ source env/bin/activate
+    .. code:: bash
+
+        $ pip install --upgrade virtualenv
+        $ virtualenv env
+        $ source env/bin/activate
+
 * Create the the database and admin user
     .. code:: bash
 
