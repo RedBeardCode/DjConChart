@@ -3,14 +3,8 @@ import os
 import sys
 from subprocess import Popen
 
-def port_free(port=5006):
-    '''
-    Checks if the port for the bokeh server is in use
-    '''
-    import socket;
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(('127.0.0.1', port))
-    return result != 0;
+from djcon_chart.wsgi import port_free
+
 
 def create_test_data():
     '''
@@ -36,7 +30,7 @@ if __name__ == "__main__":
         create_test_data()
     else:
         if 'runserver' in sys.argv and port_free():
-            server = Popen(['bokeh', 'serve',
+            server = Popen(['bokeh', 'serve', '--log-level=debug',
                             '--allow-websocket-origin=localhost:8000',
                             '--allow-websocket-origin=127.0.0.1:8000']
                            )
