@@ -30,7 +30,7 @@ if __name__ == "__main__":
         create_test_data()
     else:
         if 'runserver' in sys.argv and port_free():
-            server = Popen(['bokeh', 'serve', '--log-level=debug',
+            server = Popen(['bokeh', 'serve', '--log-level=warn',
                             '--allow-websocket-origin=localhost:8000',
                             '--allow-websocket-origin=127.0.0.1:8000']
                            )
