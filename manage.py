@@ -3,6 +3,8 @@ import os
 import sys
 from subprocess import Popen
 
+from django.db.utils import OperationalError
+
 from djcon_chart.wsgi import port_free
 
 
@@ -23,10 +25,16 @@ def create_test_data():
     create_plot_config()
 
 def run_test_server():
-    manage_main(['', 'makemigrations', 'control_chart'])
-    manage_main(['', 'migrate'])
-    manage_main(['', 'createtestdata'])
-    manage_main(['', 'runserver'])
+    try:
+        #Only a Test if migration has be done.
+        from control_chart.models import UserPlotSession
+        dummy = UserPlotSession.objects.all().first()
+    except OperationalError:
+        manage_main(['', 'makemigrations', 'control_chart'])
+        manage_main(['', 'migrate'])
+        manage_main(['', 'createtestdata'])
+    finally:
+        manage_main(['', 'runserver'])
 
 def manage_main(parameters):
     server = None

@@ -136,11 +136,11 @@ def create_correct_sample_data():
                          order_definition2,
                          order_definition3]
     for i in range(10):
-        item = MeasurementItem.objects.get_or_create(
+        item = MeasurementItem.objects.create(
             serial_nr='{:07d}'.format(i), name='Item {:d}'.format(i),
-            product=products[i % 3])[0]
-        order = MeasurementOrder.objects.get_or_create(
-            order_type=order_definitions[i % 3])[0]
+            product=products[i % 3])
+        order = MeasurementOrder.objects.create(
+            order_type=order_definitions[i % 3])
         order.measurement_items.add(item)
 
 
