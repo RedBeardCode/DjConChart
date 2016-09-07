@@ -22,20 +22,28 @@ def create_test_data():
     create_sample_characteristic_values()
     create_plot_config()
 
+def run_test_server():
+    manage_main(['', 'makemigrations', 'control_chart'])
+    manage_main(['', 'migrate'])
+    manage_main(['', 'createtestdata'])
+    manage_main(['', 'runserver'])
 
-if __name__ == "__main__":
+def manage_main(parameters):
     server = None
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djcon_chart.settings")
-    if 'createtestdata' in sys.argv:
+    if 'createtestdata' in parameters:
         create_test_data()
     else:
-        if 'runserver' in sys.argv and port_free():
+        if 'runserver' in parameters and port_free():
             server = Popen(['bokeh', 'serve', '--log-level=warn',
                             '--allow-websocket-origin=localhost:8000',
                             '--allow-websocket-origin=127.0.0.1:8000']
                            )
 
         from django.core.management import execute_from_command_line
-        execute_from_command_line(sys.argv)
+        execute_from_command_line(parameters)
         if server:
             server.terminate()
+
+if __name__ == "__main__":
+    manage_main(sys.argv)

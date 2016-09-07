@@ -12,3 +12,5 @@ doc/build/*
 test_data/*
 .cache/*
 .coverage
+build/*
+dist/*
