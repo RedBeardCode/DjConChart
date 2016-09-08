@@ -26,6 +26,9 @@ def create_test_data():
 
 def run_test_server():
     try:
+        from django import setup
+        setup()
+
         #Only a Test if migration has be done.
         from control_chart.models import UserPlotSession
         dummy = UserPlotSession.objects.all().first()
@@ -37,22 +40,14 @@ def run_test_server():
         manage_main(['', 'runserver'])
 
 def manage_main(parameters):
-    server = None
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djcon_chart.settings")
     if 'createtestdata' in parameters:
         create_test_data()
     else:
         os.environ['BOKEH_LOAD_SERVER'] = ''
-        if 'runserver' in parameters and port_free():
-            server = Popen(['bokeh', 'serve', '--log-level=warning',
-                            '--allow-websocket-origin=localhost:8000',
-                            '--allow-websocket-origin=127.0.0.1:8000']
-                           )
 
         from django.core.management import execute_from_command_line
         execute_from_command_line(parameters)
-        if server:
-            server.terminate()
 
 if __name__ == "__main__":
     manage_main(sys.argv)

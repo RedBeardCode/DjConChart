@@ -32,11 +32,13 @@ os.environ.setdefault("BOKEH_LOAD_SERVER", "/bokeh")
 
 if port_free():
 
-    server = Popen(['bokeh', 'serve', '--log-level=debug',
+    server = Popen(['bokeh', 'serve', '--log-level=warning',
                     '--host={0}/bokeh'.format(local_hostname),
                     '--host={0}'.format(local_hostname),
                     '--host=localhost:5006',
-                    '--host=127.0.0.1:5006']
+                    '--host=127.0.0.1:5006',
+                    '--host=localhost:8000',
+                    '--host=127.0.0.1:8000']
                    )
 
 application = get_wsgi_application()  # pylint: disable=C0103
