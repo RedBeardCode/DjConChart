@@ -51,7 +51,7 @@ def autoload_server(*args, **kwargs):
     """
     if 'BOKEH_SERVER' in os.environ:
         kwargs['url'] = os.environ['BOKEH_SERVER']
-    if 'BOKEH_LOAD_SERVER' in os.environ:
+    if 'BOKEH_LOAD_SERVER' in os.environ and os.environ['BOKEH_LOAD_SERVER']:
         kwargs['url'] = os.environ['BOKEH_LOAD_SERVER']
     return bokeh_autoload_server(*args, **kwargs)
 

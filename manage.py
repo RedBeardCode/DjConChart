@@ -42,8 +42,9 @@ def manage_main(parameters):
     if 'createtestdata' in parameters:
         create_test_data()
     else:
+        os.environ['BOKEH_LOAD_SERVER'] = ''
         if 'runserver' in parameters and port_free():
-            server = Popen(['bokeh', 'serve', '--log-level=warn',
+            server = Popen(['bokeh', 'serve', '--log-level=warning',
                             '--allow-websocket-origin=localhost:8000',
                             '--allow-websocket-origin=127.0.0.1:8000']
                            )
