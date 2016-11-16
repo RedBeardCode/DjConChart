@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from conftest import SauceLab
 from .utilies import create_correct_sample_data, login_as_admin
 from .utilies import create_sample_characteristic_values, create_plot_config
 from ..models import CharacteristicValue
@@ -146,6 +147,8 @@ def test_plot_titles(admin_client, live_server, webdriver, bokeh_server):
     create_plot_config()
     selenium = webdriver()
     try:
+        if isinstance(selenium, SauceLab):
+            pytest.xfail('Outworld connection not support without server')
         selenium.get(live_server + '/plot/multi/')
         login_as_admin(selenium)
         titles = selenium.find_elements_by_class_name('plot_title')
@@ -164,6 +167,8 @@ def test_plot_emtpy(admin_client, live_server, webdriver, bokeh_server):
     create_plot_config()
     selenium = webdriver()
     try:
+        if isinstance(selenium, SauceLab):
+            pytest.xfail('Outworld connection not support without server')
         selenium.get(live_server + '/plot/product3/')
         login_as_admin(selenium)
         plots = selenium.find_elements_by_class_name('bk-plot-wrapper')
