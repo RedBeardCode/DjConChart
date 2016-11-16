@@ -140,11 +140,14 @@ def test_on_change_order(admin_client, live_server, webdriver):
                 EC.text_to_be_present_in_element(
                     (By.ID, 'id_meas_item'), '---------'))
             order_items_str = [ord.text for ord in order_items.options]
-            assert order_items_str == target_order_items[i % 3]
+            for or_it in order_items_str:
+                assert or_it in target_order_items[i % 3]
             meas_items_str = [item.text for item in meas_items.options]
-            assert meas_items_str == [target_meas_items[i]]
+            for me_it in meas_items_str:
+                assert me_it in [target_meas_items[i]]
             meas_devices_str = [dev.text for dev in meas_devices.options]
-            assert meas_devices_str == target_meas_devices[i % 3]
+            for me_de in meas_devices_str:
+                assert me_de in target_meas_devices[i % 3]
     finally:
         selenium.quit()
 

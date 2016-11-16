@@ -293,8 +293,8 @@ def test_list_measurement_order_definition(admin_client, live_server,
             assert columns[0].text == row.name
             assert columns[1].text == row.product.product_name
             cvdefs = all_meas_order_defs[index].characteristic_values.all()
-            cvd_string = ' ; '.join([cvd.value_name for cvd in cvdefs])
-            assert columns[2].text == cvd_string
+            for cvd in cvdefs:
+                assert cvd.value_name in columns[2].text
     finally:
         selenium.quit()
 
