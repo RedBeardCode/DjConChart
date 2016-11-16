@@ -43,7 +43,7 @@ def test_plot_multi(admin_client, live_server, webdriver, bokeh_server):
     try:
         selenium.get(live_server + '/plot/multi/')
         login_as_admin(selenium)
-        assert len(selenium.find_elements_by_class_name('bokeh-container')) == 2
+        assert len(selenium.find_elements_by_class_name('bk-plot-wrapper')) == 2
         CharacteristicValue.objects.all().update(_is_valid=False)
         selenium.get(live_server + '/plot/multi/')
         assert selenium.find_elements_by_id('recalc_0')
@@ -166,7 +166,7 @@ def test_plot_emtpy(admin_client, live_server, webdriver, bokeh_server):
     try:
         selenium.get(live_server + '/plot/product3/')
         login_as_admin(selenium)
-        plots = selenium.find_elements_by_class_name('bokeh-container')
+        plots = selenium.find_elements_by_class_name('bk-plot-wrapper')
         assert len(plots) == 3
     finally:
         selenium.quit()

@@ -51,7 +51,7 @@ class AddContextInfoMixIn(object):  # pylint: disable=R0903
         if hasattr(self, 'fields') and self.fields:
             verbose_field_names = []
             for field_name in self.fields:
-                field = self.model._meta.get_field_by_name(field_name)[0]
+                field = self.model._meta.get_field(field_name)
                 verbose_field_names.append(field.verbose_name)
             context['verbose_field_names'] = verbose_field_names
         # pylint: enable=W0212

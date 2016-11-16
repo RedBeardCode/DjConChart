@@ -92,8 +92,7 @@ def test_list_measurement_item(admin_client, live_server, webdriver):
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 3
         for index, field_name in enumerate(['serial_nr', 'name', 'product']):
-            field = MeasurementItem._meta.get_field_by_name(field_name)[
-                0]  # pylint: disable=W0212
+            field = MeasurementItem._meta.get_field(field_name)
             assert header[index].text == field.verbose_name
 
         for index, row in enumerate(table_rows):

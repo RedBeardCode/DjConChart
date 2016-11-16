@@ -320,7 +320,7 @@ def test_list_measurement(admin_client, live_server,  # pylint: disable=R0914
         for index, field_name in enumerate(['date', 'order', 'order_items',
                                             'examiner', 'meas_item',
                                             'measurement_tag']):
-            field = Measurement._meta.get_field_by_name(field_name)[0]  # pylint: disable=W0212
+            field = Measurement._meta.get_field(field_name)  # pylint: disable=W0212
             assert header[index].text == field.verbose_name
         for index, row in enumerate(table_rows):
             url = '/measurement/{}/'.format(all_meas[index].pk)

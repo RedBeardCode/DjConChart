@@ -167,8 +167,7 @@ def test_list_calculation_rule(admin_client, live_server, webdriver):
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 1
         assert header[0].text == \
-               CalculationRule._meta.get_field_by_name(  # pylint: disable=W0212
-                   'rule_name')[0].verbose_name
+               CalculationRule._meta.get_field('rule_name').verbose_name
 
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == \

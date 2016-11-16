@@ -142,31 +142,24 @@ def test_add_meas_order_multi_fail(admin_client, live_server, webdriver):
         selenium.find_element_by_class_name('add_meas_item_btn').click()
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 4, 4)
         selenium.find_elements_by_id('id_serial_nr')[0].send_keys('4711')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 3, 4)
         Select(selenium.find_elements_by_id('id_product')[0]).select_by_index(1)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 3, 3)
         selenium.find_elements_by_id('id_serial_nr')[1].send_keys('4712')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 2, 3)
         Select(selenium.find_elements_by_id('id_product')[1]).select_by_index(2)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 2, 2)
         selenium.find_elements_by_id('id_serial_nr')[2].send_keys('4713')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 1, 2)
         Select(selenium.find_elements_by_id('id_product')[2]).select_by_index(3)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        check_err_msg(selenium, 1, 1)
         selenium.find_elements_by_id('id_serial_nr')[3].send_keys('4714')
         Select(selenium.find_elements_by_id('id_product')[3]).select_by_index(1)
         selenium.find_element_by_name('action').click()

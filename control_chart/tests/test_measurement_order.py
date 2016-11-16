@@ -80,8 +80,7 @@ def test_list_measurement_order(admin_client, live_server, webdriver):
         assert len(header) == 3
         for index, field_name in enumerate(['order_nr', 'order_type',
                                             'measurement_items']):
-            field = MeasurementOrder._meta.get_field_by_name(field_name)[
-                0]  # pylint: disable=W0212
+            field = MeasurementOrder._meta.get_field(field_name)
             assert header[index].text == field.verbose_name
         for index, row in enumerate(table_rows):
             url = '/measurement_order/{}/'.format(all_meas_order[index].pk)
@@ -282,9 +281,7 @@ def test_list_measurement_order_definition(admin_client, live_server,
         assert len(header) == 3
         for index, field_name in enumerate(['name', 'characteristic_values',
                                             'product']):
-            field = MeasurementOrderDefinition._meta.get_field_by_name(
-                # pylint: disable=W0212
-                field_name)[0]
+            field = MeasurementOrderDefinition._meta.get_field(field_name)
             assert header[index].text == field.verbose_name
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == \

@@ -85,7 +85,7 @@ def test_plot_url(admin_client, live_server, fix_webdriver, bokeh_server):
         plot_config.save()
         selenium.get(live_server + '/plot/url/')
         pull_session()
-        assert selenium.find_element_by_class_name('bk-plot')
+        assert selenium.find_element_by_class_name('bk-plot-wrapper')
     finally:
         selenium.quit()
 
@@ -103,10 +103,10 @@ def test_plot_histogram(admin_client, live_server, fix_webdriver, bokeh_server):
         selenium.get(live_server + '/plot/gt05/')
         login_as_admin(selenium)
         pull_session()
-        assert len(selenium.find_elements_by_class_name('bk-plot')) == 2
+        assert len(selenium.find_elements_by_class_name('bk-plot-wrapper')) == 2
         PlotConfig.objects.filter(short_name='gt05').update(histogram=False)
         selenium.get(live_server + '/plot/gt05/')
-        assert len(selenium.find_elements_by_class_name('bk-plot')) == 1
+        assert len(selenium.find_elements_by_class_name('bk-plot-wrapper')) == 1
     finally:
         selenium.quit()
 
@@ -162,5 +162,6 @@ def test_plot_create_product_config():
 
     for index, prod in enumerate(products):
         assert pcs[index].short_name == prod
-        assert pcs[index].titles == titles[:index + 1]
+        for title in titles[:index + 1]:
+            assert title in pcs[index].titles
         assert len(pcs[index].filter_args) == index + 1

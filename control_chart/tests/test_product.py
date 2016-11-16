@@ -51,8 +51,7 @@ def test_list_product(admin_client, live_server, webdriver):
         all_products = Product.objects.all()
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 2
-        field = Product._meta.get_field_by_name('product_name')[
-            0]  # pylint: disable=W0212
+        field = Product._meta.get_field('product_name')  # pylint: disable=W0212
         assert header[0].text == field.verbose_name
         for index, row in enumerate(table_rows):
             url = '/product/{}/'.format(all_products[index].pk)

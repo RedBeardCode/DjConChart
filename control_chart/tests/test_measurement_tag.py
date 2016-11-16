@@ -51,8 +51,7 @@ def test_list_measurement_tag(admin_client, live_server, webdriver):
         all_meas_tags = MeasurementTag.objects.all()
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 1
-        field = MeasurementTag._meta.get_field_by_name('name')[
-            0]  # pylint: disable=W0212
+        field = MeasurementTag._meta.get_field('name')
         assert header[0].text == field.verbose_name
         for index, row in enumerate(table_rows):
             url = '/measurement_tag/{}/'.format(all_meas_tags[index].pk)

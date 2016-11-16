@@ -68,7 +68,7 @@ class MultiStdAnnotation(PlotAnnotation):
     plot
     """
 
-    def __init__(self, factor, fill_color='None', fill_alpha=0.0,
+    def __init__(self, factor, fill_color='red', fill_alpha=0.0,
                  # pylint: disable=R0913
                  line_color='red', line_alpha=0.6, line_dash='dashed',
                  **kwargs):

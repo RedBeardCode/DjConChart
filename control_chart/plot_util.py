@@ -153,9 +153,9 @@ class PlotGenerator(object):
 
     def __plot_histogram(self):
         plot = Figure(plot_height=500, plot_width=300)
-        plot.title = 'Histogram'
+        plot.title.text = 'Histogram'
         hist_data = self.calc_histogram_data(self.__values)
-        plot.logo = None
+        plot.toolbar.logo = None
         plot.quad(top='hist', bottom=0, left='edges_left', right='edges_right',
                   source=hist_data,
                   fill_color="#036564", line_color="#033649")
@@ -190,8 +190,8 @@ class PlotGenerator(object):
         plot = Figure(plot_height=500, plot_width=600,
                       x_range=FactorRange(factors=self.__factors,
                                           name='x_factors'))
-        plot.logo = None
-        plot.title = 'Control chart'
+        plot.toolbar.logo = None
+        plot.title.text = 'Control chart'
         hover_tool = self.__create_tooltips()
         plot.add_tools(hover_tool)
         plot.xaxis.major_label_orientation = pi / 4

@@ -158,9 +158,7 @@ def test_list_characteristic_value_def(admin_client, live_server, webdriver):
         assert len(header) == 2
         for index, field_name in enumerate(['value_name', 'description']):
             assert header[index].text == \
-                   CharacteristicValueDefinition._meta.get_field_by_name(
-                       # pylint: disable=W0212
-                       field_name)[0].verbose_name
+                   CharacteristicValueDefinition._meta.get_field(field_name).verbose_name
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href').strip() == \
                    '/characteristic_value_definition/{}/'.format(
