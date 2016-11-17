@@ -5,6 +5,8 @@ python:
 
 services: postgresql
 
+cache: pip
+
 env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
