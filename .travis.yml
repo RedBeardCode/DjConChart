@@ -10,7 +10,27 @@ env:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
   matrix:
     - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="admin"
-    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="linux"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="base_layout"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="calculation_rule"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="characteristic_value"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="paginator"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="measurement"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="item_and_order"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="plot"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="product"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="recalculation"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="user_groups"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="admin"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="base_layout"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="calculation_rule"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="characteristic_value"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="paginator"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="measurement"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="item_and_order"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="plot"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="product"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="recalculation"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Linux" TEST_PATTERN="user_groups"
 
 
 
