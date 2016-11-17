@@ -9,9 +9,8 @@ env:
   global:
     - DJANGO_SETTINGS_MODULE=djcon_chart.test_settings
   matrix:
-    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10"
+    - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="Windows 10" TEST_PATTERN="admin"
     - SAUCE_BROWSER="chrome" SAUCE_PLATFORM="linux"
-    - TEST_PATTERN="admin"
 
 
 
