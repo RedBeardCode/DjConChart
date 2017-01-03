@@ -20,8 +20,8 @@ on your system.
 
     .. code-block:: bash
 
-        $ sudo apt-get install pip nginx postgresql postgresql-server-dev-X.Y
-        $ sudo pip install uwsgi, psycopg2
+        $ sudo apt-get install python-dev python-pip nginx postgresql postgresql-server-dev-X.Y
+        $ sudo pip install uwsgi psycopg2
 
 
 
@@ -36,8 +36,8 @@ DJCONCHART_USER with the your user which runs DjConChart.
         $ sudo su - postgres
         $ psql
         $ CREATE DATABASE djconchart;
-        $ CREATE USER DJCONCHART_USER WITH PASSWORD 'password';
-        $ GRANT ALL PRIVILEGES ON DATABASE djconchart TO DJCONCHART_USER;
+        $ CREATE USER djconchart_user WITH PASSWORD 'password';
+        $ GRANT ALL PRIVILEGES ON DATABASE djconchart TO djconchart_user;
         $ \q
         $ exit
 
@@ -62,24 +62,20 @@ packages with pip.
 
         $ sudo pip install -r requirements.txt
 
-In the settings.py in the repository the project is configured to use a sqlite
-database. Sqlite database are great for development and testing but not for the
-productive use. Therefore you have to change the database settings to use your
-database server. In this example we use postgresql database which we created under
-`Configure database`_.
+Add the IP address of your server to the ALLOWED_HOSTS in the djconchart/settings.py file.
 
     .. code-block:: python
 
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'djconchart',
-                'USER': 'DJCONCHART_USER',
-                'PASSWORD': 'password',
-                'HOST': 'localhost',
-                'PORT':'',
-            }
-        }
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'SERVER_IP']
+
+
+Set the some environment variables to define your instance.
+
+        .. code-block:: bash
+
+                DJCONCHART_SECRET_KEY="YourSecurityKey"
+                DJCONCHART_USER="Username of your db user"
+                DJCONCHART_PWD="Password of your db user"
 
 If the database is configured correct you can create the database tables for the
 project with the following commands.
@@ -106,6 +102,7 @@ Uwsgi provides the DjConChart to nginx over a socket and writes a log file in
     .. code-block:: bash
 
         sudo adduser www-data DJCONCHART_USER
+        sudo mkdir /var/log/uwsgi
         sudo chown DJCONCHART_USER /var/log/uwsgi/
 
 

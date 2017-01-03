@@ -11,12 +11,13 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+try:
+    # For production read from environment variable
+    SECRET_KEY = os.environ['DJCONCHART_SECRET_KEY']
+except KeyError:
+    pass
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '7i*nqbk-z0@l@g_rz+)n##mah(lo_im55ophhdcywdc%n8cvue'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -70,13 +71,19 @@ WSGI_APPLICATION = 'djcon_chart.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+try:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'djconchart',
+            'USER': os.environ['DJCONCHART_USER'],
+            'PASSWORD': os.environ['DJCONCHART_PWD'],
+            'HOST': 'localhost',
+            'PORT':'',
+        }
     }
-}
+except KeyError:
+    pass
 
 
 # Internationalization
