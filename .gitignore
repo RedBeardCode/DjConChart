@@ -14,4 +14,3 @@ test_data/*
 .coverage
 build/*
 dist/*
-*/dev_settings.py
