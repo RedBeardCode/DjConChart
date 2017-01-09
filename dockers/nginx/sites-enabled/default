@@ -1,0 +1,38 @@
+upstream django {
+    server web:8000; # for a web port socket (we'll use this first)
+}
+
+server {
+    listen 80;
+    server_name $hostname;
+    location /static/ {
+        root /app/staticfiles;
+    }
+    location / {
+        include uwsgi_params;
+        #Replace with your DjConChart directory
+        uwsgi_pass      django;
+    }
+    location /bokeh/ {
+        proxy_pass http://bokeh:5006;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $server_name/bokeh;
+        proxy_buffering off;
+        rewrite /bokeh/(.*) /$1 break;
+    }
+    location /ws {
+        proxy_pass http://web:5006;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+    }
+
+
+    location /bokeh/static/ {
+        #Location of the static files of the bokeh server. This can differ on your system
+        alias     /usr/local/lib/python3.5/site-packages/bokeh/server/static/;
+    }
+}

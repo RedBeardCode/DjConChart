@@ -21,7 +21,6 @@ on your system.
     .. code-block:: bash
 
         $ sudo apt-get install python-dev python-pip nginx postgresql postgresql-server-dev-X.Y
-        $ sudo pip install uwsgi psycopg2
 
 
 
@@ -73,9 +72,12 @@ Set the some environment variables to define your instance.
 
         .. code-block:: bash
 
-                DJCONCHART_SECRET_KEY="YourSecurityKey"
-                DJCONCHART_USER="Username of your db user"
-                DJCONCHART_PWD="Password of your db user"
+                SECRET_KEY="YourSecurityKey"
+                DB_USER="Username of your db user"
+                DB_PASS="Password of your db user"
+                DB_NAME="Database name"
+                DB_SERVICE="Hostname of the db"
+                DB_PORT="DB Port"
 
 If the database is configured correct you can create the database tables for the
 project with the following commands.

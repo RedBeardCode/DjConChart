@@ -13,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     # For production read from environment variable
-    SECRET_KEY = os.environ['DJCONCHART_SECRET_KEY']
+    SECRET_KEY = os.environ['SECRET_KEY']
 except KeyError:
     pass
 
@@ -74,12 +74,12 @@ WSGI_APPLICATION = 'djcon_chart.wsgi.application'
 try:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'djconchart',
-            'USER': os.environ['DJCONCHART_USER'],
-            'PASSWORD': os.environ['DJCONCHART_PWD'],
-            'HOST': 'localhost',
-            'PORT':'',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['DB_NAME'],
+            'USER': os.environ['DB_USER'],
+            'PASSWORD': os.environ['DB_PASS'],
+            'HOST': os.environ['DB_SERVICE'],
+            'PORT': os.environ['DB_PORT']
         }
     }
 except KeyError:
@@ -104,6 +104,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/static')
+
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -125,3 +127,27 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # One Week
 
 MEASUREMENT_FILE_DIR = os.path.join(BASE_DIR, 'data')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+	'bokeh': {
+	    'handlers': ['file'],
+	    'level': 'DEBUG',
+	    'propagate': True,
+	},
+    },
+}

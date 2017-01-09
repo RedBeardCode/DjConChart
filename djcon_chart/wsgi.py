@@ -30,13 +30,17 @@ local_hostname = socket.gethostname()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djcon_chart.settings")
 os.environ.setdefault("BOKEH_LOAD_SERVER", "/bokeh")
 
-if port_free():
-
+#if port_free():
+if False:
     server = Popen(['bokeh', 'serve', '--log-level=warning',
                     '--host={0}/bokeh'.format(local_hostname),
                     '--host={0}'.format(local_hostname),
                     '--host=localhost:5006',
                     '--host=127.0.0.1:5006',
+                    '--host=*:5006',
+                    '--host=*:8000',
+                    '--host=*/bokeh',
+                    '--host=*',
                     '--host=localhost:8000',
                     '--host=127.0.0.1:8000']
                    )
