@@ -15,6 +15,7 @@ from subprocess import Popen
 import socket
 
 from django.core.wsgi import get_wsgi_application
+from whitenoise.django import DjangoWhiteNoise
 
 def port_free(port=5006):
     '''
@@ -45,3 +46,4 @@ if port_free():
                    )
 
 application = get_wsgi_application()  # pylint: disable=C0103
+application = DjangoWhiteNoise(application)
