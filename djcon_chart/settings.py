@@ -114,9 +114,11 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'static'),
 )
-
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
+try:
+    import whitenoise
+    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+except ImportError:
+    pass
 LOGIN_URL = 'mysite_login'
 LOGOUT_URL = 'mysite_logout'
 LOGIN_REDIRECT_URL = '/'
