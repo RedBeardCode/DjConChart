@@ -51,4 +51,6 @@ try:
     application.add_files(os.environ['BOKEH_STATIC'], prefix='bokeh/')
 except ImportError:
     pass
+except KeyError:
+    pass
 
