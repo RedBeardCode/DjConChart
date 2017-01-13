@@ -6,4 +6,3 @@ pandas==0.17.1
 django-pandas==0.4.1
 uwsgi
 psycopg2
-whitenoise
