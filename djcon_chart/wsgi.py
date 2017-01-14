@@ -28,7 +28,7 @@ def port_free(port=5006):
 
 local_hostname = socket.gethostname()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djcon_chart.settings")
-#os.environ.setdefault("BOKEH_LOAD_SERVER", "/bokeh")
+os.environ.setdefault("BOKEH_LOAD_SERVER", "/bokeh")
 
 if port_free():
     server = Popen(['bokeh', 'serve', '--log-level=warning',
