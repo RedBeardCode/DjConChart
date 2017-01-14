@@ -27,14 +27,6 @@ def bokeh_redirect(request, *args, **kwargs):
     """
     Redirect to bokeh server to get the bokeh session
     """
-<<<<<<< Updated upstream
-    url = 'http://localhost:5006/autoload.js?bokeh-autoload-element={0}' \
-          '&bokeh-session-id={1}'.format(
-        request.GET['bokeh-autoload-element'],
-        request.GET['bokeh-session-id']
-    )
-    return redirect(url)
-=======
 
     bokeh_url = os.environ.get('BOKEH_SERVER', 'http://localhost:5006/')
     url_parts = request.build_absolute_uri().split(request.path)
@@ -46,4 +38,3 @@ def bokeh_redirect(request, *args, **kwargs):
     html = html.replace(b'http://localhost:5006', bytearray(base_url, 'utf-8'))
 
     return HttpResponse(html)
->>>>>>> Stashed changes
