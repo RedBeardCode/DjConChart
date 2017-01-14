@@ -4,6 +4,8 @@
 """
 Views for the djcon_chart project
 """
+import os
+from urllib.request import urlopen
 import django.contrib.auth.views as auth_views
 from django.shortcuts import redirect
 
@@ -25,9 +27,23 @@ def bokeh_redirect(request, *args, **kwargs):
     """
     Redirect to bokeh server to get the bokeh session
     """
+<<<<<<< Updated upstream
     url = 'http://localhost:5006/autoload.js?bokeh-autoload-element={0}' \
           '&bokeh-session-id={1}'.format(
         request.GET['bokeh-autoload-element'],
         request.GET['bokeh-session-id']
     )
     return redirect(url)
+=======
+
+    bokeh_url = os.environ.get('BOKEH_SERVER', 'http://localhost:5006/')
+    url_parts = request.build_absolute_uri().split(request.path)
+    base_url = url_parts[0]
+    parameters = url_parts[1]
+    url = '{0}autoload.js{1}'.format(bokeh_url, parameters)
+    response = urlopen(url)
+    html = response.read()
+    html = html.replace(b'http://localhost:5006', bytearray(base_url, 'utf-8'))
+
+    return HttpResponse(html)
+>>>>>>> Stashed changes
