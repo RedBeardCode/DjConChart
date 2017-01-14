@@ -36,6 +36,6 @@ def bokeh_redirect(request, *args, **kwargs):
     url = '{0}autoload.js{1}'.format(bokeh_url, parameters)
     response = urlopen(url)
     html = response.read()
-    html = html.replace(b'http://localhost:5006', bytearray(base_url, 'utf-8'))
+    html = html.replace(b'http://localhost:5006/', bytearray('', 'utf-8'))
 
     return HttpResponse(html)
