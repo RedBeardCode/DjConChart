@@ -5,7 +5,10 @@
 Views for the djcon_chart project
 """
 import os
-from urllib.request import urlopen
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 import django.contrib.auth.views as auth_views
 from django.shortcuts import redirect
 
