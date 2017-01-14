@@ -25,15 +25,17 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import logout
 
-from djcon_chart.views import login
+from djcon_chart.views import login, bokeh_redirect
 
 admin.autodiscover()
 
 urlpatterns = [
+    url(r'^bokeh/autoload.js', bokeh_redirect),
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('control_chart.urls')),
     url(r'^login/$', login, name='mysite_login'),
     url(r'^logout/$', logout, {'next_page': '/'},
         name='mysite_logout')
+
 ]
 

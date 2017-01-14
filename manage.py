@@ -44,7 +44,7 @@ def manage_main(parameters):
     if 'createtestdata' in parameters:
         create_test_data()
     else:
-        os.environ['BOKEH_LOAD_SERVER'] = ''
+        os.environ['BOKEH_LOAD_SERVER'] = 'http://localhost:8000/bokeh/'
 
         from django.core.management import execute_from_command_line
         execute_from_command_line(parameters)
