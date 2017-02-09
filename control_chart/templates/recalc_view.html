@@ -34,13 +34,11 @@
 {% endblock %}
 
 {% block inlinescripts %}
-    <script type="text/javascript">
         $(document).ready(function () {
             init_ajax_csrf();
         });
         {% for _ in '_' %}
             {% include "recalc_js_snippet.html" %}
         {% endfor %}
-    </script>
 {% endblock %}
 
