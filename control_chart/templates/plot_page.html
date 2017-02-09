@@ -81,20 +81,12 @@
             </table>
         {% endif %}
     {% endfor %}
+
+
     </div>
 {% endblock %}
-    {% block inlinescripts %}
-        <script type="text/javascript">
-            $(document).ready(function () {
-                init_ajax_csrf();
-            });
-            {% for recalc_needed, filter_args, num_of_invalid in script_values %}
-                function after_finished_{{ forloop.counter0 }}() {
-                    $("#recalc_{{ forloop.counter0 }}").remove();
-                }
 
-                {% include "recalc_js_snippet.html" %}
-            {% endfor %}
-        </script>
-    {% endblock %}
+{% block inlinescripts %}
+    {% include "plot_js_code.html" %}
+{% endblock %}
 
