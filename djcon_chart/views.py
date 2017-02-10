@@ -5,12 +5,13 @@
 Views for the djcon_chart project
 """
 import os
+
+from django.http import HttpResponse
 try:
     from urllib.request import urlopen
 except ImportError:
     from urllib2 import urlopen
 import django.contrib.auth.views as auth_views
-from django.shortcuts import redirect
 
 
 def login(request, *args, **kwargs):
@@ -26,11 +27,10 @@ def login(request, *args, **kwargs):
                             **kwargs)
 
 
-def bokeh_redirect(request, *args, **kwargs):
+def bokeh_redirect(request, *args, **kwargs):  # pylint: disable=W0613
     """
     Redirect to bokeh server to get the bokeh session
     """
-
     bokeh_url = os.environ.get('BOKEH_SERVER', 'http://localhost:5006/')
     url_parts = request.build_absolute_uri().split(request.path)
     base_url = url_parts[0]
@@ -39,5 +39,4 @@ def bokeh_redirect(request, *args, **kwargs):
     response = urlopen(url)
     html = response.read()
     html = html.replace(b'http://localhost:5006', bytearray(base_url, 'utf-8'))
-
     return HttpResponse(html)

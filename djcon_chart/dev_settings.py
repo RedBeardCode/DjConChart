@@ -4,7 +4,6 @@
 """
 Overwrites settings for the development
 """
-import os
 from .settings import *  # pylint: disable=W0401, W0614
 
 
@@ -15,17 +14,28 @@ DEBUG = True
 
 INSTALLED_APPS += (
     'debug_toolbar',
+    'leaflet',
 )
 
-MIDDLEWARE_CLASSES += (
+MIDDLEWARE += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'gis',
+        'USER': 'docker',
+        'PASSWORD': 'docker',
+        'HOST': 'localhost',
+        'PORT': 25432,
     }
 }
 
+GDAL_LIBRARY_PATH = '/home/farmer/.anaconda3/envs/DjConChart/lib/libgdal.so'
+
 DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': ''}
+
+INTERNAL_IPS = ['127.0.0.1']
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
