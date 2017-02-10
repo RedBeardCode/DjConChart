@@ -47,7 +47,7 @@ before_script:
   - psql -U postgres -c "CREATE EXTENSION postgis" -d travisci;
   - psql -U postgres -c "CREATE EXTENSION postgis_topology" -d travisci;
 script:
-  - python manage.py makemigrations
+  - python manage.py makemigrations control_chart
   - python manage.py migrate
   - python manage.py createtestdata
   - py.test --timeout=30 --force-flaky --max-run=2 --ci --cov-config .coveragerc --cov=control_chart --cov=djcon_chart -k $TEST_PATTERN
