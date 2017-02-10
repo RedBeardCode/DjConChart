@@ -26,7 +26,7 @@ def test_create_meas_device_view(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_device(admin_client, live_server, webdriver):
+def test_list_meas_dev(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -54,7 +54,7 @@ def test_list_measurement_device(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_device_click(admin_client, live_server, webdriver):
+def test_list_meas_dev_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -73,7 +73,7 @@ def test_list_measurement_device_click(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_back(admin_client, live_server, webdriver):
+def test_meas_dev_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -86,7 +86,8 @@ def test_measurement_device_back(admin_client, live_server, webdriver):
             selenium.get(start_url)
             url = '/measurement_device/{}/'.format(first_value.pk)
             selenium.get(live_server + url)
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -95,7 +96,7 @@ def test_measurement_device_back(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_delete(admin_client, live_server, webdriver):
+def test_meas_dev_delete(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -118,7 +119,7 @@ def test_measurement_device_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_buttons_limited_user(live_server, webdriver):
+def test_meas_dev_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -135,7 +136,7 @@ def test_measurement_device_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_buttons_change_user(live_server, webdriver):
+def test_meas_dev_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -153,7 +154,7 @@ def test_measurement_device_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_buttons_del_user(live_server, webdriver):
+def test_meas_dev_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -171,7 +172,7 @@ def test_measurement_device_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_buttons_add_user(live_server, webdriver):
+def test_meas_dev_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -193,8 +194,7 @@ def test_measurement_device_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_device_list_new_button(admin_client, live_server,
-                                            webdriver):
+def test_meas_dev_list_new_button(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -210,7 +210,7 @@ def test_measurement_device_list_new_button(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_device_list_new_button_limit_user(live_server, webdriver):
+def test_meas_dev_list_new_but_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()

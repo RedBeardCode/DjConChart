@@ -156,8 +156,8 @@ class PlotAnnotationContainer(object):
 
     def create_default_annotations(self):
         """
-        Creates a mean, upper control limit and lower control limit as a default
-        set of annotations.
+        Creates a mean, upper control limit and lower control limit as a
+        default set of annotations.
         """
         self.__annotations['mean'] = MeanAnnotation()
         self.__annotations['ucl'] = UpperControlLimitAnnotation()

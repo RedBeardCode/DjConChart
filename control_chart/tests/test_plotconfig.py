@@ -6,7 +6,7 @@ import pytest
 from conftest import SauceLab
 from control_chart.models import PlotConfig
 from .utilies import create_correct_sample_data, create_limited_users
-from .utilies import create_sample_characteristic_values, create_plot_config
+from .utilies import create_characteristic_values, create_plot_config
 from .utilies import login_as_admin
 from ..plot_annotation import LowerControlLimitAnnotation
 from ..plot_annotation import MeanAnnotation, UpperControlLimitAnnotation
@@ -70,7 +70,7 @@ def test_plot_annotations():
 @pytest.mark.django_db
 def test_plot_url(admin_client, live_server, fix_webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     selenium = fix_webdriver()
     selenium.implicitly_wait(10)
     try:
@@ -91,9 +91,10 @@ def test_plot_url(admin_client, live_server, fix_webdriver, bokeh_server):
 
 
 @pytest.mark.django_db
-def test_plot_histogram(admin_client, live_server, fix_webdriver, bokeh_server):
+def test_plot_histogram(admin_client, live_server,
+                        fix_webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = fix_webdriver()
     selenium.implicitly_wait(10)
@@ -103,10 +104,12 @@ def test_plot_histogram(admin_client, live_server, fix_webdriver, bokeh_server):
         selenium.get(live_server + '/plot/gt05/')
         login_as_admin(selenium)
         pull_session()
-        assert len(selenium.find_elements_by_class_name('bk-plot-wrapper')) == 2
+        assert len(selenium.find_elements_by_class_name(
+            'bk-plot-wrapper')) == 2
         PlotConfig.objects.filter(short_name='gt05').update(histogram=False)
         selenium.get(live_server + '/plot/gt05/')
-        assert len(selenium.find_elements_by_class_name('bk-plot-wrapper')) == 1
+        assert len(selenium.find_elements_by_class_name(
+            'bk-plot-wrapper')) == 1
     finally:
         selenium.quit()
 
@@ -115,7 +118,7 @@ def test_plot_histogram(admin_client, live_server, fix_webdriver, bokeh_server):
 def test_plot_index():
     create_limited_users()
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     multi = PlotConfig.objects.get(short_name='multi')
     generator = PlotGenerator(multi)

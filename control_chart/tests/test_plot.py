@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from conftest import SauceLab
 from .utilies import create_correct_sample_data, login_as_admin
-from .utilies import create_sample_characteristic_values, create_plot_config
+from .utilies import create_characteristic_values, create_plot_config
 from ..models import CharacteristicValue
 
 
@@ -16,7 +16,7 @@ from ..models import CharacteristicValue
 def test_plot_recalc_section(admin_client, live_server,
                              webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:
@@ -38,7 +38,7 @@ def test_plot_recalc_section(admin_client, live_server,
 @pytest.mark.django_db
 def test_plot_multi(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:
@@ -68,7 +68,7 @@ def test_plot_multi(admin_client, live_server, webdriver, bokeh_server):
 @pytest.mark.django_db
 def test_plot_detail_links(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:
@@ -85,7 +85,7 @@ def test_plot_detail_links(admin_client, live_server, webdriver, bokeh_server):
 @pytest.mark.django_db
 def test_plot_detail_view(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:
@@ -116,7 +116,7 @@ def test_plot_detail_view(admin_client, live_server, webdriver, bokeh_server):
 @pytest.mark.django_db
 def test_plot_summary(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:
@@ -144,7 +144,7 @@ def test_plot_summary(admin_client, live_server, webdriver, bokeh_server):
 @pytest.mark.django_db
 def test_plot_titles(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:
@@ -164,7 +164,7 @@ def test_plot_titles(admin_client, live_server, webdriver, bokeh_server):
 @pytest.mark.django_db
 def test_plot_emtpy(admin_client, live_server, webdriver, bokeh_server):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     create_plot_config()
     selenium = webdriver()
     try:

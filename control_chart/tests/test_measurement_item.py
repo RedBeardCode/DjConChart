@@ -7,7 +7,7 @@ from ..models import MeasurementItem, Product
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view(admin_client, live_server, webdriver):
+def test_create_meas_item(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
         Product.objects.create(product_name='product1')
@@ -27,7 +27,7 @@ def test_create_meas_item_view(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view_noname(admin_client, live_server, webdriver):
+def test_create_meas_item_noname(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
         Product.objects.create(product_name='product1')
@@ -45,7 +45,7 @@ def test_create_meas_item_view_noname(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view_nosn(admin_client, live_server, webdriver):
+def test_create_meas_item_nosn(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
         selenium.get(live_server + '/measurement_item/new/')
@@ -60,7 +60,7 @@ def test_create_meas_item_view_nosn(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_create_meas_item_view_noproduct(admin_client, live_server, webdriver):
+def test_create_meas_item_noproduct(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
         Product.objects.create(product_name='product1')
@@ -78,7 +78,7 @@ def test_create_meas_item_view_noproduct(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_item(admin_client, live_server, webdriver):
+def test_list_meas_item(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -102,13 +102,14 @@ def test_list_measurement_item(admin_client, live_server, webdriver):
             assert len(columns) == 3
             assert columns[0].text == all_meas_items[index].serial_nr
             assert columns[1].text == all_meas_items[index].name
-            assert columns[2].text == all_meas_items[index].product.product_name
+            assert columns[2].text == \
+                all_meas_items[index].product.product_name
     finally:
         selenium.quit()
 
 
 @pytest.mark.django_db
-def test_list_measurement_item_click(admin_client, live_server, webdriver):
+def test_list_meas_item_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -127,7 +128,7 @@ def test_list_measurement_item_click(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_back(admin_client, live_server, webdriver):
+def test_meas_item_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -140,7 +141,8 @@ def test_measurement_item_back(admin_client, live_server, webdriver):
             selenium.get(start_url)
             url = '/measurement_item/{}/'.format(first_value.pk)
             selenium.get(live_server + url)
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -149,7 +151,7 @@ def test_measurement_item_back(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_delete(admin_client, live_server, webdriver):
+def test_meas_item_delete(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -172,7 +174,7 @@ def test_measurement_item_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_buttons_limited_user(live_server, webdriver):
+def test_meas_item_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -189,7 +191,7 @@ def test_measurement_item_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_buttons_change_user(live_server, webdriver):
+def test_meas_item_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -207,7 +209,7 @@ def test_measurement_item_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_buttons_del_user(live_server, webdriver):
+def test_meas_item_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -225,7 +227,7 @@ def test_measurement_item_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_buttons_add_user(live_server, webdriver):
+def test_meas_item_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -247,7 +249,7 @@ def test_measurement_item_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_list_new_button(admin_client, live_server, webdriver):
+def test_meas_item_list_new_button(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -263,7 +265,7 @@ def test_measurement_item_list_new_button(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_item_list_new_button_limit_user(live_server, webdriver):
+def test_meas_item_list_new_but_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()

@@ -14,3 +14,9 @@ test_data/*
 .coverage
 build/*
 dist/*
+*.log
+*.sqlite
+*.swp
+*.egg-info
+staticfiles/*
+.env

@@ -31,7 +31,8 @@ def test_create_meas_order_view(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         order_type = Select(selenium.find_element_by_id('id_order_type'))
         order_type.select_by_index(1)
-        meas_items = Select(selenium.find_element_by_id('id_measurement_items'))
+        meas_items = Select(selenium.find_element_by_id(
+            'id_measurement_items'))
         meas_items.select_by_index(0)
         meas_items.select_by_index(2)
         selenium.find_element_by_tag_name('form').submit()
@@ -42,7 +43,7 @@ def test_create_meas_order_view(admin_client, live_server, webdriver):
 
 
 @pytest.mark.djangs_db
-def test_create_meas_order_def_view(admin_client, live_server, webdriver):
+def test_create_measorderdef_view(admin_client, live_server, webdriver):
     create_correct_sample_data()
     order_defs_before = len(MeasurementOrderDefinition.objects.all())
     selenium = webdriver()
@@ -51,7 +52,8 @@ def test_create_meas_order_def_view(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         name = selenium.find_element_by_id('id_name')
         name.send_keys('test_name')
-        mitems = Select(selenium.find_element_by_id('id_characteristic_values'))
+        mitems = Select(selenium.find_element_by_id(
+            'id_characteristic_values'))
         mitems.select_by_index(0)
         mitems.select_by_index(2)
         product = Select(selenium.find_element_by_id('id_product'))
@@ -65,7 +67,7 @@ def test_create_meas_order_def_view(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_order(admin_client, live_server, webdriver):
+def test_list_meas_order(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -90,13 +92,14 @@ def test_list_measurement_order(admin_client, live_server, webdriver):
             assert columns[0].text == str(all_meas_order[index].order_nr)
             assert columns[1].text == all_meas_order[index].order_type.name
             meas_items = all_meas_order[index].measurement_items.all()
-            assert columns[2].text == ' ; '.join([str(mi) for mi in meas_items])
+            assert columns[2].text == ' ; '.join(
+                [str(mi) for mi in meas_items])
     finally:
         selenium.quit()
 
 
 @pytest.mark.django_db
-def test_list_measurement_order_click(admin_client, live_server, webdriver):
+def test_list_measorder_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -114,7 +117,7 @@ def test_list_measurement_order_click(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_back(admin_client, live_server, webdriver):
+def test_measorder_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -127,7 +130,8 @@ def test_measurement_order_back(admin_client, live_server, webdriver):
             selenium.get(start_url)
             url = '/measurement_order/{}/'.format(first_value.pk)
             selenium.get(live_server + url)
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -136,7 +140,7 @@ def test_measurement_order_back(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_delete(admin_client, live_server, webdriver):
+def test_measorder_delete(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -159,7 +163,7 @@ def test_measurement_order_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_buttons_limited_user(live_server, webdriver):
+def test_measorder_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -176,7 +180,7 @@ def test_measurement_order_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_buttons_change_user(live_server, webdriver):
+def test_measorder_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -194,7 +198,7 @@ def test_measurement_order_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_buttons_del_user(live_server, webdriver):
+def test_measorder_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -212,7 +216,7 @@ def test_measurement_order_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_buttons_add_user(live_server, webdriver):
+def test_measorder_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -234,8 +238,7 @@ def test_measurement_order_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_list_new_button(admin_client, live_server,
-                                           webdriver):
+def test_measorder_list_new_button(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -251,7 +254,7 @@ def test_measurement_order_list_new_button(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_list_new_button_limit_user(live_server, webdriver):
+def test_measorder_list_button_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -265,8 +268,7 @@ def test_measurement_order_list_new_button_limit_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_order_definition(admin_client, live_server,
-                                           webdriver):
+def test_list_measorderdef(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -300,8 +302,7 @@ def test_list_measurement_order_definition(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_list_measurement_order_definition_click(admin_client, live_server,
-                                                 webdriver):
+def test_list_measorderdef_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -321,8 +322,7 @@ def test_list_measurement_order_definition_click(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_back(admin_client, live_server,
-                                           webdriver):
+def test_measorderdef_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -335,7 +335,8 @@ def test_measurement_order_definition_back(admin_client, live_server,
             selenium.get(start_url)
             url = '/measurement_order_definition/{}/'.format(first_value.pk)
             selenium.get(live_server + url)
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -344,8 +345,7 @@ def test_measurement_order_definition_back(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_delete(admin_client, live_server,
-                                             webdriver):
+def test_measorderdef_delete(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -369,8 +369,7 @@ def test_measurement_order_definition_delete(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_buttons_limited_user(live_server,
-                                                           webdriver):
+def test_measorderdef_button_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -387,8 +386,7 @@ def test_measurement_order_definition_buttons_limited_user(live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_buttons_change_user(live_server,
-                                                          webdriver):
+def test_measorderdef_button_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -406,7 +404,7 @@ def test_measurement_order_definition_buttons_change_user(live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_buttons_del_user(live_server, webdriver):
+def test_measorderdef_button_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -424,7 +422,7 @@ def test_measurement_order_definition_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_buttons_add_user(live_server, webdriver):
+def test_measorderdef_button_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -446,8 +444,7 @@ def test_measurement_order_definition_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_list_new_button(admin_client, live_server,
-                                                      webdriver):
+def test_measorderdef_list_but(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -464,8 +461,7 @@ def test_measurement_order_definition_list_new_button(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_measurement_order_definition_list_new_button_limit_user(live_server,
-                                                                 webdriver):
+def test_measorderdef_list_but_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()

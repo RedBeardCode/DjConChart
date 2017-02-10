@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from control_chart.models import CalculationRule
-from .utilies import create_sample_characteristic_values
+from .utilies import create_characteristic_values
 from .utilies import login_as_admin, create_correct_sample_data
 
 CALC_RULE_CODE = '''
@@ -19,7 +19,7 @@ def calculate(meas_dict):
 def test_recalc_finished_div(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     try:
         selenium.get(live_server + '/recalc_characteristic_values/')
         login_as_admin(selenium)
@@ -41,7 +41,7 @@ def test_recalc_finished_div(admin_client, live_server, webdriver):
 def test_recalc_invalid(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     calc_rule = CalculationRule.objects.get(rule_name='calc_rule')
     calc_rule.rule_code = CALC_RULE_CODE
     calc_rule.save()
@@ -56,7 +56,8 @@ def test_recalc_invalid(admin_client, live_server, webdriver):
         recalc_button = selenium.find_element_by_id('recalc_values')
         recalc_button.click()
         section_header = WebDriverWait(selenium, 5).until(
-            EC.text_to_be_present_in_element((By.ID, 'invalid_header'), '0/16'))
+            EC.text_to_be_present_in_element((By.ID, 'invalid_header'),
+                                             '0/16'))
         assert section_header
         assert selenium.find_element_by_id('progress_value_0').text == '100%'
         progress_bar = selenium.find_element_by_class_name('progress-bar')

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Configuration of the pytest with CmdLine options, Fixtures and TearDown function
+Configuration of the pytest with CmdLine options, Fixtures and TearDown
+function
 """
 
 import os
@@ -14,7 +15,7 @@ from selenium.webdriver import Firefox, PhantomJS, Remote
 
 from control_chart.tests.utilies import create_correct_sample_data
 from control_chart.tests.utilies import create_limited_users, login_as_admin
-from control_chart.tests.utilies import create_sample_characteristic_values
+from control_chart.tests.utilies import create_characteristic_values
 
 
 def pytest_addoption(parser):
@@ -38,6 +39,7 @@ class HtmlUnit(Remote):
     def __init__(self):
         super(HtmlUnit, self).__init__('http://127.0.0.1:4444/wd/hub',
                                        DesiredCapabilities.HTMLUNITWITHJS)
+
 
 class SauceLab(Remote):
     """
@@ -90,7 +92,7 @@ def fix_webdriver(request):
     elif request.config.getoption('htmlunit'):
         webdriver = HtmlUnit
     elif request.config.getoption('ci'):
-        webdriver = lambda : SauceLab(request)
+        webdriver = lambda: SauceLab(request)  # # noqa
     return webdriver
 
 
@@ -110,7 +112,7 @@ def working_instance(request, live_server,
 
     create_correct_sample_data()
     create_limited_users()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     selenium = fix_webdriver()
     selenium.get(live_server.url)
     login_as_admin(selenium)
@@ -141,6 +143,7 @@ def bokeh_server(request):
 
     request.addfinalizer(lambda: fin(server))
     return None
+
 
 def pytest_runtest_teardown(item):
     """

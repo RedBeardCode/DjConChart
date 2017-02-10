@@ -32,7 +32,7 @@ def test_admin_start(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_admin_calculation_rule(admin_client, live_server, webdriver):
+def test_admin_calc_rule(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -49,8 +49,7 @@ def test_admin_calculation_rule(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_admin_characteristic_value_descriptions(admin_client, live_server,
-                                                 webdriver):
+def test_admin_charac_value_desc(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -69,7 +68,7 @@ def test_admin_characteristic_value_descriptions(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_admin_measurement_device(admin_client, live_server, webdriver):
+def test_admin_meas_dev(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -89,7 +88,7 @@ def test_admin_measurement_device(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_item(admin_client, live_server, webdriver):
+def test_admin_meas_item(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -114,8 +113,7 @@ def test_admin_measurement_item(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_order_definition(admin_client, live_server,
-                                            webdriver):
+def test_admin_meas_order_def(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -133,7 +131,7 @@ def test_admin_measurement_order_definition(admin_client, live_server,
 
 
 @pytest.mark.django_db
-def test_admin_measurement_order(admin_client, live_server, webdriver):
+def test_admin_meas_order(admin_client, live_server, webdriver):
     create_correct_sample_data()
     first_index = MeasurementOrder.objects.first().pk
     selenium = webdriver()
@@ -169,7 +167,7 @@ def test_admin_measurement_order(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_admin_measurement_tag(admin_client, live_server, webdriver):
+def test_admin_meas_tag(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:

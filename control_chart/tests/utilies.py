@@ -129,8 +129,8 @@ def create_correct_sample_data():
     """
     dummy = MeasurementTag.objects.get_or_create(name='width')
     dummy = MeasurementTag.objects.get_or_create(name='height')
-    calc_rule = CalculationRule.objects.get_or_create(rule_name="calc_rule",
-                                               rule_code=CALC_RULE_CODE)[0]
+    calc_rule = CalculationRule.objects.get_or_create(
+        rule_name="calc_rule", rule_code=CALC_RULE_CODE)[0]
     calc_multi_rule = CalculationRule.objects.get_or_create(
         rule_name="calc_multi_rule", rule_code=CALC_MULTI_RULE_CODE)[0]
     devices = [MeasurementDevice.objects.get_or_create(
@@ -173,7 +173,7 @@ def create_correct_sample_data():
         order.measurement_items.add(item)
 
 
-def create_sample_characteristic_values():
+def create_characteristic_values():
     """
     Creates Measurements and so CharateristicValues will be created
     automatically
@@ -185,14 +185,15 @@ def create_sample_characteristic_values():
         user = User.objects.all()[0]
         item = order.measurement_items.all()[0]
         for cv_type in cv_types:
-            kwargs = {'date':timezone.now(), 'order':order,
-                      'meas_item':item, 'examiner':user}
+            kwargs = {'date': timezone.now(), 'order': order,
+                      'meas_item': item, 'examiner': user}
             meas = Measurement.objects.get_or_create(**kwargs)[0]
             if hasattr(Measurement, 'position'):
                 from django.contrib.gis.geos import GEOSGeometry
                 position = GEOSGeometry('SRID=4326;POINT(0.0 0.0)')
                 meas.position = position
-            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            meas.measurement_devices.add(
+                cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
             raw_filename = os.path.join(settings.BASE_DIR,
@@ -222,4 +223,3 @@ def create_plot_config():
                          {'value_type__value_name': 'width'}]
     multi.titles = ['length', 'width']
     multi.save()
-

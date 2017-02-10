@@ -33,14 +33,15 @@ class MultiFormMixin(ContextMixin):
         """
         Creates the form instances out of the given form classes
         :param form_classes: Dictonary with form classes
-        :param form_names: List of forms which data should be used in the kwargs
+        :param form_names: List of forms which data should be used in the
+        kwargs
         :param bind_all: Set True to use the data of all forms
         :return: Dictonary with the created form instances
         """
         return dict(
             [(key,
               self._create_form(
-                  key, cls, (form_names and key in form_names) or bind_all)) \
+                  key, cls, (form_names and key in form_names) or bind_all))
              for key, cls in form_classes.items()])
 
     def get_form_kwargs(self, form_name, bind_form=False):
@@ -65,8 +66,8 @@ class MultiFormMixin(ContextMixin):
         Calls the form_valid method of the given form
         :param forms: Dictonary of all Form classes
         :param form_name: Form name which should check
-        :return: Returns the result of the from_valid method or redirects to the
-        success_url if the form has no valid method
+        :return: Returns the result of the from_valid method or redirects to
+        the success_url if the form has no valid method
         """
         form_valid_method = '%s_form_valid' % form_name
         if hasattr(self, form_valid_method):
@@ -100,8 +101,8 @@ class MultiFormMixin(ContextMixin):
 
     def get_success_url(self, form_name=None):
         """
-        Returns the success_url form the given form or if no form_name given the
-        success_url of the MultiForm
+        Returns the success_url form the given form or if no form_name given
+        the success_url of the MultiForm
         """
         return self.success_urls.get(form_name, self.success_url)
 
@@ -173,6 +174,3 @@ class MultiFormsView(TemplateResponseMixin,
             return self.forms_valid(forms, '')
         else:
             return self.forms_invalid(forms)
-
-
-

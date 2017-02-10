@@ -11,7 +11,7 @@ from django.core.files.base import File
 from django.utils import timezone
 
 from .utilies import create_correct_sample_data
-from .utilies import create_sample_characteristic_values
+from .utilies import create_characteristic_values
 from ..models import CalculationRule, MeasurementTag
 from ..models import CharacteristicValue, MeasurementOrder
 from ..models import CharacteristicValueDefinition, Measurement, Product
@@ -29,7 +29,8 @@ def test_cv_single_creation(admin_client):
         for cv_type in cv_types:
             meas = Measurement.objects.create(date=timezone.now(), order=order,
                                               meas_item=item, examiner=user)
-            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            meas.measurement_devices.add(
+                cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
             raw_filename = os.path.join(settings.BASE_DIR,
@@ -60,7 +61,8 @@ def test_cv_multi_creation(admin_client):
         remarks = ''
         for cv_type in order.order_type.characteristic_values.all():
             meas.order_items.add(cv_type)
-            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            meas.measurement_devices.add(
+                cv_type.possible_meas_devices.all()[0])
             remarks += str(cv_type) + '\n'
             count += 1
         meas.remarks = remarks
@@ -89,7 +91,8 @@ def test_cv_multi_meas_creation(admin_client):
                     name__in=['width', 'height']):
                 meas = Measurement.objects.create(date=timezone.now(),
                                                   order=order,
-                                                  meas_item=item, examiner=user)
+                                                  meas_item=item,
+                                                  examiner=user)
                 meas.order_items.add(cv_type)
                 meas.measurement_devices.add(
                     cv_type.possible_meas_devices.all()[0])
@@ -124,7 +127,8 @@ def test_cv_rule_change(admin_client):
         for cv_type in cv_types:
             meas = Measurement.objects.create(date=timezone.now(), order=order,
                                               meas_item=item, examiner=user)
-            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            meas.measurement_devices.add(
+                cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
             raw_filename = os.path.join(settings.BASE_DIR,
@@ -180,7 +184,7 @@ def test_cv_wrong_value_type(admin_client):
 @pytest.mark.django_db
 def test_cv_filter_value(admin_client):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     value_qs = CharacteristicValue.objects.filter(value__gt=1)
     calc_value_qs = CharacteristicValue.objects.filter(_calc_value__gt=1)
     for cvalue in calc_value_qs:
@@ -194,7 +198,7 @@ def test_cv_filter_value(admin_client):
 @pytest.mark.django_db
 def test_cv_to_dataframe(admin_client):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     value_qs = CharacteristicValue.objects.all()
     data_frame = value_qs.to_dataframe()
     assert 'value' in data_frame.columns
@@ -208,10 +212,11 @@ def test_cv_to_dataframe(admin_client):
 @pytest.mark.django_db
 def test_cv_filter_with_product(admin_client):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     products = Product.objects.all()
-    num_cvs = [CharacteristicValue.objects.filter_with_product(prod).count() for
-               prod in products]
+    num_cvs = \
+        [CharacteristicValue.objects.filter_with_product(prod).count() for
+         prod in products]
     assert num_cvs == [4, 6, 9]
     assert CharacteristicValue.objects.filter_with_product(
         products[:2]).count() == 10

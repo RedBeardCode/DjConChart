@@ -590,7 +590,7 @@ def get_ajax_meas_item(request):
     return JsonResponse(response)
 
 
-def recalc_characteristic_values(_unused):
+def recalc_characteristic_values(_):
     """
     View to calculate all invalid CharacteristicValues
     """

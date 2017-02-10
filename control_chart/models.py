@@ -48,7 +48,7 @@ class ProductQuerySet(QuerySet):
         return value_types
 
 
-PRODUCT_MANAGER = models.Manager.from_queryset(ProductQuerySet)
+PRODUCT_MANAGER = models.Manager.from_queryset(ProductQuerySet)  # pylint: disable=E1101
 
 
 @python_2_unicode_compatible
@@ -143,8 +143,8 @@ class CalculationRule(models.Model):
         """
         self.__is_changed = True
         with transaction.atomic(), revisions.create_revision():
-            super(CalculationRule, self).save(force_insert, force_update, using,
-                                              update_fields)
+            super(CalculationRule, self).save(force_insert, force_update,
+                                              using, update_fields)
         CharacteristicValue.objects.filter(
             value_type__calculation_rule__rule_name=self.rule_name).update(
                 _is_valid=False)
@@ -187,8 +187,8 @@ class AccessLogDict(dict):
 @python_2_unicode_compatible
 class MeasurementTag(models.Model):
     """
-    Tag to differ Measurements for CharacteristicValues which need more then one
-    Measurement
+    Tag to differ Measurements for CharacteristicValues which need more then
+    one Measurement
     """
     name = models.CharField(max_length=255,
                             verbose_name='Tag to distinguish measurements for'
@@ -315,8 +315,8 @@ class MeasurementOrder(models.Model):
 
 def after_measurement_saved(instance, **kwargs):  # pylint: disable=W0613
     """
-    Creates new CharacteristicValues after new Measurement was saved. Called via
-    post_save signal
+    Creates new CharacteristicValues after new Measurement was saved. Called
+    via post_save signal
     """
     for value_type in instance.order_items.all():
         ch_value, _ = CharacteristicValue.objects.get_or_create(
@@ -332,6 +332,7 @@ def get_file_directory(_, filename):
     """
     name = os.path.split(filename)[-1]
     return os.path.join(settings.MEASUREMENT_FILE_DIR, name)
+
 
 @python_2_unicode_compatible
 class Measurement(models.Model):
@@ -485,7 +486,7 @@ class CalcValueQuerySet(DataFrameQuerySet):
         """
         if self.count_invalid() < self.MAX_NUM_CALCULATION:
             outdated_values = self.filter(_is_valid=False)
-            outdated_values.recalculation()  #pylint: disable=E1101
+            outdated_values.recalculation()  # pylint: disable=E1101
         read_calc_value = '_calc_value' in fieldnames
         if 'value' in fieldnames:
             fieldnames[fieldnames.index('value')] = '_calc_value'
@@ -498,7 +499,7 @@ class CalcValueQuerySet(DataFrameQuerySet):
         return frame
 
 
-CALC_VALUE_MANAGER = models.Manager.from_queryset(CalcValueQuerySet)
+CALC_VALUE_MANAGER = models.Manager.from_queryset(CalcValueQuerySet)   # pylint: disable=E1101
 
 
 @python_2_unicode_compatible
@@ -509,8 +510,9 @@ class CharacteristicValue(models.Model):
     name and how to calculate the value. The calculation of the value is lazy
     and is only done if the value is needed.
     CharacteristicValue is created automatically after a new Measurement is
-    saved. It is possible that one Measurement creates many CharacteristicValues
-    or that one CharacteristicValue needs many Measurement for the calculation.
+    saved. It is possible that one Measurement creates many
+    CharacteristicValues or that one CharacteristicValue needs many Measurement
+    for the calculation.
     """
     order = models.ForeignKey(MeasurementOrder)
     value_type = models.ForeignKey(CharacteristicValueDefinition)
@@ -603,17 +605,18 @@ class CharacteristicValue(models.Model):
 post_save.connect(after_charac_value_saved, sender=CharacteristicValue)
 
 
-@python_2_unicode_compatible  #pylint: disable=R0902
+@python_2_unicode_compatible  # pylint: disable=R0902
 class PlotConfig(models.Model):
     """
-    Configurtion of a plot which defines which data should be displayed and how.
+    Configurtion of a plot which defines which data should be displayed and how
     """
     description = models.CharField(
         max_length=100, verbose_name='Description of the plotted data')
     short_name = models.URLField(
         verbose_name='Short name of configuration. Also used for url',
         unique=True)
-    histogram = models.BooleanField(verbose_name='Show histogram', default=True)
+    histogram = models.BooleanField(verbose_name='Show histogram',
+                                    default=True)
     _titles = models.TextField(verbose_name='Title of the plots', default='')
     _filter_args = models.BinaryField(
         blank=True,

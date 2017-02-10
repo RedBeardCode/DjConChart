@@ -9,7 +9,7 @@ from ..models import MeasurementTag
 
 
 @pytest.mark.django_db
-def test_create_meas_tag_view(admin_client, live_server, webdriver):
+def test_create_meas_tag(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
         selenium.get(live_server + '/measurement_tag/new/')
@@ -24,7 +24,7 @@ def test_create_meas_tag_view(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_create_meas_tag_view_noname(admin_client, live_server, webdriver):
+def test_create_meas_tag_noname(admin_client, live_server, webdriver):
     selenium = webdriver()
     try:
         selenium.get(live_server + '/measurement_tag/new/')
@@ -38,7 +38,7 @@ def test_create_meas_tag_view_noname(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_tag(admin_client, live_server, webdriver):
+def test_list_meas_tag(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -64,7 +64,7 @@ def test_list_measurement_tag(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_measurement_tag_click(admin_client, live_server, webdriver):
+def test_list_meas_tag_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -83,7 +83,7 @@ def test_list_measurement_tag_click(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_back(admin_client, live_server, webdriver):
+def test_meas_tag_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -91,11 +91,13 @@ def test_measurement_tag_back(admin_client, live_server, webdriver):
         login_as_admin(selenium)
         first_value = MeasurementTag.objects.all().first()
         selenium.get(live_server + '/recalc_characteristic_values/')
-        for start_url in [live_server + '/measurement_tag/', live_server + '/']:
+        for start_url in \
+                [live_server + '/measurement_tag/', live_server + '/']:
             selenium.get(start_url)
             url = '/measurement_tag/{}/'.format(first_value.pk)
             selenium.get(live_server + url)
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -104,7 +106,7 @@ def test_measurement_tag_back(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_delete(admin_client, live_server, webdriver):
+def test_meas_tag_delete(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -127,7 +129,7 @@ def test_measurement_tag_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_buttons_limited_user(live_server, webdriver):
+def test_meas_tag_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -144,7 +146,7 @@ def test_measurement_tag_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_buttons_change_user(live_server, webdriver):
+def test_meas_tag_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -162,7 +164,7 @@ def test_measurement_tag_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_buttons_del_user(live_server, webdriver):
+def test_meas_tag_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -180,7 +182,7 @@ def test_measurement_tag_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_buttons_add_user(live_server, webdriver):
+def test_meas_tag_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -202,7 +204,7 @@ def test_measurement_tag_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_list_new_button(admin_client, live_server, webdriver):
+def test_meas_tag_list_new_button(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -218,7 +220,7 @@ def test_measurement_tag_list_new_button(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_tag_list_new_button_limit_user(live_server, webdriver):
+def test_meas_tag_list_new_but_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
