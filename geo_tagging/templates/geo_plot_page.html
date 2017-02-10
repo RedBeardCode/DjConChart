@@ -1,0 +1,41 @@
+{% extends "plot_page.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load leaflet_tags %}
+
+{% block adminscripts %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+{% endblock %}
+
+{% block leaflet_map %}
+    <div class="leaflet-map">
+        {% leaflet_map forloop.counter0  callback="map_data"%}
+    </div>
+{% endblock %}
+
+
+{% block inlinescripts %}
+    {% include "plot_js_code.html" %}
+
+    function map_data (map, options) {
+
+        var dataurl = '{% url "geo_plot_data" %}';
+        // Download GeoJSON via Ajax
+        $.ajax({
+            url: dataurl,
+            data: {path:'{{current_path}}', filter_args: {{ filter_args_list|safe }}, filter_index: map._container.id },
+            success: function (data, textStatus, XMLHttpRequest) {
+                // Add GeoJSON layer
+                var marker = L.geoJson(data);
+                marker.addTo(map);
+                map.fitBounds(marker.getBounds());
+                },
+            type:'POST',
+            datatype: 'JSON',
+        });
+    };
+
+{% endblock %}
+
+
