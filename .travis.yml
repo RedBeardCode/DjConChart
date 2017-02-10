@@ -3,7 +3,7 @@ python:
   - "2.7"
   - "3.5"
 
-services: postgresql: "9.5"
+services: postgresql
 
 cache: pip
 
@@ -44,8 +44,8 @@ install:
 
 before_script:
   - psql -c "CREATE DATABASE travisci;" -U postgres;
-  - psql -U postgres -c "CREATE EXTENSION postgis" -d travisci
-  - psql -U postgres -c "CREATE EXTENSION postgis_topology" -d travisci
+  - psql -U postgres -c "CREATE EXTENSION postgis" -d travisci;
+  - psql -U postgres -c "CREATE EXTENSION postgis_topology" -d travisci;
 script:
   - python manage.py makemigrations control_chart
   - python manage.py migrate
