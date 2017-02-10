@@ -17,3 +17,5 @@ if 'TRAVIS' in os.environ:
 
         }
     }
+
+GDAL_LIBRARY_PATH = ''
