@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from time import sleep
 
 import pytest
 from selenium.webdriver.common.by import By
@@ -195,6 +196,7 @@ def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
         serial_nrs = selenium.find_elements_by_id('id_serial_nr')
         for serial_nr in serial_nrs:
             serial_nr.send_keys('0000001')
+        sleep(2)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
         alert = selenium.find_elements_by_class_name('alert')
