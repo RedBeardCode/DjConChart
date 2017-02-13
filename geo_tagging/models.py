@@ -20,7 +20,9 @@ def add_position(sender, **kwargs):  # pylint: disable=W0613
             position = models.PointField("Measurement position",
                                          default="SRID=4326;POINT(7.0 50.0)",
                                          srid=4326,
-                                         dim=2)
+                                         dim=2,
+                                         blank=True,
+                                         null=True)
             position.contribute_to_class(sender, "position")
 
 
@@ -34,7 +36,9 @@ def add_altitude(sender, **kwargs):  # pylint: disable=W0613
             altitude = models.DecimalField("Altitude of the measurement",
                                            default=0.0,
                                            max_digits=5,
-                                           decimal_places=1)
+                                           decimal_places=1,
+                                           blank=True,
+                                           null=True)
             altitude.contribute_to_class(sender, "altitude")
 
 

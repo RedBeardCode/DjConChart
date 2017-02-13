@@ -384,6 +384,23 @@ def after_charac_value_saved(instance, update_fields,
         update_plot_sessions()
 
 
+def save_position_in_cv(instance, update_fields, **kwargs):  # pylint: disable=W0613
+    """
+    Saves the position of the measurement in the CharacteristicValue
+    """
+    if not update_fields or 'measurements' in update_fields:
+        if hasattr(instance, 'position'):
+            from django.contrib.gis.geos import LineString
+            points = []
+            for meas in instance.measurements.all():
+                points.append(meas.position)
+            if len(points) > 1:
+                instance.position = LineString(points).centroid
+            elif len(points) == 1:
+                instance.position = points[0]
+            instance.save(update_fields=['position'])
+
+
 class CalcValueQuerySet(DataFrameQuerySet):
     """
     QuerySet for CharacteristicValues to enable lazy calculation. The value is
@@ -603,6 +620,7 @@ class CharacteristicValue(models.Model):
 
 
 post_save.connect(after_charac_value_saved, sender=CharacteristicValue)
+post_save.connect(save_position_in_cv, sender=CharacteristicValue)
 
 
 @python_2_unicode_compatible  # pylint: disable=R0902
