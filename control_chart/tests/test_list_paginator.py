@@ -65,7 +65,8 @@ def test_list_paginator_click_num(admin_client, live_server, webdriver):
             url = '/characteristic_value_definition/?page={}'.format(i)
             assert selenium.current_url == live_server.url + url
             paginator = selenium.find_element_by_class_name('paginator')
-            button = paginator.find_elements_by_css_selector('#page-wrapper li')
+            button = paginator.find_elements_by_css_selector(
+                '#page-wrapper li')
             active = selenium.find_element_by_css_selector(
                 '#page-wrapper .active')
             assert button[i] == active
@@ -99,7 +100,8 @@ def test_list_paginator_click_arrow(admin_client, live_server, webdriver):
             assert selenium.current_url == live_server.url + url
             paginator = selenium.find_element_by_class_name('paginator')
             button = paginator.find_elements_by_tag_name('li')
-            act = selenium.find_element_by_css_selector('#page-wrapper .active')
+            act = selenium.find_element_by_css_selector(
+                '#page-wrapper .active')
             assert button[i] == act
         dis = selenium.find_element_by_css_selector('#page-wrapper .disabled')
         assert button[6] == dis

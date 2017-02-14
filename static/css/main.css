@@ -57,7 +57,7 @@
 }
 
 .plot {
-   display: flex;
+   display: inline-flex;
 }
 
 .detail_table {
@@ -65,13 +65,15 @@
 }
 
 .detail_view {
-   display: flex;
    justify-content: center;
+   align-content: center;
+   margin-left: 30px;
 }
 
 .detail_view .summary {
    align-self: center;
    align-content: center;
+   margin-bottom: 20px;
 }
 
 .detail_view .summary table {
@@ -79,6 +81,10 @@
 
 }
 
+.bk-root{
+    width: 950px;
+    #min-width: 950px;
+}
 .plot_title {
    width: 1200px;
    text-align: center;
@@ -104,6 +110,9 @@
     vertical-align: middle;
 }
 
+page-wrapper{
+    max-width: 1300px;
+}
 
 
 

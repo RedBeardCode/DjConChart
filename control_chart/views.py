@@ -28,6 +28,7 @@ class AddContextInfoMixIn(object):  # pylint: disable=R0903
     """
     Mixin to add additional information to the context
     """
+
     def get_context_data(self, **kwargs):
         """
         Add additional information to the context
@@ -43,11 +44,11 @@ class AddContextInfoMixIn(object):  # pylint: disable=R0903
         context['current_path'] = self.request.META['PATH_INFO']
         context['class_name'] = self.model._meta.model_name
         context['add_class'] = self.model._meta.app_label + '.add_' + \
-                               self.model._meta.model_name
+            self.model._meta.model_name
         context['change_class'] = self.model._meta.app_label + '.change_' + \
-                                  self.model._meta.model_name
+            self.model._meta.model_name
         context['delete_class'] = self.model._meta.app_label + '.delete_' + \
-                                  self.model._meta.model_name
+            self.model._meta.model_name
         if hasattr(self, 'fields') and self.fields:
             verbose_field_names = []
             for field_name in self.fields:
@@ -494,7 +495,7 @@ class DeletePlotConfig(DeleteView):  # pylint: disable=R0901
     success_url = reverse_lazy('list_plot_configuration')
 
 
-class NewMeasurementItemAndOrder(MultiFormsView):
+class NewMeasurementItemAndOrder(MultiFormsView):  # pylint: disable=R0901
     """
     View to create a new MeasurementOrder with MeasurementItems in one form
     """
@@ -541,7 +542,8 @@ def get_ajax_order_info(request):
     items_response = {'order_items': [start_tuple],
                       'meas_devices': [start_tuple],
                       'meas_items': [start_tuple]}
-    if request.is_ajax() and request.method == 'POST' and request.POST['order']:
+    if request.is_ajax() and request.method == 'POST' and \
+            request.POST['order']:
         order_items_response = []
         meas_devices_response = []
         meas_item_response = []
@@ -572,14 +574,16 @@ def get_ajax_meas_item(request):
     if request.is_ajax() and request.method == 'POST' and \
             request.POST['serial_nr']:
         serial_nr = request.POST['serial_nr']
-        items = MeasurementItem.objects.filter(serial_nr__istartswith=serial_nr)
+        items = MeasurementItem.objects.filter(
+            serial_nr__istartswith=serial_nr)
         serial_nr_response = []
         name_response = []
         product_response = []
 
         for item in items:
             response['suggestions'].append(
-                {'value': item.serial_nr, 'data': (item.name, item.product.pk)})
+                {'value': item.serial_nr, 'data': (item.name,
+                                                   item.product.pk)})
             serial_nr_response.append(item.serial_nr)
             name_response.append(item.name)
             product_response.append(item.product.pk)
@@ -645,6 +649,15 @@ def plot_given_configuration(request, configuration, index=None):
     """
     View the plots for given configurations.
     """
+    context, _ = create_plot_context(request, configuration, index)
+    return render_to_response('plot_page.html', context=context)
+
+
+def create_plot_context(request, configuration, index):
+    """
+    Creates the context data for a plot view out of
+    filter_args saved in the configuration
+    """
     context = defaultdict(list)
     try:
         plot_config = PlotConfig.objects.get(short_name=configuration)
@@ -679,7 +692,7 @@ def plot_given_configuration(request, configuration, index=None):
                  'id']].values
     except PlotConfig.DoesNotExist:
         raise Http404
-    return render_to_response('plot_page.html', context=context)
+    return context, plot_generator
 
 
 class Dashboard(TemplateView):

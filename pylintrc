@@ -22,4 +22,8 @@ generated-members=GroupManager, ModelManager
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=80
+max-line-length=79
+
+[VARIABLES]
+dummy-variables-rgx=_$|dummy|bokeh_server|admin_client
+

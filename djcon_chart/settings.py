@@ -22,9 +22,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 
-
-# Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,12 +29,17 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'reversion',
     'crispy_forms',
+    'geo_tagging',
     'control_chart',
 )
 
-MIDDLEWARE_CLASSES = (
+# Application definition
+
+
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -46,6 +48,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+
+
 )
 
 ROOT_URLCONF = 'djcon_chart.urls'
@@ -114,11 +118,13 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'static'),
 )
+
 try:
-    import whitenoise
+    import whitenoise  # pylint: disable=W0611
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 except ImportError:
     pass
+
 LOGIN_URL = 'mysite_login'
 LOGOUT_URL = 'mysite_logout'
 LOGIN_REDIRECT_URL = '/'
@@ -148,10 +154,10 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-	'bokeh': {
-	    'handlers': ['file'],
-	    'level': 'DEBUG',
-	    'propagate': True,
-	},
+        'bokeh': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }

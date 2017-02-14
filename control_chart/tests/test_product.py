@@ -3,7 +3,7 @@
 
 import pytest
 
-from .utilies import create_sample_characteristic_values
+from .utilies import create_characteristic_values
 from .utilies import login_as_admin, create_correct_sample_data
 from .utilies import login_as_limited_user, create_limited_users
 from ..models import Product
@@ -74,7 +74,8 @@ def test_list_product_click(admin_client, live_server, webdriver):
         all_products = Product.objects.all()
         for index in range(3):
             selenium.get(live_server + '/product/')
-            table_rows = selenium.find_elements_by_css_selector('.clickable-row td')
+            table_rows = selenium.find_elements_by_css_selector(
+                '.clickable-row td')
             table_rows[2*index].click()
             url = '/product/{}/'.format(all_products[index].pk)
             assert selenium.current_url == live_server + url
@@ -94,7 +95,8 @@ def test_product_back(admin_client, live_server, webdriver):
         for start_url in [live_server + '/product/', live_server + '/']:
             selenium.get(start_url)
             selenium.get(live_server + '/product/{}/'.format(first_value.pk))
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -117,7 +119,8 @@ def test_product_delete(admin_client, live_server, webdriver):
             table_cells[0].click()
             d_button = selenium.find_element_by_css_selector('#page-wrapper a')
             d_button.click()
-            url = '/product/{}/delete/'.format(Product.objects.all().first().pk)
+            url = '/product/{}/delete/'.format(
+                Product.objects.all().first().pk)
             assert selenium.current_url == live_server + url
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/product/'
@@ -126,7 +129,7 @@ def test_product_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_product_buttons_limited_user(live_server, webdriver):
+def test_product_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -142,7 +145,7 @@ def test_product_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_product_buttons_change_user(live_server, webdriver):
+def test_product_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -159,7 +162,7 @@ def test_product_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_product_buttons_del_user(live_server, webdriver):
+def test_product_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -176,7 +179,7 @@ def test_product_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_product_buttons_add_user(live_server, webdriver):
+def test_product_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -213,7 +216,7 @@ def test_product_list_new_button(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_product_list_new_button_limit_user(live_server, webdriver):
+def test_product_list_new_button_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -227,9 +230,9 @@ def test_product_list_new_button_limit_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_product_get_characteristic_value_descriptions(admin_client):
+def test_prod_get_chara_value_desc(admin_client):
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     assert len(Product.objects.all().get_charac_value_definitions()) == 3
     product1 = Product.objects.filter(product_name='product1')
     assert len(product1.get_charac_value_definitions()) == 1

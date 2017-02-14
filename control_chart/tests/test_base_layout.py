@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 class TestBaseLayout(object):
-    def test_top_navbar(self, working_instance):
+    def test_top_navbar(self, working_instance):  # pylint: disable=R0201
         if isinstance(working_instance, PhantomJS):
             pytest.xfail("is_displayed doesn't works correct in PhantomJS")
         list_elements = working_instance.find_elements_by_css_selector(
@@ -26,7 +26,7 @@ class TestBaseLayout(object):
         assert working_instance.find_element_by_css_selector(
             '.navbar-header button').is_displayed()
 
-    def test_side_navbar(self, working_instance):
+    def test_side_navbar(self, working_instance):  # pylint: disable=R0201
         if isinstance(working_instance, PhantomJS):
             pytest.xfail("is_displayed doesn't works correct in PhantomJS")
         list_elements = working_instance.find_elements_by_css_selector(
@@ -61,12 +61,12 @@ class TestBaseLayout(object):
 
         wait.until(EC.visibility_of(list_elements[13]))
         list_elements = working_instance.find_elements_by_css_selector(
-             '.sidebar li')
+            '.sidebar li')
         assert [l.is_displayed() for l in list_elements] == [True] * 8 +\
                                                             [False] * 4 + \
                                                             [True] * 2
 
-    def test_side_navbar_links(self, live_server, working_instance):
+    def test_side_navbar_links(self, live_server, working_instance):  # pylint: disable=R0201
         links = working_instance.find_elements_by_css_selector('.sidebar a')
         for link, href in zip(
                 links,

@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+"""
+Functions to create test data in the database
+for unit tests and development
+"""
+
 import os
+from random import random
 
 from django.conf import settings
 from django.contrib.auth.models import User, Permission, Group
@@ -17,6 +24,9 @@ FAKE_TIME = timezone.datetime(2020, 12, 5, 17, 5, 55)
 
 
 def create_grouped_users():
+    """
+    Creates test user and user groups
+    """
     viewer = User.objects.get_or_create(username='Viewer')[0]
     viewer.groups.add(Group.objects.get(name='Viewer'))
     viewer.set_password('test')
@@ -36,6 +46,9 @@ def create_grouped_users():
 
 
 def create_limited_users():
+    """
+    Creates users with different privileges (limit, add, change, remove, admin)
+    """
     limited_user = User.objects.get_or_create(username='limited_user')[0]
     limited_user.set_password('test')
     limited_user.save()
@@ -61,13 +74,21 @@ def create_limited_users():
 
 
 def login_as_limited_user(selenium, user='limited_user'):
+    """
+    Logs in the given selenium webdriver instance as user with the given
+    privileges
+    """
     username = selenium.find_element_by_id('id_username')
     pwd = selenium.find_element_by_id('id_password')
     username.send_keys(user)
     pwd.send_keys('test')
     selenium.find_element_by_tag_name('form').submit()
 
+
 def login_as_admin(selenium):
+    """
+    Logs in the given selenium webdriver instance as admin user
+    """
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.ui import WebDriverWait
@@ -94,14 +115,23 @@ def calculate(meas_dict):
 
 
 def wait_for_root_page(selenium):
+    """
+    Waits until the start page is shown
+    """
     selenium.implicitly_wait(5)
     selenium.find_element_by_css_selector('#page-wrapper h1')
 
+
 def create_correct_sample_data():
+    """
+    Creates a set of sample test data (MeasurementTag, CalculationRule,
+    MeasurementDevice, CharacteristicValueDefinition, Product,
+    MeasurementOrderDefinition, MeasurementOrder, MesasurementItem)
+    """
     dummy = MeasurementTag.objects.get_or_create(name='width')
     dummy = MeasurementTag.objects.get_or_create(name='height')
-    calc_rule = CalculationRule.objects.get_or_create(rule_name="calc_rule",
-                                               rule_code=CALC_RULE_CODE)[0]
+    calc_rule = CalculationRule.objects.get_or_create(
+        rule_name="calc_rule", rule_code=CALC_RULE_CODE)[0]
     calc_multi_rule = CalculationRule.objects.get_or_create(
         rule_name="calc_multi_rule", rule_code=CALC_MULTI_RULE_CODE)[0]
     devices = [MeasurementDevice.objects.get_or_create(
@@ -144,19 +174,31 @@ def create_correct_sample_data():
         order.measurement_items.add(item)
 
 
-def create_sample_characteristic_values():
+def create_characteristic_values():
+    """
+    Creates Measurements and so CharateristicValues will be created
+    automatically
+    """
     orders = MeasurementOrder.objects.all()
     count = 0
+
     for order in orders:
         cv_types = order.order_type.characteristic_values.all()
         user = User.objects.all()[0]
         item = order.measurement_items.all()[0]
         for cv_type in cv_types:
-            meas = Measurement.objects.get_or_create(date=timezone.now(),
-                                              order=order,
-                                              meas_item=item,
-                                              examiner=user)[0]
-            meas.measurement_devices.add(cv_type.possible_meas_devices.all()[0])
+            kwargs = {'date': timezone.now(), 'order': order,
+                      'meas_item': item, 'examiner': user}
+            meas = Measurement.objects.get_or_create(**kwargs)[0]
+            if hasattr(Measurement, 'position'):
+                from django.contrib.gis.geos import GEOSGeometry
+                long = 3 * random() / 10.0
+                lat = 3 * random() / 10.0
+                position = GEOSGeometry('SRID=4326;POINT({0} {1})'.format(
+                    7+long, 50+lat))
+                meas.position = position
+            meas.measurement_devices.add(
+                cv_type.possible_meas_devices.all()[0])
             meas.order_items.add(cv_type)
             meas.remarks = str(cv_type)
             raw_filename = os.path.join(settings.BASE_DIR,
@@ -167,6 +209,9 @@ def create_sample_characteristic_values():
 
 
 def create_plot_config():
+    """
+    Creates a set of test PlotConfig
+    """
     gt05 = PlotConfig.objects.get_or_create(description='Greater 0.5',
                                             short_name='gt05')[0]
     gt05.filter_args = [{'value__gt': 0.5}]
@@ -183,4 +228,3 @@ def create_plot_config():
                          {'value_type__value_name': 'width'}]
     multi.titles = ['length', 'width']
     multi.save()
-

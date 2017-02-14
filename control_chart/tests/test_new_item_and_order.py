@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from time import sleep
 
 import pytest
 from selenium.webdriver.common.by import By
@@ -145,23 +146,27 @@ def test_add_meas_order_multi_fail(admin_client, live_server, webdriver):
         selenium.find_elements_by_id('id_serial_nr')[0].send_keys('4711')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        Select(selenium.find_elements_by_id('id_product')[0]).select_by_index(1)
+        Select(selenium.find_elements_by_id(
+            'id_product')[0]).select_by_index(1)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
         selenium.find_elements_by_id('id_serial_nr')[1].send_keys('4712')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        Select(selenium.find_elements_by_id('id_product')[1]).select_by_index(2)
+        Select(selenium.find_elements_by_id(
+            'id_product')[1]).select_by_index(2)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
         selenium.find_elements_by_id('id_serial_nr')[2].send_keys('4713')
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
-        Select(selenium.find_elements_by_id('id_product')[2]).select_by_index(3)
+        Select(selenium.find_elements_by_id(
+            'id_product')[2]).select_by_index(3)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
         selenium.find_elements_by_id('id_serial_nr')[3].send_keys('4714')
-        Select(selenium.find_elements_by_id('id_product')[3]).select_by_index(1)
+        Select(selenium.find_elements_by_id(
+            'id_product')[3]).select_by_index(1)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/'
     finally:
@@ -182,7 +187,7 @@ def check_err_msg(selenium, num_sn_err, num_product_err):
 
 
 @pytest.mark.django_db
-def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
+def test_add_meas_order_same_sn(admin_client, live_server, webdriver):
     selenium = webdriver()
     selenium.implicitly_wait(3)
     try:
@@ -195,6 +200,7 @@ def test_add_meas_order_duplicate_sn(admin_client, live_server, webdriver):
         serial_nrs = selenium.find_elements_by_id('id_serial_nr')
         for serial_nr in serial_nrs:
             serial_nr.send_keys('0000001')
+        sleep(2)
         selenium.find_element_by_name('action').click()
         assert selenium.current_url == live_server.url + '/new_item_and_order/'
         alert = selenium.find_elements_by_class_name('alert')
@@ -214,7 +220,8 @@ def test_ac_single_item_type(admin_client, live_server, webdriver):
         selenium.get(live_server + '/new_item_and_order/')
         login_as_admin(selenium)
         serial_nr = selenium.find_element_by_id('id_serial_nr')
-        suggs = selenium.find_elements_by_class_name('autocomplete-suggestions')
+        suggs = selenium.find_elements_by_class_name(
+            'autocomplete-suggestions')
         assert len(suggs) == 1
         sugg = selenium.find_elements_by_class_name('autocomplete-suggestion')
         assert len(sugg) == 0
@@ -239,13 +246,16 @@ def test_ac_single_item_select(admin_client, live_server, webdriver):
         selenium.get(live_server + '/new_item_and_order/')
         login_as_admin(selenium)
         serial_nr = selenium.find_element_by_id('id_serial_nr')
-        suggs = selenium.find_elements_by_class_name('autocomplete-suggestions')
+        suggs = selenium.find_elements_by_class_name(
+            'autocomplete-suggestions')
         assert len(suggs) == 1
-        sugg = selenium.find_elements_by_class_name('autocomplete-suggestion')
+        sugg = selenium.find_elements_by_class_name(
+            'autocomplete-suggestion')
         assert len(sugg) == 0
         serial_nr.send_keys('0')
         selenium.implicitly_wait(1)
-        sugg = selenium.find_elements_by_class_name('autocomplete-suggestion')
+        sugg = selenium.find_elements_by_class_name(
+            'autocomplete-suggestion')
         assert len(sugg) == 10
         sugg[3].click()
         name = selenium.find_element_by_id('id_name').get_attribute('value')
@@ -265,7 +275,8 @@ def test_ac_single_item_create(admin_client, live_server, webdriver):
         num_items = MeasurementItem.objects.count()
         Select(selenium.find_element_by_id('id_order_type')).select_by_index(1)
         serial_nr = selenium.find_element_by_id('id_serial_nr')
-        suggs = selenium.find_elements_by_class_name('autocomplete-suggestions')
+        suggs = selenium.find_elements_by_class_name(
+            'autocomplete-suggestions')
         assert len(suggs) == 1
         sugg = selenium.find_elements_by_class_name('autocomplete-suggestion')
         assert len(sugg) == 0
@@ -295,7 +306,8 @@ def test_ac_multi_item_select(admin_client, live_server, webdriver):
         button.click()
         button.click()
         serial_nrs = selenium.find_elements_by_id('id_serial_nr')
-        suggs = selenium.find_elements_by_class_name('autocomplete-suggestions')
+        suggs = selenium.find_elements_by_class_name(
+            'autocomplete-suggestions')
         assert len(suggs) == 3
         sugg = selenium.find_elements_by_class_name('autocomplete-suggestion')
         assert len(sugg) == 0

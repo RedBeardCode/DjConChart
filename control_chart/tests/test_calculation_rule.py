@@ -61,7 +61,7 @@ def test_create_rule_view_noname(admin_client, live_server, webdriver):
 @pytest.mark.django_db
 def test_rule_changed():
     class MockRelationManager(object):  # pylint: disable=R0903
-        def all(self):
+        def all(self):  # pylint: disable=R0201
             return []
 
     rule = CalculationRule.objects.create(
@@ -167,7 +167,7 @@ def test_list_calculation_rule(admin_client, live_server, webdriver):
         header = selenium.find_elements_by_css_selector('#page-wrapper th')
         assert len(header) == 1
         assert header[0].text == \
-               CalculationRule._meta.get_field('rule_name').verbose_name
+            CalculationRule._meta.get_field('rule_name').verbose_name
 
         for index, row in enumerate(table_rows):
             assert row.get_attribute('data-href') == \
@@ -180,7 +180,7 @@ def test_list_calculation_rule(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_list_calculation_rule_click(admin_client, live_server, webdriver):
+def test_list_calc_rule_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -191,16 +191,15 @@ def test_list_calculation_rule_click(admin_client, live_server, webdriver):
             selenium.get(live_server + '/calculation_rule/')
             table_rows = selenium.find_elements_by_class_name('clickable-row')
             table_rows[index].click()
-            assert selenium.current_url == \
-                   live_server + '/calculation_rule/{}/'.format(
-                       all_calc_rules[index].pk)
+            assert selenium.current_url == live_server + \
+                '/calculation_rule/{}/'.format(all_calc_rules[index].pk)
 
     finally:
         selenium.quit()
 
 
 @pytest.mark.django_db
-def test_calculation_rule_back(admin_client, live_server, webdriver):
+def test_calc_rule_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -213,7 +212,8 @@ def test_calculation_rule_back(admin_client, live_server, webdriver):
             selenium.get(start_url)
             selenium.get(live_server + '/calculation_rule/{}/'.format(
                 first_value.pk))
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             assert selenium.current_url == start_url
@@ -222,7 +222,7 @@ def test_calculation_rule_back(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_delete(admin_client, live_server, webdriver):
+def test_calc_rule_delete(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
     try:
@@ -237,8 +237,8 @@ def test_calculation_rule_delete(admin_client, live_server, webdriver):
                 '#page-wrapper a')
             delete_button.click()
             assert selenium.current_url == \
-                   live_server + '/calculation_rule/{}/delete/'.format(
-                       CalculationRule.objects.all().first().pk)
+                live_server + '/calculation_rule/{}/delete/'.format(
+                    CalculationRule.objects.all().first().pk)
             selenium.find_element_by_class_name('btn-warning').click()
             assert selenium.current_url == live_server + '/calculation_rule/'
     finally:
@@ -246,7 +246,7 @@ def test_calculation_rule_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_buttons_limited_user(live_server, webdriver):
+def test_calc_rule_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -263,7 +263,7 @@ def test_calculation_rule_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_buttons_change_user(live_server, webdriver):
+def test_calc_rule_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -281,7 +281,7 @@ def test_calculation_rule_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_buttons_del_user(live_server, webdriver):
+def test_calc_rule_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -299,7 +299,7 @@ def test_calculation_rule_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_buttons_add_user(live_server, webdriver):
+def test_calc_rule_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -321,7 +321,7 @@ def test_calculation_rule_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_list_new_button(admin_client, live_server, webdriver):
+def test_calc_rule_list_new_but(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -337,7 +337,7 @@ def test_calculation_rule_list_new_button(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_calculation_rule_list_new_button_limit_user(live_server, webdriver):
+def test_calc_rule_list_new_but_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()

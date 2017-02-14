@@ -46,8 +46,8 @@ def pull_session(*args, **kwargs):
 
 def autoload_server(*args, **kwargs):
     """
-    Wrapper around the bokeh autoload_server, which read the enviroment variable
-    BOKEH_SERVER to get the server address. Manly used in unit tests
+    Wrapper around the bokeh autoload_server, which read the enviroment
+    variable BOKEH_SERVER to get the server address. Manly used in unit tests
     """
     if 'BOKEH_SERVER' in os.environ:
         kwargs['url'] = os.environ['BOKEH_SERVER']
@@ -75,11 +75,15 @@ class PlotGenerator(object):
             _finished=True,
             **filter_args)
 
-        dat = vals[max(0, vals.count() - self.__max_calc_points):].to_dataframe(
-            fieldnames=['id', 'measurements__meas_item__serial_nr',
-                        '_calc_value', 'date', 'order__order_type__name',
-                        'order__order_nr', 'measurements__examiner',
-                        'measurements__remarks'])
+        dat = vals[max(0, vals.count() -
+                       self.__max_calc_points):].to_dataframe(
+                           fieldnames=['id',
+                                       'measurements__meas_item__serial_nr',
+                                       '_calc_value', 'date',
+                                       'order__order_type__name',
+                                       'order__order_nr',
+                                       'measurements__examiner',
+                                       'measurements__remarks'])
         if not dat.date.empty:
             dat['date'] = dat.date.dt.strftime('%Y-%m-%d %H:%M')
         grouped = dat.groupby('id')
@@ -109,11 +113,13 @@ class PlotGenerator(object):
     @staticmethod
     def __create_x_labels(values):
         return ['{}-{}'.format(id, sn) for id, sn in
-                zip(values['id'], values['measurements__meas_item__serial_nr'])]
+                zip(values['id'],
+                    values['measurements__meas_item__serial_nr'])]
 
     def create_x_y_values(self, index):
         """
-        Create the lists for the x and y values for the plot out of the raw_data
+        Create the lists for the x and y values for the plot out of the
+        raw_data
         :param index: Index of the filter argument set of the PlotConfig
         :return: Tuple of list of x label, list of values and the number of
         invalid values
@@ -143,8 +149,8 @@ class PlotGenerator(object):
                 continue
             document = Document()
             document.title = self.__conf.description
-            self.__factors, self.__values, num_invalid = self.create_x_y_values(
-                index)
+            self.__factors, self.__values, num_invalid = \
+                self.create_x_y_values(index)
             plot = self.__create_control_chart_hist(index)
             document.add_root(plot)
             session_id = self.__save_user_session(document, index)
@@ -250,8 +256,8 @@ class PlotGenerator(object):
         std_values = self.__values._calc_value.std()  # pylint: disable=E1101, W0212
         mean_value = self.__values._calc_value.mean()  # pylint: disable=E1101, W0212
         return mean_value, \
-               PlotAnnotation.LOWER_CONTROL_LIMIT_LEVEL * std_values, \
-               PlotAnnotation.UPPER_CONTROL_LIMIT_LEVEL * std_values
+            PlotAnnotation.LOWER_CONTROL_LIMIT_LEVEL * std_values, \
+            PlotAnnotation.UPPER_CONTROL_LIMIT_LEVEL * std_values
 
 
 def update_plot_sessions():
@@ -260,8 +266,8 @@ def update_plot_sessions():
     disconnected the session will be deleted
     """
     for usession in control_chart.models.UserPlotSession.objects.all():
-        with closing(
-                pull_session(session_id=usession.bokeh_session_id)) as session:
+        with closing(pull_session(session_id=usession.bokeh_session_id))\
+                as session:
             if len(session.document.roots) == 0:
                 # In this case, the session_id was from a dead session and
                 # calling pull_session caused a new empty session to be

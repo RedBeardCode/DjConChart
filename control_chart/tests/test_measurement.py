@@ -13,13 +13,12 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 
 from .utilies import create_grouped_users
 from .utilies import create_limited_users, login_as_limited_user
-from .utilies import create_sample_characteristic_values, wait_for_root_page
+from .utilies import create_characteristic_values, wait_for_root_page
 from .utilies import login_as_admin, create_correct_sample_data
 from ..models import Measurement, MeasurementOrder, CharacteristicValue
 
 
 # Create your tests here.
-
 
 
 def test_login_requierd(admin_client, live_server, webdriver):
@@ -83,7 +82,7 @@ def test_default_values(admin_client, live_server, webdriver):
         assert selenium.find_element_by_id('id_remarks').text == ''
         meas_item_select = Select(selenium.find_element_by_id('id_meas_item'))
         assert meas_item_select.first_selected_option.text.strip() == \
-               'Please select first the order'
+            'Please select first the order'
         meas_device = selenium.find_element_by_id('id_measurement_devices')
         assert meas_device.text.strip() == 'Please select first the order'
     finally:
@@ -113,7 +112,7 @@ def test_all_elements(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_on_change_order(admin_client, live_server, webdriver):
+def test_on_change_order(admin_client, live_server, webdriver):  # pylint: disable=R0914
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -175,18 +174,18 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
             (By.ID, 'id_meas_item'), '---------'))
         reload_order = Select(selenium.find_element_by_id('id_order'))
         assert reload_order.first_selected_option.text == \
-               reload_order.options[1].text
+            reload_order.options[1].text
         reload_order_items = Select(selenium.find_element_by_id(
             'id_order_items'))
         assert reload_order_items.first_selected_option.text == \
-               reload_order_items.options[0].text
+            reload_order_items.options[0].text
         reload_meas_items = Select(selenium.find_element_by_id('id_meas_item'))
         assert reload_meas_items.first_selected_option.text == \
-               reload_meas_items.options[0].text
+            reload_meas_items.options[0].text
         reload_meas_devices = Select(selenium.find_element_by_id(
             'id_measurement_devices'))
         assert reload_meas_devices.first_selected_option.text == \
-               reload_meas_devices.options[0].text
+            reload_meas_devices.options[0].text
     finally:
         selenium.quit()
 
@@ -194,6 +193,7 @@ def test_reload_failed_submit(admin_client, live_server, webdriver):
 @pytest.fixture(params=['Administrator', 'Examiner', 'Manager'])
 def username(request):
     return request.param
+
 
 @pytest.mark.django_db
 def test_submit(username, live_server, webdriver):  # pylint: disable=W0621
@@ -268,7 +268,8 @@ def __fill_in_single_measurement(selenium):
     order_items.select_by_index(0)
     meas_items = Select(selenium.find_element_by_id('id_meas_item'))
     meas_items.select_by_index(0)
-    meas_devices = Select(selenium.find_element_by_id('id_measurement_devices'))
+    meas_devices = Select(selenium.find_element_by_id(
+        'id_measurement_devices'))
     meas_devices.select_by_index(0)
     selenium.find_element_by_id('id_remarks').send_keys('Remark')
     file_name = selenium.find_element_by_id('id_raw_data_file')
@@ -309,7 +310,7 @@ def test_list_measurement(admin_client, live_server,  # pylint: disable=R0914
                           webdriver):
     selenium = webdriver()
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     try:
         selenium.get(live_server + '/measurement/')
         login_as_admin(selenium)
@@ -346,7 +347,7 @@ def test_list_measurement(admin_client, live_server,  # pylint: disable=R0914
 def test_list_measurement_click(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     try:
         selenium.get(live_server + '/measurement/')
         login_as_admin(selenium)
@@ -366,7 +367,7 @@ def test_list_measurement_click(admin_client, live_server, webdriver):
 def test_measurement_back(admin_client, live_server, webdriver):
     selenium = webdriver()
     create_correct_sample_data()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     try:
         selenium.get(live_server + '/measurement/')
         login_as_admin(selenium)
@@ -376,7 +377,8 @@ def test_measurement_back(admin_client, live_server, webdriver):
             selenium.get(start_url)
             url = '/measurement/{}/'.format(first_value.pk)
             selenium.get(live_server + url)
-            back_button = selenium.find_elements_by_class_name('btn-default')[2]
+            back_button = selenium.find_elements_by_class_name(
+                'btn-default')[2]
             assert back_button.text == 'Go back'
             back_button.click()
             selenium.implicitly_wait(3)
@@ -412,10 +414,10 @@ def test_measurement_delete(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_buttons_limited_user(live_server, webdriver):
+def test_measurement_buttons_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     selenium = webdriver()
     try:
         first_value = Measurement.objects.all().first()
@@ -429,10 +431,10 @@ def test_measurement_buttons_limited_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_buttons_change_user(live_server, webdriver):
+def test_measurement_buttons_cu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     selenium = webdriver()
     try:
         first_value = Measurement.objects.all().first()
@@ -447,10 +449,10 @@ def test_measurement_buttons_change_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_buttons_del_user(live_server, webdriver):
+def test_measurement_buttons_du(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     selenium = webdriver()
     try:
         first_value = Measurement.objects.all().first()
@@ -465,10 +467,10 @@ def test_measurement_buttons_del_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_buttons_add_user(live_server, webdriver):
+def test_measurement_buttons_au(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
-    create_sample_characteristic_values()
+    create_characteristic_values()
     selenium = webdriver()
     try:
         first_value = Measurement.objects.all().first()
@@ -487,7 +489,7 @@ def test_measurement_buttons_add_user(live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_list_new_button(admin_client, live_server, webdriver):
+def test_meas_list_new_but(admin_client, live_server, webdriver):
     create_correct_sample_data()
     selenium = webdriver()
     try:
@@ -503,7 +505,7 @@ def test_measurement_list_new_button(admin_client, live_server, webdriver):
 
 
 @pytest.mark.django_db
-def test_measurement_list_new_button_limit_user(live_server, webdriver):
+def test_meas_list_new_but_lu(live_server, webdriver):
     create_correct_sample_data()
     create_limited_users()
     selenium = webdriver()
@@ -521,7 +523,6 @@ def test_measurement_file_dir(live_server):  # pylint: disable=W0613
     create_grouped_users()
     create_correct_sample_data()
     num_files = len(os.listdir(settings.MEASUREMENT_FILE_DIR))
-    create_sample_characteristic_values()
+    create_characteristic_values()
     new_num_files = len(os.listdir(settings.MEASUREMENT_FILE_DIR))
-    assert  new_num_files == num_files + 19
-
+    assert new_num_files == num_files + 19

@@ -5,7 +5,7 @@
     {% include "admin_include.html" %}
 {% endblock %}
 {% block form_content %}
-    <form enctype="multipart/form-data" method="post">
+    <form enctype="multipart/form-data" method="post" xmlns="http://www.w3.org/1999/html">
         {% csrf_token %}
 
         {{ form|crispy }}
@@ -14,6 +14,7 @@
 
 
 {% block inlinescripts %}
+    </script>
     <div id="dialog-confirm" title="Measurement already exists!">
         <p id="dialog-text" style="visibility: hidden">
             Selected measurement already exists.</br>
@@ -115,5 +116,4 @@
           formatTime:'H:i',
           formatDate:'Y-m-d'
         });
-    </script>
 {% endblock %}

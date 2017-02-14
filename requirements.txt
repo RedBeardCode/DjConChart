@@ -7,3 +7,4 @@ django-pandas==0.4.1
 uwsgi
 psycopg2
 whitenoise
+django-leaflet
