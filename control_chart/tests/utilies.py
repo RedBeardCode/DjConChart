@@ -7,6 +7,7 @@ for unit tests and development
 """
 
 import os
+from random import random
 
 from django.conf import settings
 from django.contrib.auth.models import User, Permission, Group
@@ -180,6 +181,7 @@ def create_characteristic_values():
     """
     orders = MeasurementOrder.objects.all()
     count = 0
+
     for order in orders:
         cv_types = order.order_type.characteristic_values.all()
         user = User.objects.all()[0]
@@ -190,7 +192,10 @@ def create_characteristic_values():
             meas = Measurement.objects.get_or_create(**kwargs)[0]
             if hasattr(Measurement, 'position'):
                 from django.contrib.gis.geos import GEOSGeometry
-                position = GEOSGeometry('SRID=4326;POINT(0.0 0.0)')
+                long = 3 * random() / 10.0
+                lat = 3 * random() / 10.0
+                position = GEOSGeometry('SRID=4326;POINT({0} {1})'.format(
+                    7+long, 50+lat))
                 meas.position = position
             meas.measurement_devices.add(
                 cv_type.possible_meas_devices.all()[0])

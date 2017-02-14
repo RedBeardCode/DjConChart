@@ -7,7 +7,6 @@ Extending the control_chart views with map views
 
 import json
 from django.core.serializers import serialize
-from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render_to_response
 
@@ -34,7 +33,14 @@ def create_map_data(request):
         values = CharacteristicValue.objects.filter(
             _finished=True,
             **filter_args)
-        data = serialize('geojson', values,
-                         geometry_field='position')
-        return HttpResponse(data, content_type='json')
+        context = {}
+        context['data'] = serialize('geojson', values,
+                                    geometry_field='position')
+        data_val = [val.value for val in values]
+        context['heat_data'] = [(val.position.coords[1],
+                                 val.position.coords[0],
+                                 val.value) for val in values]
+        context['heat_max'] = max(data_val)
+
+        return JsonResponse(context)
     return JsonResponse({})

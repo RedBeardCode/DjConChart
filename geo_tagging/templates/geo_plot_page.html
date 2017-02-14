@@ -6,6 +6,8 @@
 {% block adminscripts %}
     {% leaflet_js %}
     {% leaflet_css %}
+    <script type="text/javascript" src="{% static "js/vendor/leaflet-heat.js" %}"></script>
+
 {% endblock %}
 
 {% block leaflet_map %}
@@ -27,10 +29,11 @@
             data: {path:'{{current_path}}', filter_args: {{ filter_args_list|safe }}, filter_index: map._container.id },
             success: function (data, textStatus, XMLHttpRequest) {
                 // Add GeoJSON layer
-                var marker = L.geoJson(data);
+                var marker = L.geoJson($.parseJSON(data['data']));
                 marker.addTo(map);
                 map.fitBounds(marker.getBounds());
-                },
+                var heat = L.heatLayer(data['heat_data'], {radius:70, blur: 30, maxZoom: 6, max: data['heat_max']}).addTo(map);
+            },
             type:'POST',
             datatype: 'JSON',
         });
