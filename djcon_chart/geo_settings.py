@@ -23,6 +23,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'geo_tagging',
     'control_chart',
+    'leaflet',
 )
 
 try:

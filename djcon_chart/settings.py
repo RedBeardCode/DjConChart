@@ -32,7 +32,6 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'reversion',
     'crispy_forms',
-    'geo_tagging',
     'control_chart',
 )
 
