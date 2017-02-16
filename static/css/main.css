@@ -102,7 +102,6 @@
     font-size: 11px;
     text-align: left;
     font-weight: bold;
-    background: #7CA0C7 url(../admin/img/default-bg.gif) top left repeat-x;
     color: #fff;
 }
 
@@ -110,8 +109,9 @@
     vertical-align: middle;
 }
 
-page-wrapper{
+#page-wrapper{
     max-width: 1300px;
+    min-width: 1200px;
 }
 
 
