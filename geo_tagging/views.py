@@ -12,6 +12,7 @@ from django.shortcuts import render_to_response
 
 from control_chart.views import create_plot_context
 from control_chart.models import CharacteristicValue
+from control_chart.plot_util import MAX_CALC_POINTS
 
 
 def plot_given_configuration(request, configuration, index=None):
@@ -33,6 +34,8 @@ def create_map_data(request):
         values = CharacteristicValue.objects.filter(
             _finished=True,
             **filter_args)
+        counts = values.count()
+        values = values[max(0, counts - MAX_CALC_POINTS):]
         context = {}
         context['data'] = serialize('geojson', values,
                                     geometry_field='position')
