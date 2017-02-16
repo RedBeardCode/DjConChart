@@ -13,7 +13,7 @@ from bokeh.client import pull_session as bokeh_pull_session
 from bokeh.client import push_session as bokeh_push_session
 from bokeh.document import Document
 from bokeh.embed import autoload_server as bokeh_autoload_server
-from bokeh.models import FactorRange, ColumnDataSource, HoverTool
+from bokeh.models import FactorRange, ColumnDataSource, HoverTool, CustomJS
 from bokeh.models import HBox
 from bokeh.plotting import Figure
 from numpy import histogram
@@ -209,6 +209,7 @@ class PlotGenerator(object):
                 plot_args['alpha'] = 0.5
             self.__values['s_fac'] = self.__factors
             col_ds = ColumnDataSource(self.__values, name='control_data')
+            col_ds.js_on_change('data', CustomJS(code="refresh_maps();"))
             plot.circle('s_fac', '_calc_value', source=col_ds, name='circle',
                         **plot_args)
             plot.line('s_fac', '_calc_value', source=col_ds, name='line',

@@ -19,9 +19,13 @@
 
 {% block inlinescripts %}
     {% include "plot_js_code.html" %}
-
+    MAP_SET = new Set([]);
     function map_data (map, options) {
-
+        MAP_SET.add(map);
+        get_map_data(map);
+    };
+    function get_map_data(map)
+    {
         var dataurl = '{% url "geo_plot_data" %}';
         // Download GeoJSON via Ajax
         $.ajax({
@@ -32,11 +36,26 @@
                 var marker = L.geoJson($.parseJSON(data['data']));
                 marker.addTo(map);
                 map.fitBounds(marker.getBounds());
-                var heat = L.heatLayer(data['heat_data'], {radius:70, blur: 30, maxZoom: 6, max: data['heat_max']}).addTo(map);
+                var heat = L.heatLayer(data['heat_data'], {radius:70, blur: 30, maxZoom: 12, max: data['heat_max']}).addTo(map);
             },
             type:'POST',
             datatype: 'JSON',
         });
+    }
+    function refresh_maps()
+    {
+
+        function refresh_one(element, index, array)
+        {
+            element.eachLayer(function(layer) {
+                if(layer instanceof L.HeatLayer)
+                {
+                    element.removeLayer(layer);
+                };
+            });
+            get_map_data(element);
+        };
+        MAP_SET.forEach(refresh_one);
     };
 
 {% endblock %}
