@@ -75,15 +75,15 @@ class PlotGenerator(object):
             _finished=True,
             **filter_args)
 
-        dat = vals[max(0, vals.count() -
-                       self.__max_calc_points):].to_dataframe(
+        dat = vals.to_dataframe(
                            fieldnames=['id',
                                        'measurements__meas_item__serial_nr',
                                        '_calc_value', 'date',
                                        'order__order_type__name',
                                        'order__order_nr',
                                        'measurements__examiner',
-                                       'measurements__remarks'])
+                                       'measurements__remarks'])[max(0, vals.count() -
+                       self.__max_calc_points):]
         if not dat.date.empty:
             dat['date'] = dat.date.dt.strftime('%Y-%m-%d %H:%M')
         grouped = dat.groupby('id')
