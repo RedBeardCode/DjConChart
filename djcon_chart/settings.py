@@ -8,6 +8,7 @@ Django settings for djcon_chart project.
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import bokeh.server
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -116,7 +117,12 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'static'),
+    bokeh.server.__path__[0] + os.sep + 'static',
 )
+
+
+
+
 
 try:
     import whitenoise  # pylint: disable=W0611

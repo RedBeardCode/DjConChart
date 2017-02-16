@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/
 import os
 from subprocess import Popen
 import socket
+import bokeh.server
+import leaflet
 
 from django.core.wsgi import get_wsgi_application
 
@@ -48,7 +50,9 @@ application = get_wsgi_application()  # pylint: disable=C0103
 try:
     from whitenoise.django import DjangoWhiteNoise
     application = DjangoWhiteNoise(application)  # pylint: disable=C0103,R0204
-    application.add_files(os.environ['BOKEH_STATIC'], prefix='bokeh/')
+    application.add_files(bokeh.server.__path__[0] + os.sep + 'static',
+                          prefix='bokeh/', )
+    application.add_files(leaflet.__path__[0] + os.sep + 'static')
 except ImportError:
     pass
 except KeyError:
