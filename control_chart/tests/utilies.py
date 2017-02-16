@@ -186,27 +186,47 @@ def create_characteristic_values():
         cv_types = order.order_type.characteristic_values.all()
         user = User.objects.all()[0]
         item = order.measurement_items.all()[0]
-        for cv_type in cv_types:
-            kwargs = {'date': timezone.now(), 'order': order,
-                      'meas_item': item, 'examiner': user}
-            meas = Measurement.objects.get_or_create(**kwargs)[0]
-            if hasattr(Measurement, 'position'):
-                from django.contrib.gis.geos import GEOSGeometry
-                long = 3 * random() / 10.0
-                lat = 3 * random() / 10.0
-                position = GEOSGeometry('SRID=4326;POINT({0} {1})'.format(
-                    7+long, 50+lat))
-                meas.position = position
-            meas.measurement_devices.add(
-                cv_type.possible_meas_devices.all()[0])
-            meas.order_items.add(cv_type)
-            meas.remarks = str(cv_type)
-            raw_filename = os.path.join(settings.BASE_DIR,
-                                        'samples_rsc/erste_messung.txt')
-            meas.raw_data_file = File(open(raw_filename, 'r'))
-            meas.save()
-            count += 1
+        create_new_measurement(order, item)
 
+
+def create_new_measurement(order, meas_item, cv_type_ids=None):
+
+    user = User.objects.all()[0]
+    cv_types = order.order_type.characteristic_values.all()
+    if cv_type_ids:
+        cv_types = [cv_types[i] for i in cv_type_ids]
+    for cv_type in cv_types:
+        kwargs = {'date': timezone.now(), 'order': order,
+                  'meas_item': meas_item, 'examiner': user}
+        meas = Measurement.objects.get_or_create(**kwargs)[0]
+        if hasattr(Measurement, 'position'):
+            from django.contrib.gis.geos import GEOSGeometry
+            long = 3 * random() / 10.0
+            lat = 3 * random() / 10.0
+            position = GEOSGeometry('SRID=4326;POINT({0} {1})'.format(
+                7 + long, 50 + lat))
+            meas.position = position
+        meas.measurement_devices.add(
+            cv_type.possible_meas_devices.all()[0])
+        meas.order_items.add(cv_type)
+        meas.remarks = str(cv_type)
+        raw_filename = os.path.join(settings.BASE_DIR,
+                                    'samples_rsc/erste_messung.txt')
+        meas.raw_data_file = File(open(raw_filename, 'r'))
+        meas.save()
+
+
+def create_item_order_meas(order_type, product):
+    serial_nr = int(random() * 1e10)
+    name = '{0}: {1}'.format(product.product_name, serial_nr)
+    item = MeasurementItem.objects.get_or_create(product=product,
+                                                 serial_nr=serial_nr,
+                                                 name=name)[0]
+    item.save()
+    order = MeasurementOrder.objects.create(order_type=order_type)
+    order.measurement_items.add(item)
+    order.save()
+    create_new_measurement(order, item)
 
 def create_plot_config():
     """
