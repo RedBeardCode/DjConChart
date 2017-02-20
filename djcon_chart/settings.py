@@ -121,9 +121,6 @@ STATICFILES_DIRS = (
 )
 
 
-
-
-
 try:
     import whitenoise  # pylint: disable=W0611
     STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'

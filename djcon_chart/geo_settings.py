@@ -6,9 +6,7 @@ Django settings for djcon_chart project.
 
 """
 
-from .settings import *
-
-
+from .settings import *  # pylint: disable=W0401, W0614
 
 
 INSTALLED_APPS = (

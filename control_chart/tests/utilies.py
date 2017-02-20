@@ -180,17 +180,18 @@ def create_characteristic_values():
     automatically
     """
     orders = MeasurementOrder.objects.all()
-    count = 0
-
     for order in orders:
-        cv_types = order.order_type.characteristic_values.all()
-        user = User.objects.all()[0]
         item = order.measurement_items.all()[0]
         create_new_measurement(order, item)
 
 
 def create_new_measurement(order, meas_item, cv_type_ids=None):
-
+    """
+    Creates a new test measurement for the given measurement order,
+    measurement item and Characteristic value type. If the characteristic
+    value type is None measurements for all types in the measurement order
+    will be created
+    """
     user = User.objects.all()[0]
     cv_types = order.order_type.characteristic_values.all()
     if cv_type_ids:
@@ -217,6 +218,10 @@ def create_new_measurement(order, meas_item, cv_type_ids=None):
 
 
 def create_item_order_meas(order_type, product):
+    """
+    Helper to create a measurement item, measurement order and measurement for
+    the given measurement order definition and product.
+    """
     serial_nr = int(random() * 1e10)
     name = '{0}: {1}'.format(product.product_name, serial_nr)
     item = MeasurementItem.objects.get_or_create(product=product,
@@ -227,6 +232,7 @@ def create_item_order_meas(order_type, product):
     order.measurement_items.add(item)
     order.save()
     create_new_measurement(order, item)
+
 
 def create_plot_config():
     """
