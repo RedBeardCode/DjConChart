@@ -392,13 +392,18 @@ def save_position_in_cv(instance, update_fields, **kwargs):  # pylint: disable=W
         if hasattr(instance, 'position'):
             from django.contrib.gis.geos import LineString
             points = []
+            altitude = 0.0
             for meas in instance.measurements.all():
                 points.append(meas.position)
+                altitude += float(meas.altitude)
             if len(points) > 1:
                 instance.position = LineString(points).centroid
             elif len(points) == 1:
                 instance.position = points[0]
-            instance.save(update_fields=['position'])
+            count = instance.measurements.count()
+            if count:
+                instance.altitude = altitude / instance.measurements.count()
+            instance.save(update_fields=['position', 'altitude'])
 
 
 class CalcValueQuerySet(DataFrameQuerySet):

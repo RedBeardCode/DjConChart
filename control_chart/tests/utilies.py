@@ -196,6 +196,7 @@ def create_new_measurement(order, meas_item, cv_type_ids=None):
     cv_types = order.order_type.characteristic_values.all()
     if cv_type_ids:
         cv_types = [cv_types[i] for i in cv_type_ids]
+    measurements = []
     for cv_type in cv_types:
         kwargs = {'date': timezone.now(), 'order': order,
                   'meas_item': meas_item, 'examiner': user}
@@ -207,6 +208,7 @@ def create_new_measurement(order, meas_item, cv_type_ids=None):
             position = GEOSGeometry('SRID=4326;POINT({0} {1})'.format(
                 7 + long, 50 + lat))
             meas.position = position
+            meas.altitude = random()
         meas.measurement_devices.add(
             cv_type.possible_meas_devices.all()[0])
         meas.order_items.add(cv_type)
@@ -215,6 +217,9 @@ def create_new_measurement(order, meas_item, cv_type_ids=None):
                                     'samples_rsc/erste_messung.txt')
         meas.raw_data_file = File(open(raw_filename, 'r'))
         meas.save()
+        meas.refresh_from_db()
+        measurements.append(meas)
+    return measurements
 
 
 def create_item_order_meas(order_type, product):
@@ -231,7 +236,7 @@ def create_item_order_meas(order_type, product):
     order = MeasurementOrder.objects.create(order_type=order_type)
     order.measurement_items.add(item)
     order.save()
-    create_new_measurement(order, item)
+    return create_new_measurement(order, item)
 
 
 def create_plot_config():

@@ -97,9 +97,20 @@ def fix_webdriver(request):
 
 
 @pytest.fixture
+def test_data():
+    """
+    Creates test data in the database
+    """
+    create_correct_sample_data()
+    create_limited_users()
+    create_characteristic_values()
+
+
+@pytest.fixture
 def working_instance(request, live_server,
                      fix_webdriver,      # pylint: disable=W0621
-                     transactional_db):  # pylint: disable=W0613
+                     transactional_db,  # pylint: disable=W0613
+                     test_data):  # pylint: disable=W0613,W0621
     """
     Create ready to use testing enviroment, with sample datas in the db and
     webdriver instance which is logged in as admin
@@ -110,9 +121,6 @@ def working_instance(request, live_server,
         """
         selenium.quit()
 
-    create_correct_sample_data()
-    create_limited_users()
-    create_characteristic_values()
     selenium = fix_webdriver()
     selenium.get(live_server.url)
     login_as_admin(selenium)
