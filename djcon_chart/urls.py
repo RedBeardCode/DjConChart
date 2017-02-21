@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('geo_tagging.urls')),
     url(r'', include('control_chart.urls')),
+    url(r'api/', include('rest_api.urls')),
     url(r'^login/$', login, name='mysite_login'),
     url(r'^logout/$', logout, {'next_page': '/'},
         name='mysite_logout')

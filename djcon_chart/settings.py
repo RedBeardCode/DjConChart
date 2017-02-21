@@ -33,6 +33,8 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'reversion',
     'crispy_forms',
+    'rest_framework',
+    'rest_api',
     'control_chart',
 )
 

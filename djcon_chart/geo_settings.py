@@ -18,6 +18,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'reversion',
+    'rest_framework',
+    'rest_api',
     'crispy_forms',
     'geo_tagging',
     'control_chart',

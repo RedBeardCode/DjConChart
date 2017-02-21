@@ -8,3 +8,4 @@ uwsgi
 psycopg2
 whitenoise
 django-leaflet
+djangorestframework
