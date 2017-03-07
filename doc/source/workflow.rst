@@ -36,3 +36,13 @@ a idea of the meaning of the different tables please have a look at :ref:`Overvi
  - :ref:`CalculationRule <CalculationRule>`
  - :ref:`CharacteristicValueDefinition <CharacteristicValue>`
  - :ref:`MeasurementOrderDefinition <MeasurementOrder>`
+
+
+Perparing the item level
+^^^^^^^^^^^^^^^^^^^^^^^^
+Before you can make a measurement you first create the MeasurementItem and a
+Order for measurement which should be made with the item.
+
+ - :ref:`MeasurementItem <ProductItem>`
+ - :ref:`MeasurementOrder`
+
