@@ -44,3 +44,7 @@ urls
     :members:
 
 
+views
+^^^^^
+.. automodule:: control_chart.views
+    :members:

@@ -7,6 +7,7 @@ API Reference
 
    djcon_chart
    control_chart
+   geo_tagging
    manage
 
 

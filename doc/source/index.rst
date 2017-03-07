@@ -27,6 +27,7 @@ Features
 * Calculation of characteristic values for the control chart out of raw data
 * Version control of the calculation rules for the characteristic data
 * Dashboard show always the latest measurements
+* Geo tagging of measurment values
 
 Following Features
 ------------------
@@ -43,6 +44,7 @@ Overview
    gettingstarted
    overview
    deployment
+   workflow
    api
 
 

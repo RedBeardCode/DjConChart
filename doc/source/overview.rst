@@ -1,14 +1,18 @@
+.. _`Overview`:
+
 Overview
 --------
 
-Imported classes
-^^^^^^^^^^^^^^^^
+Important classes
+^^^^^^^^^^^^^^^^^
 
 To understand how to work with DjConChart you have to know some classes.
 As a start I will introduce you this classes and afterwards I will describe
 the workflow to see how the classes work together. For easier understanding I
 will use the example of a restaurant which serves breakfast. Of course the best
 selling dish are the famous Spam and Eggs.
+
+.. _`ProductItem`:
 
 Product and MeasurementItem
 """""""""""""""""""""""""""
@@ -19,12 +23,14 @@ product. In our example the product is the dish you offer for example
 The plate on the other side is the MeasurementItem. So the MeasurementItem is
 the instance of the a product with which you make the measurements.
 
+.. _`MeasurementDevice`:
 
 MeasurementDevice
 """""""""""""""""
 Is simply the measurement device used to make a measurement like a scale to
 measurement the amount of spam you serve.
 
+.. _`CalculationRule`:
 
 CalculationRule
 """""""""""""""
@@ -42,6 +48,8 @@ to be recalculated. This is handled by DjConChart. Also DjConChart has a
 integrated versioning system for the calculation rules. So it is possible to see
 who changed the rule and when as well as reverting the changing.
 
+.. _`MeasurementTag`:
+
 MeasurementTag
 """"""""""""""
 Some times you need more than one measurement to calculate a characteristic
@@ -53,6 +61,8 @@ you could use the tags "spam" and "egg" to distinguish the two measurements.
 If you don't need multiple measurements for a characteristic value you don't
 have to add a tag to the measurement.
 
+.. _`CharacteristicValue`:
+
 CharacteristicValueDefinition and CharacteristicValue
 """""""""""""""""""""""""""""""""""""""""""""""""""""
 The characteristic values are the value you want to control in a control chart.
@@ -62,6 +72,8 @@ example you would make one CharateristicValueDefinition for the weight of spam
 and one for the weight of the eggs and one for the weight of the whole dish.
 The definition has a name like "Weight of spam" and is connected to a
 calculation rule.
+
+.. _`MeasurementOrder`:
 
 MeasurementOrderDefinition and MeasurementOrder
 """""""""""""""""""""""""""""""""""""""""""""""
@@ -74,6 +86,7 @@ not the whole dish because it will be calculated out of the sum. And than we
 will create a MeasurementOrder for each dish we serve. So the dish is linked
 with the order definition and it is defined which measurements have to be taken.
 
+.. _`Measurement`:
 
 Measurement
 """""""""""
