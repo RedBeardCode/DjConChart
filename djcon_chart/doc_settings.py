@@ -12,24 +12,6 @@ DEBUG = True
 
 # Application definition
 
-INSTALLED_APPS += (
-    'debug_toolbar',
-)
-
-MIDDLEWARE += (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'gis',
-        'USER': 'docker',
-        'PASSWORD': 'docker',
-        'HOST': 'localhost',
-        'PORT': 25432,
-    }
-}
 
 
 DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL': ''}
